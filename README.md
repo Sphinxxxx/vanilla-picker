@@ -6,6 +6,8 @@ A simple, easy to use, versatile and customisable Javascript colour picker.
 
 Demo: http://lonely-pixel.com/projects/picker
 
+And on codepen: http://codepen.io/suffick/pen/DpnmA
+
 
 Using Picker is as simple as this: 
 
