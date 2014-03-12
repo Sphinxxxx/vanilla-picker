@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Picker</title>
+
+    <script src="src/picker.js"></script>
+
+    <!--<script src="dist/picker.min.js"></script>-->
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        body {
+            background: #239feb;
+        }
+        
+        #parent {
+            
+            margin: 100px auto;
+            background: #46b7fd;
+            color: #fff;
+            padding: 10px 16px;
+            width: 100px;
+            font-family: sans-serif;
+            font-weight: 100;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="parent">click me</div>
+
+    <script>
+        var picker = new Picker(document.getElementById('parent'));
+        
+        picker.on_done = function(colour) {
+            
+            document.getElementById('parent').style.background = colour.rgba().toString();
+        }
+        
+        document.getElementById('parent').onclick = function() {
+            
+            picker.show();
+        };
+    </script>
+
+</body>
+
+</html>

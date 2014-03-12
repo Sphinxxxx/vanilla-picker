@@ -1,0 +1,15 @@
+{
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.7"
+  },
+  "name": "picker",
+  "version": "1.0.0",
+  "main": "Gruntfile.js",
+  "author": "lonely-pixel.com",
+  "license": "ISC"
+}
