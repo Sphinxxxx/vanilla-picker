@@ -27,7 +27,7 @@ picker.on_done = function(colour) {
 
 Explained: 
 
-```javascript
+```html
 <script src="picker.min.js"></script>
 
 <div id="parent">click me</div>
