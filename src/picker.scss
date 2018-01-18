@@ -1,0 +1,134 @@
+.picker_wrapper {
+  position: absolute;
+  display: block;
+  width: 272px;
+  padding: 8px 0 8px 8px;
+  box-sizing: border-box;
+  overflow: visible;
+  cursor: default;
+  pointer-events: auto;
+  z-index: 1;
+  /* Initial selection */
+  color: red;
+
+  &, &::before, &::after {
+    background: #f2f2f2;
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.4);
+  }
+
+  //Arrow
+  &::before, &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -99;
+  }
+  &::before {
+    width: 30px;
+    height: 30px;
+    transform: skew(45deg);
+    transform-origin: 0 100%;
+  }
+  &::after {
+    width: 40px;
+    height: 40px;
+    box-shadow: none;
+  }
+  
+  //UI layout
+  > div {
+    margin: 8px;
+    float: left;
+  }
+}
+
+.picker_hue {
+  width: 240px;
+  height: 20px;
+  position: relative;
+  margin-left: 10px;
+  background-image: linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);
+  outline: 1px solid #cccccc;
+}
+
+.picker_sl {
+  width: 203px;
+  height: 203px;
+  position: relative;
+  outline: 1px solid #cccccc;
+  background-color: red;
+  /* https://css-tricks.com/thing-know-gradients-transparent-black/ */
+  background-image: linear-gradient(0deg, black, rgba(0, 0, 0, 0)), linear-gradient(90deg, white, rgba(255, 255, 255, 0));
+}
+
+.picker_alpha {
+  width: 20px;
+  height: 200px;
+  position: relative;
+  margin-left: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E") top / contain white;
+  outline: 1px solid #cccccc;
+}
+
+.picker_selector {
+  position: absolute;
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: -12px;
+  cursor: pointer;
+  border: 2px solid white;
+  box-sizing: border-box;
+  border-radius: 20px;
+  box-shadow: 0 0 3px 1px #67b9ff;
+  background: currentColor;
+}
+
+.picker_slider .picker_selector {
+  border-radius: 2px;
+}
+
+.picker_hue .picker_selector {
+  top: 50%;
+}
+
+.picker_sl .picker_selector {
+  left: 100%;
+}
+
+.picker_alpha .picker_selector {
+  left: 50%;
+  background: none;
+}
+
+.picker_sample {
+  width: 170px;
+  height: 30px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E") left top / 20px white;
+  position: relative;
+  margin-top: 10px;
+  outline: 1px solid #aaaaaa;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: currentColor;
+  }
+}
+
+.picker_done {
+  width: 53px;
+  height: 30px;
+  line-height: 30px;
+  color: #444444;
+  background: #e2e2e2;
+  outline: 1px solid #cccccc;
+  box-shadow: 0 0 3px 1px #eeeeee;
+  text-align: center;
+  cursor: pointer;
+}

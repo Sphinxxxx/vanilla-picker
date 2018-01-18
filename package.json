@@ -1,15 +1,32 @@
 {
+  "name": "Picker",
+  "version": "2.0.0-alpha.1",
+  "description": "A simple, easy to use, versatile and customisable Javascript colour picker.",
+  "author": "Adam Brooks (https://github.com/dissimulate), Andreas Borgen (https://github.com/Sphinxxxx)",
+  "homepage": "https://github.com/Sphinxxxx/Picker",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sphinxxxx/Picker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sphinxxxx/Picker/issues"
+  },
+  "main": "dist/picker.js",
   "engines": {
     "node": ">= 0.10.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.7"
-  },
-  "name": "picker",
-  "version": "1.0.0",
-  "main": "Gruntfile.js",
-  "author": "lonely-pixel.com",
-  "license": "ISC"
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "grunt": "~1.0.1",
+    "grunt-babel": "^7.0.0",
+    "grunt-banner": "^0.6.0",
+    "grunt-contrib-concat": "~1.0.1",
+    "grunt-contrib-uglify": "~3.3.0",
+    "grunt-replace": "^1.0.1",
+    "grunt-sass": "^2.0.0",
+    "load-grunt-tasks": "^3.5.2"
+  }
 }

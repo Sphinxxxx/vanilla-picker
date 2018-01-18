@@ -1,35 +1,123 @@
 module.exports = function(grunt) {
+  
+  const pkg = grunt.file.readJSON('package.json'),
+        srcJS = 'src/picker.js',
+        destJS = 'dist/picker.js',
+        srcCSS = 'src/picker.scss',
+        destCSS = 'dist/picker.css';
 
+  //Copied the short default from https://www.npmjs.com/package/add-banner
+  const myBanner = `/*!
+ * <%= pkg.name %> <<%= pkg.homepage %>>
+ * <%= pkg.description %>
+ * Version <%= pkg.version %>  <%= grunt.template.today("yyyy-mm-dd") %>
+ *
+ * Copyright (c) 2014-<%= grunt.template.today("yyyy") %> <%= pkg.author %>
+ * Licensed under the <%= pkg.license %> license.
+ */`;
+  
+  
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-      ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
-    concat: {
-      options: {
-        separator: ';'
-      },
-      dist: {
-        src: ['src/**/*.js'],
-        dest: 'dist/<%= pkg.name %>.js'
+    pkg: pkg, //grunt.file.readJSON('package.json'),
+    
+    
+    /*
+      1: The first thing we need to do is insert the CSS into the JS file,
+         because we use the ES6 `` string delimiters as a better-than-nothing solution to avoid conflicts with strings in the CSS
+    */
+
+    //https://www.npmjs.com/package/grunt-sass
+    sass: {
+  		options: {
+  			//sourceMap: true,
+  			outputStyle: 'compressed',
+  		},
+  		myDistBuild: {
+    		src: srcCSS,
+    		dest: destCSS,
+  		}
+  	},
+	  //https://www.npmjs.com/package/grunt-replace
+  	replace: {
+      myDistBuild: {
+        options: {
+          patterns: [
+            {
+              match: '## PLACEHOLDER-CSS ##',
+              replacement: '<%= grunt.file.read("' +destCSS+ '") %>',
+            }
+          ],
+          usePrefix: false
+        },
+    		src: srcJS,
+    		dest: destJS,
+      }
+    },
+
+
+    /*
+      2: Transpile and minify the JS
+    */
+
+    //https://github.com/babel/grunt-babel
+    babel: {
+    	options: {
+    	  //Not a valid option
+    	  //  banner: myBanner,
+    	  //Removed by the other "comments: false" option
+    	  //  auxiliaryCommentBefore: myBanner,
+    	  
+    	  moduleId: pkg.name,
+    		presets: ['env'],
+    		plugins: ["transform-es2015-modules-umd"], //https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-umd
+    		comments: false,
+    		//compact: true, //Removes all whitespace
+    	},
+    	myDistBuild: {
+    		//files: {
+    		//	destJS /* ES5 target */: destJS /* ES6 source */,
+    		//},
+    		src: destJS,
+    		dest: destJS,
+    	}
+    },
+    //https://github.com/mattstyles/grunt-banner
+    usebanner: {
+      myDistBuild: {
+        options: {
+          banner: myBanner,
+        },
+        src: [ destJS ],
       }
     },
     uglify: {
       options: {
-        banner: '/*\nCopyright (c) 2014 <%= pkg.author %>\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n*/\n\n/* <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+        banner: myBanner,
       },
-      dist: {
-        files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-        }
+      myDistBuild: {
+    		src: destJS,
+    		dest: destJS.replace(/\.js$/, '.min.js'),
       }
-    }
+    },
+    
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('default', ['concat', 'uglify']);
+  //https://github.com/sindresorhus/load-grunt-tasks
+  //
+  //  //https://github.com/babel/grunt-babel
+  //  grunt.loadNpmTasks('grunt-babel');
+  //
+  //  grunt.loadNpmTasks('grunt-contrib-uglify');
+  //  grunt.loadNpmTasks('grunt-contrib-concat');
+  //
+  require('load-grunt-tasks')(grunt); // npm install --save-dev load-grunt-tasks
+
+  grunt.registerTask('cleanup', '', function() {
+    //Delete the no longer needed CSS file
+    grunt.file.delete(destCSS);
+  });
+  
+  grunt.registerTask('default', ['sass', 'replace', 'babel', 'usebanner', 'uglify', 'cleanup']);
+
 };

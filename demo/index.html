@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Picker</title>
+
+    <!--link href="../src/picker.scss" rel="stylesheet">
+    <script src="../src/picker.js"></script-->
+
+    <script src="../dist/picker.min.js?v2"></script>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        body {
+            height: 100vh;
+            background-color: white;
+            background-image: repeating-linear-gradient( 45deg, skyblue 0, skyblue 1px, transparent 0, transparent 40px),
+                              repeating-linear-gradient(135deg, skyblue 0, skyblue 1px, transparent 0, transparent 40px);
+        }
+        
+        .parent {
+            position: absolute;
+            background: dodgerblue;
+            color: white;
+            padding: 10px 16px;
+            width: 100px;
+            font-family: sans-serif;
+            font-weight: 100;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="parent" style="top:20%;left:30%">click me</div>
+    <div class="parent" style="top:30%;left:40%">..or me!</div>
+    <div class="parent" style="top:40%;left:10%">..or me?</div>
+
+    <script>
+        var parents = Array.prototype.slice.call(document.querySelectorAll('.parent'));
+        parents.forEach(function(p) {
+
+            var picker = new Picker(p);
+            picker.on_done = function(colour) {
+                p.style.background = colour.rgba().toString();
+            };
+            
+            p.onclick = function() {
+                picker.show();
+            };
+        });
+    </script>
+
+</body>
+
+</html>
