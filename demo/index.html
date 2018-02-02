@@ -8,7 +8,7 @@
     <!--link href="../src/picker.scss" rel="stylesheet">
     <script src="../src/picker.js"></script-->
 
-    <script src="../dist/picker.min.js?v2"></script>
+    <script src="../dist/picker.js?v2"></script>
 
     <style>
         * {
@@ -48,8 +48,8 @@
         parents.forEach(function(p) {
 
             var picker = new Picker(p);
-            picker.on_done = function(colour) {
-                p.style.background = colour.rgba().toString();
+            picker.onDone = function(colour) {
+                p.style.background = colour.rgbaString;
             };
             
             p.onclick = function() {

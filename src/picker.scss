@@ -54,13 +54,37 @@
 }
 
 .picker_sl {
+  $desat:  #808080;
+  //https://css-tricks.com/thing-know-gradients-transparent-black/
+  $desat0: rgba($desat, 0);
+  $white0: rgba( white, 0);
+  $black0: rgba( black, 0);
+
   width: 203px;
   height: 203px;
   position: relative;
   outline: 1px solid #cccccc;
   background-color: red;
-  /* https://css-tricks.com/thing-know-gradients-transparent-black/ */
-  background-image: linear-gradient(0deg, black, rgba(0, 0, 0, 0)), linear-gradient(90deg, white, rgba(255, 255, 255, 0));
+  background-image:
+    /*
+      Different SL pickers
+      https://en.wikipedia.org/wiki/HSL_and_HSV
+    */
+    
+    //HSV
+    //linear-gradient( 0deg, black, $black0),
+    //linear-gradient(90deg, white, $white0);
+
+    //HSL:
+    linear-gradient(180deg, white,  $white0 50%), 
+    linear-gradient(  0deg, black,  $black0 50%), 
+    linear-gradient( 90deg, $desat, $desat0);
+
+    //Hue, chroma, lightness (almost):
+    //linear-gradient( 45deg, #eee   50%, transparent 50%), //Masking the triangle
+    //linear-gradient(135deg, white   0%, $white0  50%),   //Lightness, white
+    //linear-gradient(-45deg, black   0%, $black0  50%),  //Lightness, black
+    //linear-gradient( 45deg, $desat 50%, $desat0 100%); //Saturation
 }
 
 .picker_alpha {

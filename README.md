@@ -3,12 +3,6 @@ Picker
 
 A simple, easy to use, versatile and customisable Javascript colour picker.
 
-
-Demo: http://lonely-pixel.com/projects/picker
-
-And on codepen: http://codepen.io/suffick/pen/DpnmA
-
-
 Using Picker is as simple as this: 
 
 ```javascript
@@ -17,17 +11,19 @@ var parent = document.getElementById('parent');
 var picker = new Picker(parent);
 
 parent.onclick = function() {
-
     picker.show();
 };
 
-picker.on_done = function(colour) {
-
-    parent.style.background = colour.rgba().toString();
+picker.onDone = function(colour) {
+    parent.style.background = colour.rgbaString;
 };
 ```
 
-Explained: 
+Demo: https://rawgit.com/Sphinxxxx/Picker/master/demo/index.html
+
+
+Explained
+---------
 
 ```html
 <script src="picker.min.js"></script>
@@ -35,7 +31,6 @@ Explained:
 <div id="parent">click me</div>
 
 <script>
-
 
     /* STEP 1 */
 
@@ -51,7 +46,6 @@ Explained:
     /* Set Picker to open when you want, when the parent is clicked for example. */
 
     parent.onclick = function() {
-
         picker.show();
     };
 
@@ -59,28 +53,35 @@ Explained:
 
     /*
     You can do what you want with the chosen colour using two events,
-    on_change and on_done.
+    onChange and onDone.
     */
 
-    picker.on_done = function(colour) {
+    picker.onDone = function(colour) {
 
         /*
-        You can get the colour using the hsl(), hsla(), rgb(), rgba() and hex() functions.
+        You can get the colour components from
+            colour.rgba
+            colour.hsla  (all values between 0 and 1, inclusive)
 
-        Each function returns an object containing each component (e.g r, g and b) and a
-        toString() function, which returns the colour as a string to use with CSS or JS.
-        E.g 'rgba(255, 0, 0, 0.4)'.
+        ..or ready to use CSS values from
+            colour.rgbString
+            colour.rgbaString
+            colour.hslString
+            colour.hslaString
+            colour.hex   (eight digit #RRGGBBAA, not supported in all browsers)
         */
 
-        parent.style.background = colour.rgba().toString();
+        parent.style.background = colour.rgbaString;
     };
 
-    /* on_change is called every time the selection is changed without clicking 'ok' */
+    /* onChange is called every time the selection is changed without clicking 'ok' */
 
 </script>
 ```
 
-There are also a number of options you can choose. 
+
+TODO: Options
+-------------
 
 ```javascript
 var picker = new Picker({
@@ -113,14 +114,3 @@ var picker = new Picker({
     arrow_size: (number)
 });
 ```
-
-
-You can customise the CSS in the source file, or do it dynamically like so: 
-
-```javascript
-picker.wrapper.background = '#333';
-```
-
-Easy! 
-
-Picker is in it's early stages, and although it's fully functional and usable, there could be a bug or two. Please let me know if you find a problem, have feedback or would like to contact me for any other reason via contact@lonely-pixel.com. 
