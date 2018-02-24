@@ -1,0 +1,5 @@
+//For gulpfile.babel.js
+//https://github.com/gulpjs/gulp#use-latest-javascript-version-in-your-gulpfile
+{
+  "presets": [ "env" ]
+}

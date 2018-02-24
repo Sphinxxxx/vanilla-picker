@@ -19,7 +19,7 @@ picker.onDone = function(colour) {
 };
 ```
 
-Demo: https://rawgit.com/Sphinxxxx/Picker/master/demo/index.html
+**Demo:** https://rawgit.com/Sphinxxxx/Picker/master/demo/index.html
 
 
 Explained

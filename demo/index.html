@@ -5,10 +5,10 @@
 <head>
     <title>Picker</title>
 
-    <!--link href="../src/picker.scss" rel="stylesheet">
-    <script src="../src/picker.js"></script-->
+    <link href="../src/_picker.css" rel="stylesheet">
+    <!--script src="../src/picker.js"></script-->
 
-    <script src="../dist/picker.js?v2"></script>
+    <script src="../dist/vanilla-picker.min.js"></script>
 
     <style>
         * {
@@ -45,9 +45,12 @@
 
     <script>
         var parents = Array.prototype.slice.call(document.querySelectorAll('.parent'));
-        parents.forEach(function(p) {
+        parents.forEach(function(p, i) {
 
             var picker = new Picker(p);
+            if(i === 0) {
+                picker.setColor('#dbeb');
+            }
             picker.onDone = function(colour) {
                 p.style.background = colour.rgbaString;
             };

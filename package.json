@@ -1,7 +1,7 @@
 {
-  "name": "Picker",
-  "version": "2.0.0-alpha.2",
-  "description": "A simple, easy to use, versatile and customisable Javascript colour picker.",
+  "name": "vanilla-picker",
+  "version": "2.0.0-alpha.3",
+  "description": "A simple, easy to use, versatile and customizable Javascript color picker.",
   "author": "Adam Brooks (https://github.com/dissimulate), Andreas Borgen (https://github.com/Sphinxxxx)",
   "homepage": "https://github.com/Sphinxxxx/Picker",
   "license": "ISC",
@@ -12,21 +12,34 @@
   "bugs": {
     "url": "https://github.com/Sphinxxxx/Picker/issues"
   },
-  "main": "dist/picker.js",
-  "engines": {
-    "node": ">= 0.10.0"
+  "main": "dist/vanilla-picker.js",
+  "module": "src/picker.js",
+  "files": [
+    "src/",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
-    "grunt": "~1.0.1",
-    "grunt-babel": "^7.0.0",
-    "grunt-banner": "^0.6.0",
-    "grunt-contrib-concat": "~1.0.1",
-    "grunt-contrib-uglify": "~3.3.0",
-    "grunt-replace": "^1.0.1",
-    "grunt-sass": "^2.0.0",
-    "load-grunt-tasks": "^3.5.2"
+    "babel-register": "^6.26.0",
+    "gulp": "^4.0.0",
+    "gulp-file": "^0.4.0",
+    "gulp-header": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
+    "gulp-sass": "^3.1.0",
+    "gulp-strip-comments": "^2.5.2",
+    "gulp-uglify": "^3.0.0",
+    "rollup": "^0.56.2",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-node-resolve": "^3.0.3"
+  },
+  "dependencies": {
+    "@sphinxxxx/color-conversion": "^2.0.0-alpha.3",
+    "drag-tracker": "^0.4.1"
   }
 }
