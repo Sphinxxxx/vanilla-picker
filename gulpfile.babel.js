@@ -96,8 +96,27 @@ gulp.task('build', function() {
                     .pipe(rename({ extname: '.min.js' }))
                     .pipe(uglify())
         
-                    .pipe(header(myBanner, { pkg : pkg }))
+                    .pipe(header(myBanner, { pkg: pkg }))
                     .pipe(gulp.dest(outFolder));
             });
     });
 });
+
+
+//https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglobs-opts-fn
+//https://css-tricks.com/gulp-for-beginners/
+gulp.task('watch', function(){
+    console.log('** Listening for file changes...');
+
+    var watcher = gulp.watch('src/**/*.*', gulp.parallel('build'));
+    
+    watcher.on('change', function(path, stats) {
+      console.log('File ' + path + ' was changed');
+    });
+    watcher.on('unlink', function(path) {
+      console.log('File ' + path + ' was removed');
+    });
+});
+
+
+gulp.task('default', gulp.series('build', 'watch'));

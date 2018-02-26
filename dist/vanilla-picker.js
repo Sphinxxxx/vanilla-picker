@@ -1,8 +1,8 @@
 /*!
- * vanilla-picker v2.0.0-alpha.3
- * https://github.com/Sphinxxxx/Picker
+ * vanilla-picker v2.0.0-alpha.7
+ * https://github.com/Sphinxxxx/vanilla-picker
  *
- * Copyright 2017-2018 Adam Brooks (https://github.com/dissimulate), Andreas Borgen (https://github.com/Sphinxxxx)
+ * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
  * Released under the ISC license.
  */
 (function (global, factory) {
@@ -515,61 +515,102 @@ function dragTracker(options) {
     }
 }
 
-document.documentElement.firstElementChild 
-.appendChild(document.createElement('style')).textContent = '.picker_wrapper{position:absolute;display:block;width:272px;padding:8px 0 8px 8px;box-sizing:border-box;overflow:visible;cursor:default;pointer-events:auto;z-index:1;color:red}.picker_wrapper,.picker_wrapper::before,.picker_wrapper::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,0.4)}.picker_wrapper::before,.picker_wrapper::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper::before{width:30px;height:30px;transform:skew(45deg);transform-origin:0 100%}.picker_wrapper::after{width:40px;height:40px;box-shadow:none}.picker_wrapper>div{margin:8px;float:left}.picker_hue{width:240px;height:20px;position:relative;margin-left:10px;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);outline:1px solid #cccccc}.picker_sl{width:203px;height:203px;position:relative;outline:1px solid #cccccc;background-color:red;background-image:linear-gradient(180deg, white, rgba(255,255,255,0) 50%),linear-gradient(0deg, black, transparent 50%),linear-gradient(90deg, gray, rgba(128,128,128,0))}.picker_alpha{width:20px;height:200px;position:relative;margin-left:10px;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") top/contain white;outline:1px solid #cccccc}.picker_selector{position:absolute;display:block;width:24px;height:24px;margin:-12px;cursor:pointer;border:2px solid white;box-sizing:border-box;border-radius:20px;box-shadow:0 0 3px 1px #67b9ff;background:currentColor}.picker_slider .picker_selector{border-radius:2px}.picker_hue .picker_selector{top:50%}.picker_sl .picker_selector{left:100%}.picker_alpha .picker_selector{left:50%;background:none}.picker_sample{width:170px;height:30px;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") left top/20px white;position:relative;margin-top:10px;outline:1px solid #aaaaaa}.picker_sample::before{content:"";position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_done{width:53px;height:30px;line-height:30px;color:#444444;background:#e2e2e2;outline:1px solid #cccccc;box-shadow:0 0 3px 1px #eeeeee;text-align:center;cursor:pointer}';
+
+function parseHTML(htmlString) {
+    var div = document.createElement('div');
+    div.innerHTML = htmlString;
+    return div.firstElementChild;
+}
 
 var BG_TRANSP = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E")';
 var HUES = 360;
 
+document.documentElement.firstElementChild 
+.appendChild(document.createElement('style')).textContent = '.picker_wrapper{display:flex;flex-flow:row wrap;justify-content:space-between;align-items:stretch;font-size:10px;width:25em;padding:.5em;box-sizing:border-box;background:#f2f2f2;cursor:default;pointer-events:auto}.picker_wrapper>*{margin:.5em}.picker_wrapper::before{content:\'\';display:block;width:100%;order:1}.picker_slider,.picker_selector{padding:1em}.picker_hue{width:100%}.picker_sl{flex:1 1 auto}.picker_sl::before{content:\'\';display:block;padding-bottom:100%}.picker_wrapper.no_alpha .picker_alpha{display:none}.picker_sample{order:1;flex:1 1 auto;min-height:3em}.picker_done{order:1;width:3rem;height:2rem}.picker_selector{position:absolute;z-index:1;display:block;transform:translate(-50%, -50%);border:2px solid white;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);outline:1px solid silver}.picker_sl{position:relative;outline:1px solid silver;background-image:linear-gradient(180deg, white, rgba(255,255,255,0) 50%),linear-gradient(0deg, black, transparent 50%),linear-gradient(90deg, gray, rgba(128,128,128,0))}.picker_alpha,.picker_sample{position:relative;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") left top/contain white;outline:1px solid silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_sample::before{content:\'\';position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_done{font:inherit;font-family:sans-serif;box-sizing:border-box;text-align:center;cursor:pointer;position:relative;padding:0;text-indent:100%;white-space:nowrap;overflow:hidden}.picker_done::before{content:\'Ok\';position:absolute;top:0;left:0;display:flex;width:100%;height:100%;justify-content:center;align-items:center;font-size:1rem;text-indent:0}.picker_arrow{position:absolute}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,0.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;transform:skew(45deg);transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
+
 var Picker = function () {
+
     function Picker(options) {
         classCallCheck(this, Picker);
 
 
-
         this.settings = {
             parent: document.body,
-            orientation: 'right',
-            x: 'auto',
-            y: 'auto',
-            arrowSize: 20
+            popup: 'right',
+            alpha: true
         };
 
-        if (options instanceof HTMLElement) {
-            this.settings.parent = options;
-        } else {
-            for (var name in options) {
-                this.settings[name] = options[name];
-            }
-        }
-
-
-        this.sliders = {
-            'picker_hue': {
-                down: false,
-                vertical: true
-            },
-            'picker_sl': {
-                down: false
-            },
-            'picker_alpha': {
-                down: false,
-                vertical: true
-            }
-        };
-
-
-        this.onDone = null;
-        this.onChange = null;
+        this.setOptions(options);
     }
 
 
 
     createClass(Picker, [{
+        key: 'setOptions',
+        value: function setOptions(options) {
+            if (!options) {
+                return;
+            }
+            var settings = this.settings;
+
+            function transfer(source, target, skipKeys) {
+                for (var key in source) {
+                    if (skipKeys && skipKeys.indexOf(key) >= 0) {
+                        continue;
+                    }
+
+                    target[key] = source[key];
+                }
+            }
+
+            if (options instanceof HTMLElement) {
+                settings.parent = options;
+            } else {
+                var skipKeys = [];
+
+                if (options.popup instanceof Object) {
+                    transfer(options.popup, settings.popup);
+                    skipKeys.push('popup');
+                }
+
+                transfer(options, settings, skipKeys);
+            }
+
+            if (options.onChange) {
+                this.onChange = options.onChange;
+            }
+            if (options.onDone) {
+                this.onDone = options.onDone;
+            }
+
+            var col = options.color || options.colour;
+            if (col) {
+                this.setColor(col);
+            }
+
+            if (!settings.popup) {
+                this.show();
+            }
+        }
+
+
+    }, {
         key: 'setColor',
         value: function setColor(color) {
-            this.colour = this.color = new Color(color);
+            var c = new Color(color);
+            if (!this.settings.alpha) {
+                var hsla = c.hsla;
+                hsla[3] = 1;
+                c.hsla = hsla;
+            }
+            this.colour = this.color = c;
             this._setHSLA();
+        }
+
+    }, {
+        key: 'setColour',
+        value: function setColour(colour) {
+            this.setColor(colour);
         }
 
 
@@ -582,16 +623,15 @@ var Picker = function () {
 
             if (this.domElement) {
                 this.domElement.style.display = '';
+
+                this._setPosition();
+
                 return;
             }
 
-            var html = '<div class="picker_wrapper">\n   <div class="picker_hue picker_slider">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_sl">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_alpha picker_slider">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_sample"></div>\n   <div class="picker_done">ok</div>\n</div>';
+            var html = '<div class="picker_wrapper">\n   <div class="picker_arrow"></div>\n   <div class="picker_hue picker_slider">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_sl">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_alpha picker_slider">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_sample"></div>\n   <button class="picker_done">Ok</div>\n</div>';
 
-            var wrapper = function parse(htmlString) {
-                var div = document.createElement('div');
-                div.innerHTML = htmlString;
-                return div.firstElementChild;
-            }(html);
+            var wrapper = parseHTML(html);
 
             this.domElement = wrapper;
             this._domH = wrapper.querySelector('.picker_hue');
@@ -600,76 +640,21 @@ var Picker = function () {
             this._domSample = wrapper.querySelector('.picker_sample');
             this._domOkay = wrapper.querySelector('.picker_done');
 
-            if (getComputedStyle(parent).position !== 'absolute') {
-                parent.style.position = 'relative';
+            if (this.settings.popup) {
+                wrapper.classList.add('popup');
+            }
+            if (!this.settings.alpha) {
+                wrapper.classList.add('no_alpha');
             }
 
-            parent.appendChild(this.domElement);
-
-
-
-            var w = wrapper.offsetWidth,
-                h = wrapper.offsetHeight,
-                pw = parent.offsetWidth,
-                ph = parent.offsetHeight,
-                arrow = this.settings.arrowSize;
-
-            var x = this.settings.x,
-                y = this.settings.y;
-
-            if (x === 'auto') {
-                switch (this.settings.orientation) {
-                    case 'left':
-                        x = -w - arrow - 4;
-                        break;
-
-                    case 'top':
-                    case 'bottom':
-                        x = pw / 2 - arrow;
-                        break;
-
-                    case 'center':
-                    case 'centre':
-                        x = -w / 2 + pw / 2;
-                        break;
-
-                    default:
-                        x = pw + arrow + 4;
-                        break;
-                }
-            }
-
-            if (y === 'auto') {
-                switch (this.settings.orientation) {
-                    case 'top':
-                        y = -h - arrow - 4;
-                        break;
-
-                    case 'bottom':
-                        y = ph + arrow + 4;
-                        break;
-
-                    case 'center':
-                    case 'centre':
-                        y = -ph / 2 + -h / 2;
-                        break;
-
-                    default:
-                        y = ph / 2 - arrow;
-                        break;
-                }
-            }
-
-            wrapper.style.left = x + 'px';
-            wrapper.style.top = y + 'px';
-
-            this._bindEvents();
+            this._setPosition();
 
             if (this.colour) {
                 this._updateUI();
             } else {
                 this.setColor('#0cf');
             }
+            this._bindEvents();
         }
 
 
@@ -686,9 +671,10 @@ var Picker = function () {
     }, {
         key: '_bindEvents',
         value: function _bindEvents() {
-
+            var _this = this;
 
             var that = this;
+
 
             function createDragConfig(container, callbackRelative) {
 
@@ -700,9 +686,10 @@ var Picker = function () {
 
                 var config = {
                     container: container,
+                    dragOutside: false,
                     callback: relayDrag,
                     callbackClick: relayDrag,
-                    dragOutside: false
+                    callbackDragStart: relayDrag
                 };
                 return config;
             }
@@ -720,44 +707,84 @@ var Picker = function () {
             }));
 
 
-            this.domElement.addEventListener('mousedown', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-            });
+            if (this.settings.popup) {
+                this.domElement.addEventListener('mousedown', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
 
-            window.addEventListener('mousedown', function (e) {
-                that.hide();
-            });
+                window.addEventListener('mousedown', function (e) {
+                    that.hide();
+                });
+            }
 
             this._domOkay.onclick = function (e) {
-                e.preventDefault();
-                e.stopPropagation();
+                if (_this.settings.popup) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                that._done();
+                    _this.hide();
+                }
+
+                if (_this.onDone) {
+                    _this.onDone(_this.colour);
+                }
             };
+        }
+
+
+    }, {
+        key: '_setPosition',
+        value: function _setPosition() {
+
+            var parent = this.settings.parent,
+                elm = this.domElement;
+
+            if (parent !== elm.parentNode) {
+                parent.appendChild(elm);
+            }
+
+            var popup = this.settings.popup;
+            if (popup) {
+                if (getComputedStyle(parent).position === 'static') {
+                    parent.style.position = 'relative';
+                }
+
+                var cssClass = popup === true ? 'popup_right' : 'popup_' + popup;
+
+                ['popup_top', 'popup_bottom', 'popup_left', 'popup_right'].forEach(function (c) {
+                    if (c === cssClass) {
+                        elm.classList.add(c);
+                    } else {
+                        elm.classList.remove(c);
+                    }
+                });
+                elm.classList.add(cssClass);
+            }
         }
 
 
     }, {
         key: '_setHSLA',
         value: function _setHSLA(h, s, l, a) {
+            var arg = arguments,
+                col = this.colour;
 
-            var arg = arguments;
             if (arg.length) {
-                var hsla = this.colour.hsla;
+                var hsla = col.hsla;
                 for (var i = 0; i < arg.length; i++) {
-                    var _a = arg[i];
-                    if (_a || _a === 0) {
-                        hsla[i] = _a;
+                    var x = arg[i];
+                    if (x || x === 0) {
+                        hsla[i] = x;
                     }
                 }
-                this.colour.hsla = hsla;
+                col.hsla = hsla;
             }
 
             this._updateUI();
 
             if (this.onChange) {
-                this.onChange(this.colour);
+                this.onChange(col);
             }
         }
     }, {
@@ -778,10 +805,10 @@ var Picker = function () {
                 uiA = this._domA;
 
             function posX(parent, child, relX) {
-                child.style.left = parent.clientWidth * relX + 'px';
+                child.style.left = relX * 100 + '%'; 
             }
             function posY(parent, child, relY) {
-                child.style.top = parent.clientHeight * relY + 'px';
+                child.style.top = relY * 100 + '%'; 
             }
 
 
@@ -799,22 +826,13 @@ var Picker = function () {
             posY(uiA, uiA.firstElementChild, 1 - hsl[3]);
 
             var opaque = cssHSL,
-            transp = opaque.replace('hsl', 'hsla').replace(')', ', 0)'),
+                transp = opaque.replace('hsl', 'hsla').replace(')', ', 0)'),
                 bg = 'linear-gradient(' + [opaque, transp] + ')';
 
             this._domA.style.backgroundImage = bg + ', ' + BG_TRANSP;
 
 
             this._domSample.style.color = cssHSLA;
-        }
-    }, {
-        key: '_done',
-        value: function _done() {
-            this.hide();
-
-            if (this.onDone) {
-                this.onDone(this.colour);
-            }
         }
     }]);
     return Picker;

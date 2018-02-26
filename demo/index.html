@@ -3,10 +3,8 @@
 <html>
 
 <head>
-    <title>Picker</title>
-
-    <link href="../src/_picker.css" rel="stylesheet">
-    <!--script src="../src/picker.js"></script-->
+    <title>vanilla-picker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="../dist/vanilla-picker.min.js"></script>
 
@@ -17,13 +15,26 @@
         }
         
         body {
-            height: 100vh;
+            min-height: 100vh;
+            font-family: Georgia, sans-serif;
             background-color: white;
-            background-image: repeating-linear-gradient( 45deg, skyblue 0, skyblue 1px, transparent 0, transparent 40px),
-                              repeating-linear-gradient(135deg, skyblue 0, skyblue 1px, transparent 0, transparent 40px);
+            background-image: repeating-linear-gradient( 0deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px),
+                              repeating-linear-gradient(90deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px);
         }
         
-        .parent {
+        h1 {
+            text-align: center;
+        }
+        
+        #main-color {
+            position: absolute;
+            border: 4px dashed tomato;
+        }
+        #main-color .picker_sample, #main-color .picker_done {
+            display: none;
+        }
+
+        .popup-parent {
             position: absolute;
             background: dodgerblue;
             color: white;
@@ -34,28 +45,65 @@
             font-size: 20px;
             text-align: center;
         }
+        
+        @media(max-width: 500px) {
+            .picker_wrapper {
+                font-size: 7px;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <h1><a href="https://github.com/Sphinxxxx/vanilla-picker">vanilla-picker</a> demo</h1>
 
-    <div class="parent" style="top:20%;left:30%">click me</div>
-    <div class="parent" style="top:30%;left:40%">..or me!</div>
-    <div class="parent" style="top:40%;left:10%">..or me?</div>
+    <div id="main-color" style="top:3em;right:1em"></div>
+
+    <div class="popup-parent" style="top:45%;left:1em;">
+        Click me
+    </div>
+
+    <div class="popup-parent" style="bottom:20%;left:20%;">
+        ..or me!
+        <select onclick="event.stopPropagation();">
+            <option selected>top</option>
+            <option>bottom</option>
+            <option>left</option>
+            <option>right</option>
+        </select>
+    </div>
+
 
     <script>
-        var parents = Array.prototype.slice.call(document.querySelectorAll('.parent'));
+        new Picker({
+            parent: document.querySelector('#main-color'),
+            color: '#cef6',
+            alpha: false,
+            popup: false,
+            onChange: function(color) {
+                document.body.style.backgroundColor = color.rgbaString;
+            },
+        });
+
+        var parents = Array.prototype.slice.call(document.querySelectorAll('.popup-parent'));
         parents.forEach(function(p, i) {
 
             var picker = new Picker(p);
             if(i === 0) {
                 picker.setColor('#dbeb');
+                picker.show();
             }
-            picker.onDone = function(colour) {
-                p.style.background = colour.rgbaString;
+            picker.onDone = function(color) {
+                p.style.background = color.rgbaString;
             };
             
             p.onclick = function() {
+                var pos = p.querySelector('select');
+                if(pos) {
+                    picker.setOptions({
+                        popup: pos.value,
+                    });
+                }
                 picker.show();
             };
         });

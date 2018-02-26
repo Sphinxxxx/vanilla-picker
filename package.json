@@ -1,16 +1,16 @@
 {
   "name": "vanilla-picker",
-  "version": "2.0.0-alpha.3",
-  "description": "A simple, easy to use, versatile and customizable Javascript color picker.",
-  "author": "Adam Brooks (https://github.com/dissimulate), Andreas Borgen (https://github.com/Sphinxxxx)",
-  "homepage": "https://github.com/Sphinxxxx/Picker",
+  "version": "2.0.0-alpha.7",
+  "description": "A simple, easy to use, versatile and customizable vanilla JS color picker.",
+  "author": "Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)",
+  "homepage": "https://github.com/Sphinxxxx/vanilla-picker",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sphinxxxx/Picker.git"
+    "url": "https://github.com/Sphinxxxx/vanilla-picker.git"
   },
   "bugs": {
-    "url": "https://github.com/Sphinxxxx/Picker/issues"
+    "url": "https://github.com/Sphinxxxx/vanilla-picker/issues"
   },
   "main": "dist/vanilla-picker.js",
   "module": "src/picker.js",

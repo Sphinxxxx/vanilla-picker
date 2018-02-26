@@ -1,29 +1,29 @@
-Picker
-======
+# vanilla-picker
 
-A simple, easy to use, versatile and customisable Javascript colour picker.
+A simple, easy to use, versatile and customizable vanilla JS color picker.
 
-Using Picker is as simple as this: 
+Using it is as simple as this: 
 
 ```javascript
-var parent = document.getElementById('parent');
-
+var parent = document.querySelector('#parent');
 var picker = new Picker(parent);
 
 parent.onclick = function() {
     picker.show();
 };
-
-picker.onDone = function(colour) {
-    parent.style.background = colour.rgbaString;
+picker.onDone = function(color) {
+    parent.style.background = color.rgbaString;
 };
 ```
 
-**Demo:** https://rawgit.com/Sphinxxxx/Picker/master/demo/index.html
+#### Demo
+
+https://rawgit.com/Sphinxxxx/vanilla-picker/master/demo/index.html
+
+https://codepen.io/Sphinxxxx/pen/zRmKBX
 
 
-Explained
----------
+## Explained
 
 ```html
 <script src="picker.min.js"></script>
@@ -32,85 +32,82 @@ Explained
 
 <script>
 
-    /* STEP 1 */
-
-    /* Create a new picker object and set the parent element. */
-
-    var parent = document.getElementById('parent'); /* or jQuery */ $('#parent');
-
+    /*
+        STEP 1
+        Create a new Picker object and set the parent element.
+    */
+    var parent = document.querySelector('#parent');
     var picker = new Picker(parent);
 
-
-    /* STEP 2 */
-
-    /* Set Picker to open when you want, when the parent is clicked for example. */
-
+    /*
+        STEP 2
+        Set the color picker to open when you want, when the parent is clicked for example.
+    */
     parent.onclick = function() {
         picker.show();
     };
 
-    /* STEP 3 */
-
     /*
-    You can do what you want with the chosen colour using two events,
-    onChange and onDone.
+        STEP 3
+        You can do what you want with the chosen color using two callbacks: onChange and onDone.
     */
-
-    picker.onDone = function(colour) {
+    picker.onDone = function(color) {
 
         /*
-        You can get the colour components from
-            colour.rgba
-            colour.hsla  (all values between 0 and 1, inclusive)
-
-        ..or ready to use CSS values from
-            colour.rgbString
-            colour.rgbaString
-            colour.hslString
-            colour.hslaString
-            colour.hex   (eight digit #RRGGBBAA, not supported in all browsers)
+            You can get the color components from
+                color.rgba
+                color.hsla  (all values between 0 and 1, inclusive)
+    
+            ..or ready to use CSS values from
+                color.rgbString
+                color.rgbaString
+                color.hslString
+                color.hslaString
+                color.hex   (eight digit #RRGGBBAA, not supported in all browsers)
         */
 
-        parent.style.background = colour.rgbaString;
+        parent.style.background = color.rgbaString;
     };
 
-    /* onChange is called every time the selection is changed without clicking 'ok' */
+    /* onChange is called every time the selection is changed without clicking 'Ok' */
 
 </script>
 ```
 
 
-TODO: Options
--------------
+## Options
 
 ```javascript
 var picker = new Picker({
 
-    /* The colour picker's parent */
-    parent: (parent element),
+    parent:        /* Which element the picker should be attached to */
+    
+    /* If the picker is used as a popup, where to place it relative to the parent */
+    popup: 'right' (default)
+           'left'
+           'top'
+           'bottom'
+           false   /* No popup, just add the picker as a normal element on the page */
 
-    /*
-    Where the colour picker is relative to the parent.
-    Defaults to 'right'.
-    */
-    orientation: ('left', 'right', 'top', 'bottom', 'centre', 'center'),
+    alpha: true    /* Whether to enable adjusting the alpha channel */
+    
+    color:         /* Initial color for the picker        (or call picker.setColor()) */
+    
+    onChange:      /* Callback whenever the color changes (or set  picker.onChange) */
+    
+    onDone:        /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
 
-    /*
-    The colour picker's x position relative to the parent.
-    Defaults to 'auto'.
-    */
-    x: (number),
-
-    /*
-    The colour picker's y position relative to the parent.
-    Defaults to 'auto'.
-    */
-    y: (number),
-
-    /*
-    The colour picker's arrow size.
-    Defaults to 20.
-    */
-    arrow_size: (number)
 });
 ```
+
+
+## Credits
+
+* Based on https://github.com/dissimulate/Picker by **Adam Brooks**
+* Built with https://github.com/Joudee/color-conversion by **Joudee**
+* Built with https://gist.github.com/mjackson/5311256 by **Michael Jackson**
+
+
+## License
+
+The ISC license - see the [LICENSE.md](LICENSE.md) file for details.
