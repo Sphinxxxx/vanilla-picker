@@ -12,7 +12,8 @@
 
 import gulp from 'gulp';
 import file from 'gulp-file';
-import sass from 'gulp-sass';
+import sass from 'node-sass';
+import pug  from 'pug';
 import { rollup } from 'rollup';
 import babel from 'rollup-plugin-babel';
 //If the code imports modules from /node_modules
@@ -20,7 +21,7 @@ import resolve from 'rollup-plugin-node-resolve';
 
 //Cleanup & minification step:
 import replace from 'gulp-replace';
-import strip from 'gulp-strip-comments';
+import strip  from 'gulp-strip-comments';
 import header from 'gulp-header';
 import rename from 'gulp-rename';
 import uglify from 'gulp-uglify';
@@ -70,35 +71,47 @@ gulp.task('build', function() {
     })
     .then(gen => {
         
-        //Before we create the destination file, prepare the CSS which we'll paste into the JS code:
-        //https://github.com/dlmanning/gulp-sass#basic-usage
-        gulp.src(pkg.module.replace('.js', '.scss'))
-            .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+        //  //Before we create the destination file, prepare the CSS which we'll paste into the JS code:
+        //  //https://github.com/dlmanning/gulp-sass#basic-usage
+        //  gulp.src(pkg.module.replace('.js', '.scss'))
+        //      .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+        //  
+        //      //https://stackoverflow.com/questions/41523743/can-i-convert-a-gulp-stream-into-a-string
+        //      .on('data', function(cssStream) {
+        //          const css = cssStream.contents.toString();
+        //          //console.log(css);
 
-            //https://stackoverflow.com/questions/41523743/can-i-convert-a-gulp-stream-into-a-string
-            .on('data', function(cssStream) {
-                const css = cssStream.contents.toString();
-                //console.log(css);
+        //Easier to use the normal node packages to read the HTML and CSS we'll inline into the JS:
+        const sassed = sass.renderSync({
+            file: pkg.module.replace('.js', '.scss'),
+            outputStyle: 'compressed',
+        });
+        const css = sassed.css.toString(); //(Buffer.toString())
+        //console.log('CSS:', css);
+        
+        const html = pug.renderFile(pkg.module.replace('.js', '.pug'));
+        //console.log('HTML:', html);
 
-                //Insert the CSS 
-                file(outFile + '.js', gen.code, { src: true })
-                    .pipe(strip())
-                    .pipe(replace('## PLACEHOLDER-CSS ##', css.replace(/'/g, "\\'").trim()))
-        
-                    //Write un-minified:
-                    .pipe(header(myBanner, { pkg : pkg }))
-                    .pipe(gulp.dest(outFolder))
-        
-                    //Minify:
-                    //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
-                    //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
-                    //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
-                    .pipe(rename({ extname: '.min.js' }))
-                    .pipe(uglify())
-        
-                    .pipe(header(myBanner, { pkg: pkg }))
-                    .pipe(gulp.dest(outFolder));
-            });
+        file(outFile + '.js', gen.code, { src: true })
+            .pipe(strip())
+            .pipe(replace( '## PLACEHOLDER-CSS ##', css.replace(/'/g, "\\'").trim() ))
+            .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
+
+            //Write un-minified:
+            .pipe(header(myBanner, { pkg : pkg }))
+            .pipe(gulp.dest(outFolder))
+
+            //Minify:
+            //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
+            //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
+            //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
+            .pipe(rename({ extname: '.min.js' }))
+            .pipe(uglify())
+
+            .pipe(header(myBanner, { pkg: pkg }))
+            .pipe(gulp.dest(outFolder));
+
+        //      });
     });
 });
 
@@ -108,7 +121,9 @@ gulp.task('build', function() {
 gulp.task('watch', function(){
     console.log('** Listening for file changes...');
 
-    var watcher = gulp.watch('src/**/*.*', gulp.parallel('build'));
+    //Watch everything in src/, plus package.json and gulpfile.babel.js in the root folder:
+    //https://stackoverflow.com/questions/27645103/how-to-gulp-watch-multiple-files
+    const watcher = gulp.watch(['src/**/*.*', '*.js*'], gulp.parallel('build'));
     
     watcher.on('change', function(path, stats) {
       console.log('File ' + path + ' was changed');

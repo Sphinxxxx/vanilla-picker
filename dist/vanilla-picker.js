@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.0.0-alpha.7
+ * vanilla-picker v2.0.0-alpha.8
  * https://github.com/Sphinxxxx/vanilla-picker
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -548,6 +548,8 @@ var Picker = function () {
     createClass(Picker, [{
         key: 'setOptions',
         value: function setOptions(options) {
+            var _this = this;
+
             if (!options) {
                 return;
             }
@@ -566,14 +568,8 @@ var Picker = function () {
             if (options instanceof HTMLElement) {
                 settings.parent = options;
             } else {
-                var skipKeys = [];
 
-                if (options.popup instanceof Object) {
-                    transfer(options.popup, settings.popup);
-                    skipKeys.push('popup');
-                }
-
-                transfer(options, settings, skipKeys);
+                transfer(options, settings );
             }
 
             if (options.onChange) {
@@ -588,9 +584,9 @@ var Picker = function () {
                 this.setColor(col);
             }
 
-            if (!settings.popup) {
-                this.show();
-            }
+            this._ifPopup(null, function () {
+                return _this.show();
+            });
         }
 
 
@@ -619,7 +615,9 @@ var Picker = function () {
         value: function show() {
             var parent = this.settings.parent;
 
-            parent.style.pointerEvents = 'none';
+            this._ifPopup(function () {
+                return parent.style.pointerEvents = 'none';
+            });
 
             if (this.domElement) {
                 this.domElement.style.display = '';
@@ -629,8 +627,7 @@ var Picker = function () {
                 return;
             }
 
-            var html = '<div class="picker_wrapper">\n   <div class="picker_arrow"></div>\n   <div class="picker_hue picker_slider">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_sl">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_alpha picker_slider">\n       <div class="picker_selector"></div>\n   </div>\n   <div class="picker_sample"></div>\n   <button class="picker_done">Ok</div>\n</div>';
-
+            var html = this.settings.template || '<div class="picker_wrapper"><div class="picker_arrow"></div><div class="picker_hue picker_slider"><div class="picker_selector"></div></div><div class="picker_sl"><div class="picker_selector"></div></div><div class="picker_alpha picker_slider"><div class="picker_selector"></div></div><div class="picker_sample"></div><button class="picker_done"></button></div>';
             var wrapper = parseHTML(html);
 
             this.domElement = wrapper;
@@ -640,12 +637,12 @@ var Picker = function () {
             this._domSample = wrapper.querySelector('.picker_sample');
             this._domOkay = wrapper.querySelector('.picker_done');
 
-            if (this.settings.popup) {
-                wrapper.classList.add('popup');
-            }
             if (!this.settings.alpha) {
                 wrapper.classList.add('no_alpha');
             }
+            this._ifPopup(function () {
+                return wrapper.classList.add('popup');
+            });
 
             this._setPosition();
 
@@ -661,17 +658,21 @@ var Picker = function () {
     }, {
         key: 'hide',
         value: function hide() {
+            var _this2 = this;
+
             if (this.domElement) {
                 this.domElement.style.display = 'none';
             }
-            this.settings.parent.style.pointerEvents = '';
+            this._ifPopup(function () {
+                return _this2.settings.parent.style.pointerEvents = '';
+            });
         }
 
 
     }, {
         key: '_bindEvents',
         value: function _bindEvents() {
-            var _this = this;
+            var _this3 = this;
 
             var that = this;
 
@@ -707,8 +708,8 @@ var Picker = function () {
             }));
 
 
-            if (this.settings.popup) {
-                this.domElement.addEventListener('mousedown', function (e) {
+            this._ifPopup(function () {
+                _this3.domElement.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                 });
@@ -716,18 +717,18 @@ var Picker = function () {
                 window.addEventListener('mousedown', function (e) {
                     that.hide();
                 });
-            }
+            });
 
             this._domOkay.onclick = function (e) {
-                if (_this.settings.popup) {
+                _this3._ifPopup(function () {
                     e.preventDefault();
                     e.stopPropagation();
 
-                    _this.hide();
-                }
+                    _this3.hide();
+                });
 
-                if (_this.onDone) {
-                    _this.onDone(_this.colour);
+                if (_this3.onDone) {
+                    _this3.onDone(_this3.colour);
                 }
             };
         }
@@ -744,8 +745,7 @@ var Picker = function () {
                 parent.appendChild(elm);
             }
 
-            var popup = this.settings.popup;
-            if (popup) {
+            this._ifPopup(function (popup) {
                 if (getComputedStyle(parent).position === 'static') {
                     parent.style.position = 'relative';
                 }
@@ -760,7 +760,7 @@ var Picker = function () {
                     }
                 });
                 elm.classList.add(cssClass);
-            }
+            });
         }
 
 
@@ -834,6 +834,17 @@ var Picker = function () {
 
             this._domSample.style.color = cssHSLA;
         }
+    }, {
+        key: '_ifPopup',
+        value: function _ifPopup(actionIf, actionElse) {
+            if (this.settings.popup) {
+                actionIf && actionIf(this.settings.popup);
+            } else {
+                actionElse && actionElse();
+            }
+        }
+
+
     }]);
     return Picker;
 }();

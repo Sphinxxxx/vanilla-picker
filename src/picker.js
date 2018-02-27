@@ -68,14 +68,14 @@ class Picker {
             settings.parent = options;
         }
         else {
-            const skipKeys = [];
+            //const skipKeys = [];
+            //
+            //if(options.popup instanceof Object) {
+            //    transfer(options.popup, settings.popup);
+            //    skipKeys.push('popup');
+            //}
 
-            if(options.popup instanceof Object) {
-                transfer(options.popup, settings.popup);
-                skipKeys.push('popup');
-            }
-
-            transfer(options, settings, skipKeys);
+            transfer(options, settings/*, skipKeys*/);
         }
         
         //Event callbacks. Hook these up before setColor() below,
@@ -87,7 +87,7 @@ class Picker {
         const col = options.color || options.colour;
         if(col) { this.setColor(col); }
         
-        if(!settings.popup) { this.show(); }
+        this._ifPopup(null, () => this.show());
     }
 
 
@@ -121,7 +121,7 @@ class Picker {
         const parent = this.settings.parent;
         
         //A trick to avoid re-opening the dialog if you click the parent element while the dialog is open:
-        parent.style.pointerEvents = 'none';
+        this._ifPopup(() => parent.style.pointerEvents = 'none');
 
         // unhide html if it exists
         if (this.domElement) {
@@ -133,7 +133,7 @@ class Picker {
             return;
         }
 
-
+/*
         const html =
 `<div class="picker_wrapper">
    <div class="picker_arrow"></div>
@@ -149,7 +149,8 @@ class Picker {
    <div class="picker_sample"></div>
    <button class="picker_done">Ok</div>
 </div>`;
-
+*/
+        const html = this.settings.template || '## PLACEHOLDER-HTML ##';
         const wrapper = parseHTML(html);
         
         this.domElement = wrapper;
@@ -159,8 +160,8 @@ class Picker {
         this._domSample = wrapper.querySelector('.picker_sample');
         this._domOkay   = wrapper.querySelector('.picker_done');
 
-        if(this.settings.popup) { wrapper.classList.add('popup'); }
         if(!this.settings.alpha) { wrapper.classList.add('no_alpha'); }
+        this._ifPopup(() => wrapper.classList.add('popup'));
         
         this._setPosition();
 
@@ -182,7 +183,7 @@ class Picker {
         if (this.domElement) {
             this.domElement.style.display = 'none';
         }
-        this.settings.parent.style.pointerEvents = '';
+        this._ifPopup(() => this.settings.parent.style.pointerEvents = '');
     }
 
 
@@ -229,7 +230,7 @@ class Picker {
 
         /* Close the dialog */
 
-        if(this.settings.popup) {
+        this._ifPopup(() => {
             this.domElement.addEventListener('mousedown', e => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -238,16 +239,16 @@ class Picker {
             window.addEventListener('mousedown', e => {
                 that.hide();
             });
-        }
+        });
 
         this._domOkay.onclick = (e) => {
-            if(this.settings.popup) {
+            this._ifPopup(() => {
                 //Don't bubble the click up to the parent, because that's probably the trigger to re-open the popup:
                 e.preventDefault();
                 e.stopPropagation();
 
                 this.hide();
-            }
+            });
             
             if (this.onDone) { this.onDone(this.colour); }
         };
@@ -267,8 +268,7 @@ class Picker {
 
         if(parent !== elm.parentNode) { parent.appendChild(elm); }
 
-        let popup = this.settings.popup;
-        if(popup) {
+        this._ifPopup((popup) => {
             //Allow for absolute positioning of the picker popup:
             if(getComputedStyle(parent).position === 'static') {
                 parent.style.position = 'relative';
@@ -287,7 +287,7 @@ class Picker {
             });
             //Allow for custom placement via CSS:
             elm.classList.add(cssClass);
-        }
+        });
     }
 
 
@@ -368,6 +368,52 @@ class Picker {
         
         this._domSample.style.color = cssHSLA;
     }
+    
+    
+    _ifPopup(actionIf, actionElse) {
+        if(this.settings.popup) {
+            actionIf && actionIf(this.settings.popup);
+        }
+        else {
+            actionElse && actionElse();
+        }
+    }
+
+
+/*
+    //Feature: settings to flip hue & alpha 90deg (i.e. vertical or horizontal mode)
+    
+    
+        function createDragConfig(container, callbackRelative) {
+const flipped = true;
+
+            function capRel(val) {
+                return (val < 0) ? 0
+                                 : (val > 1) ? 1 : val;
+            }
+
+            //Convert the px coordinates to relative coordinates (0-1) before invoking the callback:
+            function relayDrag(_, pos) {
+                const w = container.clientWidth,
+                      h = container.clientHeight;
+                      
+                const relX = pos[0]/(flipped ? h : w),
+                      relY = pos[1]/(flipped ? w : h);
+                      
+                callbackRelative(capRel(relX), capRel(relY));
+            }
+
+            const config = {
+                container:     container,
+                //dragOutside:   false,
+                callback:      relayDrag,
+                callbackClick: relayDrag,
+                //Respond at once (mousedown), don't wait for click or drag:
+                callbackDragStart: relayDrag,
+            };
+            return config;
+        }
+*/
 
 }
 
