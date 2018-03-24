@@ -21,7 +21,7 @@
     position: relative;
     
     background-image: linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);
-    outline: $border-deco;
+    @include border-deco();
 }
 
 
@@ -34,7 +34,7 @@
     
     position: relative;
     
-    outline: $border-deco;
+    @include border-deco();
     background-image:
         /*
           Different SL pickers
@@ -62,7 +62,7 @@
     position: relative;
     
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E") left top / contain white;
-    outline: $border-deco;
+    @include border-deco();
     
     .picker_selector {
         background: none;
