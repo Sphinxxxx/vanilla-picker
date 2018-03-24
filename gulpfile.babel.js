@@ -118,7 +118,7 @@ gulp.task('build', function() {
 
 //https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglobs-opts-fn
 //https://css-tricks.com/gulp-for-beginners/
-gulp.task('watch', function(){
+gulp.task('watch', function() {
     console.log('** Listening for file changes...');
 
     //Watch everything in src/, plus package.json and gulpfile.babel.js in the root folder:

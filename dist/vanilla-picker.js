@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.0.0-alpha.8
+ * vanilla-picker v2.0.0
  * https://github.com/Sphinxxxx/vanilla-picker
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -522,6 +522,10 @@ function parseHTML(htmlString) {
     return div.firstElementChild;
 }
 
+function addEvent(target, type, handler) {
+    target.addEventListener(type, handler, false);
+}
+
 var BG_TRANSP = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E")';
 var HUES = 360;
 
@@ -535,7 +539,6 @@ var Picker = function () {
 
 
         this.settings = {
-            parent: document.body,
             popup: 'right',
             alpha: true
         };
@@ -584,9 +587,50 @@ var Picker = function () {
                 this.setColor(col);
             }
 
-            this._ifPopup(null, function () {
-                return _this.show();
-            });
+            if (settings.parent && settings.popup && !this._popupInited) {
+
+                addEvent(settings.parent, 'click', function (e) {
+                    return _this.openHandler(e);
+                });
+
+
+                this._popupInited = true;
+            } else if (options.parent && !settings.popup) {
+                this.show();
+            }
+        }
+
+
+    }, {
+        key: 'openHandler',
+        value: function openHandler(e) {
+            this.show();
+
+            this.settings.parent.style.pointerEvents = 'none';
+        }
+
+
+    }, {
+        key: 'closeHandler',
+        value: function closeHandler(e) {
+            var doHide = false;
+
+            if (e.type === 'mousedown') {
+                if (!this.domElement.contains(e.target)) {
+                    doHide = true;
+                }
+            }
+            else {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    doHide = true;
+                }
+
+            if (doHide) {
+                this.hide();
+                this.settings.parent.style.pointerEvents = '';
+            }
         }
 
 
@@ -614,10 +658,9 @@ var Picker = function () {
         key: 'show',
         value: function show() {
             var parent = this.settings.parent;
-
-            this._ifPopup(function () {
-                return parent.style.pointerEvents = 'none';
-            });
+            if (!parent) {
+                return;
+            }
 
             if (this.domElement) {
                 this.domElement.style.display = '';
@@ -658,21 +701,16 @@ var Picker = function () {
     }, {
         key: 'hide',
         value: function hide() {
-            var _this2 = this;
-
             if (this.domElement) {
                 this.domElement.style.display = 'none';
             }
-            this._ifPopup(function () {
-                return _this2.settings.parent.style.pointerEvents = '';
-            });
         }
 
 
     }, {
         key: '_bindEvents',
         value: function _bindEvents() {
-            var _this3 = this;
+            var _this2 = this;
 
             var that = this;
 
@@ -708,36 +746,27 @@ var Picker = function () {
             }));
 
 
-            this._ifPopup(function () {
-                _this3.domElement.addEventListener('mousedown', function (e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                });
-
-                window.addEventListener('mousedown', function (e) {
-                    that.hide();
+            addEvent(window, 'mousedown', function (e) {
+                return _this2._ifPopup(function () {
+                    return _this2.closeHandler(e);
                 });
             });
 
-            this._domOkay.onclick = function (e) {
-                _this3._ifPopup(function () {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    _this3.hide();
+            addEvent(this._domOkay, 'click', function (e) {
+                _this2._ifPopup(function () {
+                    return _this2.closeHandler(e);
                 });
 
-                if (_this3.onDone) {
-                    _this3.onDone(_this3.colour);
+                if (_this2.onDone) {
+                    _this2.onDone(_this2.colour);
                 }
-            };
+            });
         }
 
 
     }, {
         key: '_setPosition',
         value: function _setPosition() {
-
             var parent = this.settings.parent,
                 elm = this.domElement;
 
@@ -746,6 +775,7 @@ var Picker = function () {
             }
 
             this._ifPopup(function (popup) {
+
                 if (getComputedStyle(parent).position === 'static') {
                     parent.style.position = 'relative';
                 }
@@ -759,6 +789,7 @@ var Picker = function () {
                         elm.classList.remove(c);
                     }
                 });
+
                 elm.classList.add(cssClass);
             });
         }
@@ -837,7 +868,7 @@ var Picker = function () {
     }, {
         key: '_ifPopup',
         value: function _ifPopup(actionIf, actionElse) {
-            if (this.settings.popup) {
+            if (this.settings.parent && this.settings.popup) {
                 actionIf && actionIf(this.settings.popup);
             } else {
                 actionElse && actionElse();

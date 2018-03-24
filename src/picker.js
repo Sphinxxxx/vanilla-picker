@@ -11,6 +11,10 @@ function parseHTML(htmlString) {
     return div.firstElementChild;
 }
 
+function addEvent(target, type, handler) {
+    target.addEventListener(type, handler, false);
+}
+
 
 const BG_TRANSP = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E")`;
 const HUES = 360;
@@ -32,7 +36,8 @@ class Picker {
 
         //Default settings
         this.settings = {
-            parent: document.body,
+            //Allow creating a popup without putting it on screen yet.
+            //  parent: document.body,
             popup: 'right',
             alpha: true,
         };
@@ -87,7 +92,59 @@ class Picker {
         const col = options.color || options.colour;
         if(col) { this.setColor(col); }
         
-        this._ifPopup(null, () => this.show());
+        //Init popup behavior once we have all the parts we need:
+        if(settings.parent && settings.popup && !this._popupInited) {
+
+            addEvent(settings.parent, 'click', (e) => this.openHandler(e));
+            
+            //This must wait until we have created our DOM..
+            //  addEvent(window, 'mousedown', (e) => this.closeHandler(e));
+            //  addEvent(this._domOkay, 'click', (e) => this.closeHandler(e));
+
+            this._popupInited = true;
+        }
+        else if(options.parent && !settings.popup) {
+            this.show();
+        }
+    }
+
+
+    /**
+     * Default behavior for opening the popup
+     */
+    openHandler(e) {
+        this.show();
+
+        //A trick to avoid re-opening the dialog if you click the parent element while the dialog is open:
+        this.settings.parent.style.pointerEvents = 'none';
+    }
+
+
+    /**
+     * Default behavior for closing the popup
+     */
+    closeHandler(e) {
+        let doHide = false;
+
+        //Close by clicking outside the popup:
+        if(e.type === 'mousedown') {
+            if(!this.domElement.contains(e.target)) {
+                doHide = true;
+            }
+        }
+        //Close by clicking "Ok":
+        else {
+            //Don't bubble the click up to the parent, because that's the trigger to re-open the popup:
+            e.preventDefault();
+            e.stopPropagation();
+    
+            doHide = true;
+        }
+
+        if(doHide) {
+            this.hide();
+            this.settings.parent.style.pointerEvents = '';
+        }
     }
 
 
@@ -119,11 +176,9 @@ class Picker {
      */
     show() {
         const parent = this.settings.parent;
+        if(!parent) { return; }
         
-        //A trick to avoid re-opening the dialog if you click the parent element while the dialog is open:
-        this._ifPopup(() => parent.style.pointerEvents = 'none');
-
-        // unhide html if it exists
+        //Unhide html if it exists
         if (this.domElement) {
             this.domElement.style.display = '';
 
@@ -133,23 +188,6 @@ class Picker {
             return;
         }
 
-/*
-        const html =
-`<div class="picker_wrapper">
-   <div class="picker_arrow"></div>
-   <div class="picker_hue picker_slider">
-       <div class="picker_selector"></div>
-   </div>
-   <div class="picker_sl">
-       <div class="picker_selector"></div>
-   </div>
-   <div class="picker_alpha picker_slider">
-       <div class="picker_selector"></div>
-   </div>
-   <div class="picker_sample"></div>
-   <button class="picker_done">Ok</div>
-</div>`;
-*/
         const html = this.settings.template || '## PLACEHOLDER-HTML ##';
         const wrapper = parseHTML(html);
         
@@ -183,7 +221,6 @@ class Picker {
         if (this.domElement) {
             this.domElement.style.display = 'none';
         }
-        this._ifPopup(() => this.settings.parent.style.pointerEvents = '');
     }
 
 
@@ -193,7 +230,6 @@ class Picker {
      * @private
      */
     _bindEvents() {
-        
         const that = this;
 
         /* Draggable color selection */
@@ -230,29 +266,15 @@ class Picker {
 
         /* Close the dialog */
 
-        this._ifPopup(() => {
-            this.domElement.addEventListener('mousedown', e => {
-                e.stopPropagation();
-                e.preventDefault();
-            });
-    
-            window.addEventListener('mousedown', e => {
-                that.hide();
-            });
-        });
+        addEvent(window, 'mousedown', (e) =>
+            this._ifPopup(() => this.closeHandler(e))
+        );
 
-        this._domOkay.onclick = (e) => {
-            this._ifPopup(() => {
-                //Don't bubble the click up to the parent, because that's probably the trigger to re-open the popup:
-                e.preventDefault();
-                e.stopPropagation();
-
-                this.hide();
-            });
+        addEvent(this._domOkay, 'click', (e) => {
+            this._ifPopup(() => this.closeHandler(e));
             
             if (this.onDone) { this.onDone(this.colour); }
-        };
-
+        });
     }
 
 
@@ -262,13 +284,13 @@ class Picker {
      * @private
      */
     _setPosition() {
-
         const parent = this.settings.parent,
               elm = this.domElement;
 
         if(parent !== elm.parentNode) { parent.appendChild(elm); }
 
         this._ifPopup((popup) => {
+
             //Allow for absolute positioning of the picker popup:
             if(getComputedStyle(parent).position === 'static') {
                 parent.style.position = 'relative';
@@ -285,6 +307,7 @@ class Picker {
                     elm.classList.remove(c);
                 }
             });
+
             //Allow for custom placement via CSS:
             elm.classList.add(cssClass);
         });
@@ -371,7 +394,7 @@ class Picker {
     
     
     _ifPopup(actionIf, actionElse) {
-        if(this.settings.popup) {
+        if(this.settings.parent && this.settings.popup) {
             actionIf && actionIf(this.settings.popup);
         }
         else {

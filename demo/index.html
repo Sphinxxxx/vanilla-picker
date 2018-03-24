@@ -6,28 +6,30 @@
     <title>vanilla-picker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="../dist/vanilla-picker.min.js"></script>
+    <script src="../dist/vanilla-picker.js"></script>
 
     <style>
-        * {
-            padding: 0;
-            margin: 0;
-        }
-        
         body {
+            display: flex;
+            flex-flow: column nowrap;
+            margin: 0;
             min-height: 100vh;
+            align-items: center;
+
             font-family: Georgia, sans-serif;
             background-color: white;
             background-image: repeating-linear-gradient( 0deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px),
                               repeating-linear-gradient(90deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px);
         }
         
-        h1 {
-            text-align: center;
+        #custom-toggler {
+            padding: 1em;
+            margin: 1em;
+            background: white;
         }
         
         #main-color {
-            position: absolute;
+            display: inline-block;
             border: 4px dashed tomato;
         }
         #main-color .picker_sample, #main-color .picker_done {
@@ -73,15 +75,20 @@
 <body>
     <h1><a href="https://github.com/Sphinxxxx/vanilla-picker">vanilla-picker</a> demo</h1>
 
-    <div id="main-color" style="top:3em;right:1em"></div>
 
-    <div class="popup-parent" style="top:45%;left:1em;">
-        Click me
+    <div id="main-color"></div>
+
+    <div id="basic" class="popup-parent" style="top:45%;left:1em;">
+        Click me!
     </div>
 
-    <div class="popup-parent" style="bottom:20%;left:20%;">
-        ..or me!
-        <select onclick="event.stopPropagation();">
+    <label id="custom-toggler">
+        <input type="checkbox" />
+        Toggle "Custom" popup
+    </label>
+    <div id="custom" class="popup-parent" style="bottom:20%;left:40%;">
+        Custom
+        <select id="custom-placement" onclick="event.stopPropagation();">
             <option selected>top</option>
             <option>bottom</option>
             <option>left</option>
@@ -91,38 +98,63 @@
 
 
     <script>
+        "use strict";
+        /*global Picker*/
+
+        var parentMain = document.querySelector('#main-color'),
+            parentBasic = document.querySelector('#basic'),
+            parentCustom = document.querySelector('#custom'),
+            customPlacement = document.querySelector('#custom-placement'),
+            customToggler = document.querySelector('#custom-toggler input');
+
+        var popupBasic, popupCustom;
+
+
+        /* Basic example */
+        popupBasic = new Picker(parentBasic);
+        popupBasic.onDone = function(color) {
+            parentBasic.style.background = color.rgbaString;
+        };
+        popupBasic.show();
+
+
+        /* Custom popup behavior */
+        popupCustom = new Picker({
+            parent: parentCustom,
+            popup: customPlacement.value,
+            color: '#dbeb',
+            onDone: function(color) {
+                parentCustom.style.background = color.rgbaString;
+            },
+        });
+        customPlacement.onchange = function(e) {
+            popupCustom.setOptions({
+                popup: customPlacement.value,
+            });
+        };
+        //Disable the normal open/close behavior and implement our own:
+        popupCustom.openHandler = popupCustom.closeHandler = function() { };
+        customToggler.onchange = function(e) {
+            if(customToggler.checked) {
+                popupCustom.show();
+            }
+            else {
+                popupCustom.hide();
+            }
+        };
+
+
+        /* Non-popup picker */
         new Picker({
-            parent: document.querySelector('#main-color'),
-            color: '#cef6',
-            alpha: false,
+            parent: parentMain,
             popup: false,
+            alpha: false,
+            color: '#cef6',
             onChange: function(color) {
                 document.body.style.backgroundColor = color.rgbaString;
             },
         });
 
-        var parents = Array.prototype.slice.call(document.querySelectorAll('.popup-parent'));
-        parents.forEach(function(p, i) {
-
-            var picker = new Picker(p);
-            if(i === 0) {
-                picker.setColor('#dbeb');
-                picker.show();
-            }
-            picker.onDone = function(color) {
-                p.style.background = color.rgbaString;
-            };
-            
-            p.onclick = function() {
-                var pos = p.querySelector('select');
-                if(pos) {
-                    picker.setOptions({
-                        popup: pos.value,
-                    });
-                }
-                picker.show();
-            };
-        });
     </script>
 
 </body>

@@ -1,75 +1,64 @@
 # vanilla-picker
 
-A simple, easy to use, versatile and customizable vanilla JS color picker.
-
-Using it is as simple as this: 
-
-```javascript
-var parent = document.querySelector('#parent');
-var picker = new Picker(parent);
-
-parent.onclick = function() {
-    picker.show();
-};
-picker.onDone = function(color) {
-    parent.style.background = color.rgbaString;
-};
-```
+A simple, easy to use vanilla JS (no dependencies) color picker with alpha selection.
 
 #### Demo
 
-https://rawgit.com/Sphinxxxx/vanilla-picker/master/demo/index.html
-
+https://rawgit.com/Sphinxxxx/vanilla-picker/master/demo/index.html  
 https://codepen.io/Sphinxxxx/pen/zRmKBX
 
 
-## Explained
+## Getting Started
+
+#### Installing
+
+* For the pros:
+
+  + ```npm install vanilla-picker --save```
+  + ```import Picker from 'vanilla-picker';```
+
+* For the rest of us:
+
+```
+<script src='https://unpkg.com/vanilla-picker'></script>
+```
+
+#### Usage
 
 ```html
-<script src="picker.min.js"></script>
-
-<div id="parent">click me</div>
+<div id="parent">Click me</div>
 
 <script>
 
     /*
-        STEP 1
-        Create a new Picker object and set the parent element.
+        Create a new Picker instance and set the parent element.
+        By default, the color picker is a popup which appears when you click the parent.
     */
     var parent = document.querySelector('#parent');
     var picker = new Picker(parent);
 
     /*
-        STEP 2
-        Set the color picker to open when you want, when the parent is clicked for example.
-    */
-    parent.onclick = function() {
-        picker.show();
-    };
-
-    /*
-        STEP 3
         You can do what you want with the chosen color using two callbacks: onChange and onDone.
     */
-    picker.onDone = function(color) {
+    picker.onChange = function(color) {
 
         /*
             You can get the color components from
                 color.rgba
                 color.hsla  (all values between 0 and 1, inclusive)
     
-            ..or ready to use CSS values from
+            ..or ready-to-use CSS values from
                 color.rgbString
                 color.rgbaString
                 color.hslString
                 color.hslaString
-                color.hex   (eight digit #RRGGBBAA, not supported in all browsers)
+                color.hex   (8 digit #RRGGBBAA, not supported in all browsers)
         */
 
         parent.style.background = color.rgbaString;
     };
 
-    /* onChange is called every time the selection is changed without clicking 'Ok' */
+    /* onDone is similar to onChange, but only called when you click 'Ok' */
 
 </script>
 ```
