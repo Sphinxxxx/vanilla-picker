@@ -1,7 +1,7 @@
 {
   "name": "vanilla-picker",
-  "version": "2.0.1",
-  "description": "A simple, easy to use, versatile and customizable vanilla JS color picker.",
+  "version": "2.0.2",
+  "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "author": "Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)",
   "homepage": "https://github.com/Sphinxxxx/vanilla-picker",
   "license": "ISC",
@@ -19,6 +19,8 @@
     "dist/"
   ],
   "scripts": {
+    "prepublish": "bash ./scripts/prepub.sh",
+    "postpublish": "bash ./scripts/postpub.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
