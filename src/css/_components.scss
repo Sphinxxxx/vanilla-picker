@@ -1,3 +1,12 @@
+.picker_wrapper {
+    box-sizing: border-box;
+    background: $color-bg;
+    cursor: default;
+
+    //Needed for the default popup behavior, where the parent is temporarily disabled via "pointer-events: none"
+    pointer-events: auto;
+}
+
 .picker_selector {
     position: absolute;
     z-index: 1; //On top of nearby sliders

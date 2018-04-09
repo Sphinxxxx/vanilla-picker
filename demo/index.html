@@ -23,9 +23,9 @@
         }
         
         #custom-toggler {
+            position: absolute;
             padding: 1em;
-            margin: 1em;
-            background: white;
+            font: inherit;
         }
         
         #main-color {
@@ -82,10 +82,9 @@
         Click me!
     </div>
 
-    <label id="custom-toggler">
-        <input type="checkbox" />
-        Toggle "Custom" popup
-    </label>
+    <button id="custom-toggler" style="bottom:20%;left:5%;">
+        Open "Custom" popup
+    </button>
     <div id="custom" class="popup-parent" style="bottom:20%;left:40%;">
         Custom
         <select id="custom-placement" onclick="event.stopPropagation();">
@@ -105,7 +104,7 @@
             parentBasic = document.querySelector('#basic'),
             parentCustom = document.querySelector('#custom'),
             customPlacement = document.querySelector('#custom-placement'),
-            customToggler = document.querySelector('#custom-toggler input');
+            customToggler = document.querySelector('#custom-toggler');
 
         var popupBasic, popupCustom;
 
@@ -115,7 +114,7 @@
         popupBasic.onDone = function(color) {
             parentBasic.style.background = color.rgbaString;
         };
-        popupBasic.show();
+        popupBasic.openHandler();
 
 
         /* Custom popup behavior */
@@ -133,14 +132,9 @@
             });
         };
         //Disable the normal open/close behavior and implement our own:
-        popupCustom.openHandler = popupCustom.closeHandler = function() { };
-        customToggler.onchange = function(e) {
-            if(customToggler.checked) {
-                popupCustom.show();
-            }
-            else {
-                popupCustom.hide();
-            }
+        popupCustom.openHandler = /*popupCustom.closeHandler =*/ function() { };
+        customToggler.onclick = function(e) {
+            popupCustom.show();
         };
 
 

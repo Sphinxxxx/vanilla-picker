@@ -1,8 +1,9 @@
+.layout_default {
+
 $width-gutter: 1em;
 $width-slider: 2em;
 
-
-.picker_wrapper {
+&.picker_wrapper {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
@@ -15,11 +16,6 @@ $width-slider: 2em;
     > * {
         margin: $width-gutter/2;
     }
-    
-    box-sizing: border-box;
-    background: $color-bg;
-    cursor: default;
-    pointer-events: auto;
     
     //https://stackoverflow.com/questions/29732575/line-break-in-multi-line-flexbox
     //We use this to insert a line break after .picker_alpha,
@@ -77,4 +73,6 @@ $width-slider: 2em;
     
     width: 3rem;
     height: 2rem;
+}
+
 }

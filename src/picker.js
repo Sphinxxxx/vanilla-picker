@@ -40,6 +40,7 @@ class Picker {
             //  parent: document.body,
             popup: 'right',
             alpha: true,
+            layout: 'default',
         };
 
         this.setOptions(options);
@@ -198,6 +199,7 @@ class Picker {
         this._domSample = wrapper.querySelector('.picker_sample');
         this._domOkay   = wrapper.querySelector('.picker_done');
 
+        wrapper.classList.add('layout_' + this.settings.layout);
         if(!this.settings.alpha) { wrapper.classList.add('no_alpha'); }
         this._ifPopup(() => wrapper.classList.add('popup'));
         
