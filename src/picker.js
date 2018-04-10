@@ -39,8 +39,9 @@ class Picker {
             //Allow creating a popup without putting it on screen yet.
             //  parent: document.body,
             popup: 'right',
-            alpha: true,
             layout: 'default',
+            alpha:  true,
+            editor: true,
         };
 
         this.setOptions(options);
@@ -70,7 +71,7 @@ class Picker {
             }
         }
 
-        if (options instanceof HTMLElement) {
+        if(options instanceof HTMLElement) {
             settings.parent = options;
         }
         else {
@@ -91,7 +92,7 @@ class Picker {
 
         //Note: Look for color in 'options', as a color value in 'settings' may be an old one we don't want to revert to.
         const col = options.color || options.colour;
-        if(col) { this.setColor(col); }
+        if(col) { this._setColor(col); }
         
         //Init popup behavior once we have all the parts we need:
         if(settings.parent && settings.popup && !this._popupInited) {
@@ -155,6 +156,9 @@ class Picker {
      * @param {string} color - RGBA/HSLA/HEX string, or RGBA array (*Not color name*).
      */
     setColor(color) {
+        this._setColor(color);
+    }
+    _setColor(color, fromEditor) {
         let c = new Color(color);
         if(!this.settings.alpha) {
             const hsla = c.hsla;
@@ -162,7 +166,7 @@ class Picker {
             c.hsla = hsla;
         }
         this.colour = this.color = c;
-        this._setHSLA();
+        this._setHSLA(null, null, null, null, fromEditor);
     }
     /**
      * @see setColor
@@ -180,7 +184,7 @@ class Picker {
         if(!parent) { return; }
         
         //Unhide html if it exists
-        if (this.domElement) {
+        if(this.domElement) {
             this.domElement.style.display = '';
 
             //Things could have changed through setOptions():
@@ -196,11 +200,13 @@ class Picker {
         this._domH  = wrapper.querySelector('.picker_hue');
         this._domSL = wrapper.querySelector('.picker_sl');
         this._domA  = wrapper.querySelector('.picker_alpha');
+        this._domEdit = wrapper.querySelector('.picker_editor input');
         this._domSample = wrapper.querySelector('.picker_sample');
-        this._domOkay   = wrapper.querySelector('.picker_done');
+        this._domOkay   = wrapper.querySelector('.picker_done button');
 
         wrapper.classList.add('layout_' + this.settings.layout);
         if(!this.settings.alpha) { wrapper.classList.add('no_alpha'); }
+        if(!this.settings.editor) { wrapper.classList.add('no_editor'); }
         this._ifPopup(() => wrapper.classList.add('popup'));
         
         this._setPosition();
@@ -210,7 +216,7 @@ class Picker {
             this._updateUI();
         }
         else {
-            this.setColor('#0cf');
+            this._setColor('#0cf');
         }
         this._bindEvents();
     }
@@ -220,7 +226,7 @@ class Picker {
      * Hide the picker.
      */
     hide() {
-        if (this.domElement) {
+        if(this.domElement) {
             this.domElement.style.display = 'none';
         }
     }
@@ -252,6 +258,8 @@ class Picker {
                 callbackClick: relayDrag,
                 //Respond at once (mousedown), don't wait for click or drag:
                 callbackDragStart: relayDrag,
+                //When interacting with a picker, this allows other open picker popups to close:
+                propagateEvents: true,
             };
             return config;
         }
@@ -263,7 +271,25 @@ class Picker {
         dragTracker(createDragConfig(this._domSL, (x, y) => that._setHSLA(null, x, 1 - y)));
 
         //Select alpha
-        dragTracker(createDragConfig(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y)));
+        if(this.settings.alpha) {
+            dragTracker(createDragConfig(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y)));
+        }
+        
+        
+        /* Direct color value editing */
+        
+        if(this.settings.editor) {
+            addEvent(this._domEdit, 'input', function(e) {
+                const color = this.value;
+                try {
+                    //Will throw on unknown colors
+                    new Color(this.value);
+    
+                    that._setColor(color, true);
+                }
+                catch(ex) { }
+            });
+        }
 
 
         /* Close the dialog */
@@ -275,7 +301,7 @@ class Picker {
         addEvent(this._domOkay, 'click', (e) => {
             this._ifPopup(() => this.closeHandler(e));
             
-            if (this.onDone) { this.onDone(this.colour); }
+            if(this.onDone) { this.onDone(this.colour); }
         });
     }
 
@@ -321,25 +347,22 @@ class Picker {
      * 
      * @private
      */
-    _setHSLA(h, s, l, a) {
+    _setHSLA(h, s, l, a,  fromEditor) {
         const arg = arguments,
               col = this.colour;
 
-        if(arg.length) {
-            const hsla = col.hsla;
-            for (let i = 0; i < arg.length; i++) {
-                const x = arg[i];
-                if(x || (x === 0)) { hsla[i] = x; }
-            }
-            col.hsla = hsla;
-        }
-        
-        this._updateUI();
+        const hsla = col.hsla;
+        [h, s, l, a].forEach((x, i) => {
+            if(x || (x === 0)) { hsla[i] = x; }
+        });
+        col.hsla = hsla;
 
-        if (this.onChange) { this.onChange(col); }
+        this._updateUI(fromEditor);
+
+        if(this.onChange) { this.onChange(col); }
     }
 
-    _updateUI() {
+    _updateUI(fromEditor) {
         if(!this.domElement) { return; }
         
         const col = this.colour,
@@ -387,6 +410,16 @@ class Picker {
 
         //Let the Alpha slider fade from opaque to transparent:
         this._domA.style.backgroundImage = bg + ', ' + BG_TRANSP;
+
+
+        /* Editable value */
+        
+        //Don't update the editor if the user is typing.
+        //That creates too much noise because of our auto-expansion of 3/4/6 -> 8 digit hex codes.
+        if(!fromEditor) {
+            const hex = col.hex;
+            this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
+        }
 
 
         /* Sample swatch */

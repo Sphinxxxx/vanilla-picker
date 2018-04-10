@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "author": "Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)",
   "homepage": "https://github.com/Sphinxxxx/vanilla-picker",
@@ -30,19 +30,19 @@
     "babel-register": "^6.26.0",
     "gulp": "^4.0.0",
     "gulp-file": "^0.4.0",
-    "gulp-header": "^2.0.1",
+    "gulp-header": "^2.0.5",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.6.1",
     "gulp-strip-comments": "^2.5.2",
     "gulp-uglify": "^3.0.0",
-    "node-sass": "^4.7.2",
-    "pug": "^2.0.0-rc.4",
-    "rollup": "^0.56.2",
+    "node-sass": "^4.8.3",
+    "pug": "^2.0.3",
+    "rollup": "^0.56.5",
     "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-node-resolve": "^3.0.3"
+    "rollup-plugin-node-resolve": "^3.3.0"
   },
   "dependencies": {
-    "@sphinxxxx/color-conversion": "^2.0.0-alpha.3",
-    "drag-tracker": "^0.4.1"
+    "@sphinxxxx/color-conversion": "^2.0.0",
+    "drag-tracker": "^1.0.0"
   }
 }

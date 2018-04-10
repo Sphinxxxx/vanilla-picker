@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.0.2
+ * vanilla-picker v2.1.0
  * https://github.com/Sphinxxxx/vanilla-picker
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -217,7 +217,7 @@ var Color = function () {
 		get: function get$$1() {
 			var rgb = this.rgba,
 			    hex = rgb.map(function (x, i) {
-				return i < 3 ? x.toString(16) : (x * 255).toString(16);
+				return i < 3 ? x.toString(16) : Math.round(x * 255).toString(16);
 			});
 
 			return '#' + hex.map(function (x) {
@@ -333,6 +333,8 @@ var Color = function () {
 	return Color;
 }();
 
+var root = window;
+
 function dragTracker(options) {
 
 
@@ -356,6 +358,7 @@ function dragTracker(options) {
         callbackEnd = options.callbackDragEnd,
 
     callbackClick = options.callbackClick,
+        propagate = options.propagateEvents,
         roundCoords = options.roundCoords !== false,
         dragOutside = options.dragOutside !== false,
 
@@ -369,9 +372,7 @@ function dragTracker(options) {
             offsetToCenter = false;break;
     }
 
-    var dragged = void 0,
-        mouseOffset = void 0,
-        dragStart = void 0;
+    var dragState = void 0;
 
     function getMousePos(e, elm, offset, stayWithin) {
         var x = e.clientX,
@@ -408,65 +409,86 @@ function dragTracker(options) {
         return roundCoords ? [Math.round(x), Math.round(y)] : [x, y];
     }
 
-    function onDown(e) {
-        dragged = selector ? e.target.closest(selector) : {};
-        if (dragged) {
-            e.preventDefault();
+    function stopEvent(e) {
+        e.preventDefault();
+        if (!propagate) {
             e.stopPropagation();
+        }
+    }
 
-            mouseOffset = selector && handleOffset ? getMousePos(e, dragged) : [0, 0];
-            dragStart = getMousePos(e, container, mouseOffset);
-            if (roundCoords) {
-                dragStart = dragStart.map(Math.round);
-            }
+    function onDown(e) {
+        var target = void 0;
+        if (selector) {
+            target = selector instanceof Element ? selector.contains(e.target) ? selector : null : e.target.closest(selector);
+        } else {
+            target = {};
+        }
+
+        if (target) {
+            stopEvent(e);
+
+            var mouseOffset = selector && handleOffset ? getMousePos(e, target) : [0, 0],
+                startPos = getMousePos(e, container, mouseOffset);
+            dragState = {
+                target: target,
+                mouseOffset: mouseOffset,
+                startPos: startPos,
+                actuallyDragged: false
+            };
 
             if (callbackStart) {
-                callbackStart(dragged, dragStart);
+                callbackStart(target, startPos);
             }
         }
     }
 
     function onMove(e) {
-        if (!dragged) {
+        if (!dragState) {
             return;
         }
-        e.preventDefault();
-        e.stopPropagation();
+        stopEvent(e);
 
-        var pos = getMousePos(e, container, mouseOffset, !dragOutside);
-        callback(dragged, pos, dragStart);
+        var start = dragState.startPos,
+            pos = getMousePos(e, container, dragState.mouseOffset, !dragOutside);
+
+        dragState.actuallyDragged = dragState.actuallyDragged || start[0] !== pos[0] || start[1] !== pos[1];
+
+        callback(dragState.target, pos, start);
     }
 
-    function onEnd(e) {
-        if (!dragged) {
+    function onEnd(e, cancelled) {
+        if (!dragState) {
             return;
         }
 
         if (callbackEnd || callbackClick) {
-            var pos = getMousePos(e, container, mouseOffset, !dragOutside);
+            var isClick = !dragState.actuallyDragged,
+                pos = isClick ? dragState.startPos : getMousePos(e, container, dragState.mouseOffset, !dragOutside);
 
-            if (callbackClick && dragStart[0] === pos[0] && dragStart[1] === pos[1]) {
-                callbackClick(dragged, dragStart);
+            if (callbackClick && isClick && !cancelled) {
+                callbackClick(dragState.target, pos);
             }
             if (callbackEnd) {
-                callbackEnd(dragged, pos, dragStart);
+                callbackEnd(dragState.target, pos, dragState.startPos, cancelled || isClick && callbackClick);
             }
         }
-        dragged = null;
+        dragState = null;
     }
 
 
-    container.addEventListener('mousedown', function (e) {
+    addEvent(container, 'mousedown', function (e) {
         if (isLeftButton(e)) {
             onDown(e);
+        } else {
+            onEnd(e, true);
         }
     });
-    container.addEventListener('touchstart', function (e) {
-        relayTouch(e, onDown);
+    addEvent(container, 'touchstart', function (e) {
+        return relayTouch(e, onDown);
     });
 
-    window.addEventListener('mousemove', function (e) {
-        if (!dragged) {
+    addEvent(root, 'mousemove', function (e) {
+        if (!dragState) {
             return;
         }
 
@@ -477,28 +499,35 @@ function dragTracker(options) {
                 onEnd(e);
             }
     });
-    window.addEventListener('touchmove', function (e) {
-        relayTouch(e, onMove);
+    addEvent(root, 'touchmove', function (e) {
+        return relayTouch(e, onMove);
     });
 
-    window.addEventListener('mouseup', function (e) {
-        if (dragged && !isLeftButton(e)) {
+    addEvent(container, 'mouseup', function (e) {
+        if (dragState && !isLeftButton(e)) {
             onEnd(e);
         }
     });
-    function onTouchEnd(e) {
-        onEnd(tweakTouch(e));
+    function onTouchEnd(e, cancelled) {
+        onEnd(tweakTouch(e), cancelled);
     }
-    container.addEventListener('touchend', onTouchEnd);
-    container.addEventListener('touchcancel', onTouchEnd);
+    addEvent(container, 'touchend', function (e) {
+        return onTouchEnd(e);
+    });
+    addEvent(container, 'touchcancel', function (e) {
+        return onTouchEnd(e, true);
+    });
 
+    function addEvent(target, type, handler) {
+        target.addEventListener(type, handler);
+    }
     function isLeftButton(e) {
         return e.buttons !== undefined ? e.buttons === 1 :
         e.which === 1;
     }
     function relayTouch(e, handler) {
         if (e.touches.length !== 1) {
-            onEnd(e);return;
+            onEnd(e, true);return;
         }
 
         handler(tweakTouch(e));
@@ -530,7 +559,7 @@ var BG_TRANSP = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/s
 var HUES = 360;
 
 document.documentElement.firstElementChild 
-.appendChild(document.createElement('style')).textContent = '.layout_default.picker_wrapper{display:flex;flex-flow:row wrap;justify-content:space-between;align-items:stretch;font-size:10px;width:25em;padding:.5em}.layout_default.picker_wrapper>*{margin:.5em}.layout_default.picker_wrapper::before{content:\'\';display:block;width:100%;height:0;order:1}.layout_default .picker_slider,.layout_default .picker_selector{padding:1em}.layout_default .picker_hue{width:100%}.layout_default .picker_sl{flex:1 1 auto}.layout_default .picker_sl::before{content:\'\';display:block;padding-bottom:100%}.layout_default .picker_wrapper.no_alpha .picker_alpha{display:none}.layout_default .picker_sample{order:1;flex:1 1 auto;min-height:3em}.layout_default .picker_done{order:1;width:3rem;height:2rem}.picker_wrapper{box-sizing:border-box;background:#f2f2f2;cursor:default;pointer-events:auto}.picker_selector{position:absolute;z-index:1;display:block;transform:translate(-50%, -50%);border:2px solid white;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);box-shadow:0 0 0 1px silver}.picker_sl{position:relative;box-shadow:0 0 0 1px silver;background-image:linear-gradient(180deg, white, rgba(255,255,255,0) 50%),linear-gradient(0deg, black, transparent 50%),linear-gradient(90deg, gray, rgba(128,128,128,0))}.picker_alpha,.picker_sample{position:relative;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") left top/contain white;box-shadow:0 0 0 1px silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_sample::before{content:\'\';position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_done{font:inherit;font-family:sans-serif;box-sizing:border-box;text-align:center;cursor:pointer;position:relative;padding:0;text-indent:100%;white-space:nowrap;overflow:hidden}.picker_done::before{content:\'Ok\';position:absolute;top:0;left:0;display:flex;width:100%;height:100%;justify-content:center;align-items:center;font-size:1rem;text-indent:0}.picker_arrow{position:absolute}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,0.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;transform:skew(45deg);transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
+.appendChild(document.createElement('style')).textContent = '.picker_wrapper.no_alpha .picker_alpha,.picker_wrapper.no_editor .picker_editor{display:none}.layout_default.picker_wrapper{display:flex;flex-flow:row wrap;justify-content:space-between;align-items:stretch;font-size:10px;width:25em;padding:.5em}.layout_default.picker_wrapper input,.layout_default.picker_wrapper button{font-size:1rem}.layout_default.picker_wrapper>*{margin:.5em}.layout_default.picker_wrapper::before{content:\'\';display:block;width:100%;height:0;order:1}.layout_default .picker_slider,.layout_default .picker_selector{padding:1em}.layout_default .picker_hue{width:100%}.layout_default .picker_sl{flex:1 1 auto}.layout_default .picker_sl::before{content:\'\';display:block;padding-bottom:100%}.layout_default .picker_editor{order:1;width:6rem}.layout_default .picker_editor input{width:calc(100% + 2px);height:calc(100% + 2px)}.layout_default .picker_sample{order:1;flex:1 1 auto}.layout_default .picker_done{order:1}.picker_wrapper{box-sizing:border-box;background:#f2f2f2;cursor:default;font-family:sans-serif;pointer-events:auto}.picker_wrapper button,.picker_wrapper input{margin:-1px}.picker_selector{position:absolute;z-index:1;display:block;transform:translate(-50%, -50%);border:2px solid white;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);box-shadow:0 0 0 1px silver}.picker_sl{position:relative;box-shadow:0 0 0 1px silver;background-image:linear-gradient(180deg, white, rgba(255,255,255,0) 50%),linear-gradient(0deg, black, transparent 50%),linear-gradient(90deg, gray, rgba(128,128,128,0))}.picker_alpha,.picker_sample{position:relative;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") left top/contain white;box-shadow:0 0 0 1px silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_editor input{box-sizing:border-box;font-family:monospace;padding:.1em .2em}.picker_sample::before{content:\'\';position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_done button{box-sizing:border-box;padding:.2em .5em;cursor:pointer}.picker_arrow{position:absolute;z-index:-1}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,0.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;transform:skew(45deg);transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
 
 var Picker = function () {
 
@@ -540,8 +569,9 @@ var Picker = function () {
 
         this.settings = {
             popup: 'right',
+            layout: 'default',
             alpha: true,
-            layout: 'default'
+            editor: true
         };
 
         this.setOptions(options);
@@ -585,7 +615,7 @@ var Picker = function () {
 
             var col = options.color || options.colour;
             if (col) {
-                this.setColor(col);
+                this._setColor(col);
             }
 
             if (settings.parent && settings.popup && !this._popupInited) {
@@ -638,6 +668,11 @@ var Picker = function () {
     }, {
         key: 'setColor',
         value: function setColor(color) {
+            this._setColor(color);
+        }
+    }, {
+        key: '_setColor',
+        value: function _setColor(color, fromEditor) {
             var c = new Color(color);
             if (!this.settings.alpha) {
                 var hsla = c.hsla;
@@ -645,7 +680,7 @@ var Picker = function () {
                 c.hsla = hsla;
             }
             this.colour = this.color = c;
-            this._setHSLA();
+            this._setHSLA(null, null, null, null, fromEditor);
         }
 
     }, {
@@ -671,19 +706,23 @@ var Picker = function () {
                 return;
             }
 
-            var html = this.settings.template || '<div class="picker_wrapper"><div class="picker_arrow"></div><div class="picker_hue picker_slider"><div class="picker_selector"></div></div><div class="picker_sl"><div class="picker_selector"></div></div><div class="picker_alpha picker_slider"><div class="picker_selector"></div></div><div class="picker_sample"></div><button class="picker_done"></button></div>';
+            var html = this.settings.template || '<div class="picker_wrapper"><div class="picker_arrow"></div><div class="picker_hue picker_slider"><div class="picker_selector"></div></div><div class="picker_sl"><div class="picker_selector"></div></div><div class="picker_alpha picker_slider"><div class="picker_selector"></div></div><div class="picker_editor"><input/></div><div class="picker_sample"></div><div class="picker_done"><button>Ok</button></div></div>';
             var wrapper = parseHTML(html);
 
             this.domElement = wrapper;
             this._domH = wrapper.querySelector('.picker_hue');
             this._domSL = wrapper.querySelector('.picker_sl');
             this._domA = wrapper.querySelector('.picker_alpha');
+            this._domEdit = wrapper.querySelector('.picker_editor input');
             this._domSample = wrapper.querySelector('.picker_sample');
-            this._domOkay = wrapper.querySelector('.picker_done');
+            this._domOkay = wrapper.querySelector('.picker_done button');
 
             wrapper.classList.add('layout_' + this.settings.layout);
             if (!this.settings.alpha) {
                 wrapper.classList.add('no_alpha');
+            }
+            if (!this.settings.editor) {
+                wrapper.classList.add('no_editor');
             }
             this._ifPopup(function () {
                 return wrapper.classList.add('popup');
@@ -694,7 +733,7 @@ var Picker = function () {
             if (this.colour) {
                 this._updateUI();
             } else {
-                this.setColor('#0cf');
+                this._setColor('#0cf');
             }
             this._bindEvents();
         }
@@ -730,7 +769,8 @@ var Picker = function () {
                     dragOutside: false,
                     callback: relayDrag,
                     callbackClick: relayDrag,
-                    callbackDragStart: relayDrag
+                    callbackDragStart: relayDrag,
+                    propagateEvents: true
                 };
                 return config;
             }
@@ -743,9 +783,23 @@ var Picker = function () {
                 return that._setHSLA(null, x, 1 - y);
             }));
 
-            dragTracker(createDragConfig(this._domA, function (x, y) {
-                return that._setHSLA(null, null, null, 1 - y);
-            }));
+            if (this.settings.alpha) {
+                dragTracker(createDragConfig(this._domA, function (x, y) {
+                    return that._setHSLA(null, null, null, 1 - y);
+                }));
+            }
+
+
+            if (this.settings.editor) {
+                addEvent(this._domEdit, 'input', function (e) {
+                    var color = this.value;
+                    try {
+                        new Color(this.value);
+
+                        that._setColor(color, true);
+                    } catch (ex) {}
+                });
+            }
 
 
             addEvent(window, 'mousedown', function (e) {
@@ -799,22 +853,18 @@ var Picker = function () {
 
     }, {
         key: '_setHSLA',
-        value: function _setHSLA(h, s, l, a) {
-            var arg = arguments,
-                col = this.colour;
+        value: function _setHSLA(h, s, l, a, fromEditor) {
+            var col = this.colour;
 
-            if (arg.length) {
-                var hsla = col.hsla;
-                for (var i = 0; i < arg.length; i++) {
-                    var x = arg[i];
-                    if (x || x === 0) {
-                        hsla[i] = x;
-                    }
+            var hsla = col.hsla;
+            [h, s, l, a].forEach(function (x, i) {
+                if (x || x === 0) {
+                    hsla[i] = x;
                 }
-                col.hsla = hsla;
-            }
+            });
+            col.hsla = hsla;
 
-            this._updateUI();
+            this._updateUI(fromEditor);
 
             if (this.onChange) {
                 this.onChange(col);
@@ -822,7 +872,7 @@ var Picker = function () {
         }
     }, {
         key: '_updateUI',
-        value: function _updateUI() {
+        value: function _updateUI(fromEditor) {
             if (!this.domElement) {
                 return;
             }
@@ -863,6 +913,12 @@ var Picker = function () {
                 bg = 'linear-gradient(' + [opaque, transp] + ')';
 
             this._domA.style.backgroundImage = bg + ', ' + BG_TRANSP;
+
+
+            if (!fromEditor) {
+                var hex = col.hex;
+                this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
+            }
 
 
             this._domSample.style.color = cssHSLA;

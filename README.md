@@ -76,15 +76,21 @@ var picker = new Picker({
            'left'
            'top'
            'bottom'
-           false   /* No popup, just add the picker as a normal element on the page */
-
-    alpha: true    /* Whether to enable adjusting the alpha channel */
+           false      /* No popup, just add the picker as a normal element on the page */
     
-    color:         /* Initial color for the picker        (or call picker.setColor()) */
+    template:         /* Custom HTML string from which to build the picker. See src/picker.pug for required elements and class names */
     
-    onChange:      /* Callback whenever the color changes (or set  picker.onChange) */
+    layout: 'default' /* Suffix of a custom layout_... CSS class to handle the overall arrangement of the picker elements */
     
-    onDone:        /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
+    alpha:  true      /* Whether to enable adjusting the alpha channel */
+    
+    editor: true      /* Whether to show a text field for color value editing */
+    
+    color:            /* Initial color for the picker        (or call picker.setColor()) */
+    
+    onChange:         /* Callback whenever the color changes (or set  picker.onChange) */
+    
+    onDone:           /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
 
 });
 ```

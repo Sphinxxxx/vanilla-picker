@@ -49,8 +49,11 @@
         }
         
         @media(max-width: 500px) {
-            .picker_wrapper {
+            .layout_default.picker_wrapper {
                 font-size: 7px;
+            }
+            .layout_default .picker_editor {
+                width: 100%;
             }
         }
         
@@ -143,6 +146,7 @@
             parent: parentMain,
             popup: false,
             alpha: false,
+            editor: false,
             color: '#cef6',
             onChange: function(color) {
                 document.body.style.backgroundColor = color.rgbaString;
