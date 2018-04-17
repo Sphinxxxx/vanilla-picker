@@ -20,7 +20,7 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 * For the rest of us:
 
 ```
-<script src='https://unpkg.com/vanilla-picker'></script>
+<script src="https://unpkg.com/vanilla-picker@2"></script>
 ```
 
 #### Usage
@@ -69,28 +69,28 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 ```javascript
 var picker = new Picker({
 
-    parent:        /* Which element the picker should be attached to */
+    parent:               /* Which element the picker should be attached to */
     
     /* If the picker is used as a popup, where to place it relative to the parent */
-    popup: 'right' (default)
-           'left'
-           'top'
-           'bottom'
-           false      /* No popup, just add the picker as a normal element on the page */
+    popup:     'right'    //Default
+               'left'
+               'top'
+               'bottom'
+                false     //No popup, just add the picker as a normal child element of the parent
     
-    template:         /* Custom HTML string from which to build the picker. See src/picker.pug for required elements and class names */
+    template:             /* Custom HTML string from which to build the picker. See src/picker.pug for required elements and class names */
     
-    layout: 'default' /* Suffix of a custom layout_... CSS class to handle the overall arrangement of the picker elements */
+    layout:    'default'  /* Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements */
     
-    alpha:  true      /* Whether to enable adjusting the alpha channel */
+    alpha:      true      /* Whether to enable adjusting the alpha channel */
     
-    editor: true      /* Whether to show a text field for color value editing */
+    editor:     true      /* Whether to show a text field for color value editing */
     
-    color:            /* Initial color for the picker        (or call picker.setColor()) */
+    color:                /* Initial color for the picker        (or call picker.setColor()) */
     
-    onChange:         /* Callback whenever the color changes (or set  picker.onChange) */
+    onChange:             /* Callback whenever the color changes (or set  picker.onChange) */
     
-    onDone:           /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
+    onDone:               /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
 
 });
 ```
