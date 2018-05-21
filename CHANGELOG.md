@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
-## [2.2.0]
+## [2.2.1] - 2018-05-21
+### Removed
+- Disabled package-lock.json (https://stackoverflow.com/questions/44206782/do-i-commit-the-package-lock-json-file-created-by-npm-5).
+
+
+## [2.2.0] - 2018-05-20
 ### Added
 - Supports CSS color names as input.
 
@@ -42,7 +47,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.0.1...v2.0.2
