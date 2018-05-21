@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.2.0]
+### Added
+- Supports CSS color names as input.
+
+
 ## [2.1.0]
 ### Added
 - Text field for color input.
@@ -37,7 +42,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.0.0...v2.0.1
