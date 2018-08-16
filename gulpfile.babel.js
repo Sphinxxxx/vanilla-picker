@@ -28,6 +28,9 @@ import uglify from 'gulp-uglify';
 
 import * as pkg from './package.json';
 
+//Automatically build/reload on file changes:
+import { spawn } from 'child_process';
+
 
 const globalName = 'Picker',
       outFolder = 'dist/',
@@ -116,14 +119,17 @@ gulp.task('build', function() {
 });
 
 
+/* The rest of these tasks are only here to run 'build' automatically when files change */
+
+
 //https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglobs-opts-fn
 //https://css-tricks.com/gulp-for-beginners/
 gulp.task('watch', function() {
     console.log('** Listening for file changes...');
 
-    //Watch everything in src/, plus package.json and gulpfile.babel.js in the root folder:
+    //Rebuild when anything in src/ changes:
     //https://stackoverflow.com/questions/27645103/how-to-gulp-watch-multiple-files
-    const watcher = gulp.watch(['src/**/*.*', '*.js*'], gulp.parallel('build'));
+    const watcher = gulp.watch(['src/**/*.*'], gulp.parallel('build'));
     
     watcher.on('change', function(path, stats) {
       console.log('File ' + path + ' was changed');
@@ -134,4 +140,32 @@ gulp.task('watch', function() {
 });
 
 
-gulp.task('default', gulp.series('build', 'watch'));
+gulp.task('startup', gulp.series('build', 'watch'));
+
+
+//In addition to listening for code changes, we also need to restart gulp whenever package.json or gulpfile.babel.js change
+//https://stackoverflow.com/questions/22886682/how-can-gulp-be-restarted-upon-each-gulpfile-change
+//https://gist.github.com/tilap/31167027ddee8acbf0e7
+gulp.task('auto-reload', function() {
+    let p;
+    
+    gulp.watch(['*.js*'], spawnChildren);
+    spawnChildren();
+    
+    function spawnChildren(callback) {
+        //Kill previous spawned process
+        if(p) { p.kill(); }
+        
+        //`spawn` a child `gulp` process linked to the parent `stdio`
+        p = spawn('gulp', ['startup'], { stdio: 'inherit' });
+
+        //https://github.com/gulpjs/gulp/blob/master/docs/API.md#fn-1
+        if(callback) {
+            console.log('package.json or gulpfile.babel.js changed, restarted..');
+            callback();
+        }
+    }
+});
+
+
+gulp.task('default', gulp.series('auto-reload'));

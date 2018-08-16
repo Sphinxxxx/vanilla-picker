@@ -91,6 +91,10 @@ var picker = new Picker({
     onChange:             /* Callback whenever the color changes (or set  picker.onChange) */
     
     onDone:               /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
+    
+    onOpen:               /* Callback when popup opens           (or set  picker.onOpen) */
+    
+    onClose:              /* Callback when popup closes          (or set  picker.onClose) */
 
 });
 ```

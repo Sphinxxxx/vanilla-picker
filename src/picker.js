@@ -58,6 +58,8 @@ class Picker {
      * @param {string}           [options.color]       - Initial color for the picker.
      * @param {function}         [options.onChange]    - Callback whenever the color changes.
      * @param {function}         [options.onDone]      - Callback when the user clicks "Ok".
+     * @param {function}         [options.onOpen]      - Callback when the popup opens.
+     * @param {function}         [options.onClose]     - Callback when the popup closes.
      */
     setOptions(options) {
         if(!options) { return; }
@@ -89,6 +91,8 @@ class Picker {
         //because we'll need to fire onChange() if there is a color in the options
         if(options.onChange) { this.onChange = options.onChange; }
         if(options.onDone)   { this.onDone   = options.onDone; }
+        if(options.onOpen)   { this.onOpen   = options.onOpen; }
+        if(options.onClose)  { this.onClose  = options.onClose; }
 
         //Note: Look for color in 'options', as a color value in 'settings' may be an old one we don't want to revert to.
         const col = options.color || options.colour;
@@ -115,10 +119,12 @@ class Picker {
      * Default behavior for opening the popup
      */
     openHandler(e) {
-        this.show();
+        if(this.show()) {
+            //A trick to avoid re-opening the dialog if you click the parent element while the dialog is open:
+            this.settings.parent.style.pointerEvents = 'none';
 
-        //A trick to avoid re-opening the dialog if you click the parent element while the dialog is open:
-        this.settings.parent.style.pointerEvents = 'none';
+            if(this.onOpen) { this.onOpen(this.colour); }
+        }
     }
 
 
@@ -143,9 +149,10 @@ class Picker {
             doHide = true;
         }
 
-        if(doHide) {
-            this.hide();
+        if(doHide && this.hide()) {
             this.settings.parent.style.pointerEvents = '';
+
+            if(this.onClose) { this.onClose(this.colour); }
         }
     }
 
@@ -181,16 +188,16 @@ class Picker {
      */
     show() {
         const parent = this.settings.parent;
-        if(!parent) { return; }
+        if(!parent) { return false; }
         
         //Unhide html if it exists
         if(this.domElement) {
-            this.domElement.style.display = '';
+            const toggled = this._toggleDOM(true);
 
             //Things could have changed through setOptions():
             this._setPosition();
 
-            return;
+            return toggled;
         }
 
         const html = this.settings.template || '## PLACEHOLDER-HTML ##';
@@ -219,6 +226,8 @@ class Picker {
             this._setColor('#0cf');
         }
         this._bindEvents();
+        
+        return true;
     }
 
 
@@ -226,13 +235,11 @@ class Picker {
      * Hide the picker.
      */
     hide() {
-        if(this.domElement) {
-            this.domElement.style.display = 'none';
-        }
+        return this._toggleDOM(false);
     }
 
 
-    /**
+    /*
      * Handle user input.
      * 
      * @private
@@ -306,7 +313,7 @@ class Picker {
     }
 
 
-    /**
+    /*
      * Position the picker on screen.
      * 
      * @private
@@ -342,7 +349,7 @@ class Picker {
     }
 
 
-    /**
+    /*
      * "Hub" for all color changes
      * 
      * @private
@@ -435,6 +442,18 @@ class Picker {
         else {
             actionElse && actionElse();
         }
+    }
+
+
+    _toggleDOM(toVisible) {
+        const dom = this.domElement;
+        if(!dom) { return false; }
+
+        const displayStyle = toVisible ? '' : 'none',
+              toggle = (dom.style.display !== displayStyle);
+        
+        if(toggle) { dom.style.display = displayStyle; }
+        return toggle;
     }
 
 

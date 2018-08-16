@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.2.1
+ * vanilla-picker v2.3.0
  * https://github.com/Sphinxxxx/vanilla-picker
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -639,6 +639,12 @@
               if (options.onDone) {
                   this.onDone = options.onDone;
               }
+              if (options.onOpen) {
+                  this.onOpen = options.onOpen;
+              }
+              if (options.onClose) {
+                  this.onClose = options.onClose;
+              }
 
               var col = options.color || options.colour;
               if (col) {
@@ -662,9 +668,13 @@
       }, {
           key: 'openHandler',
           value: function openHandler(e) {
-              this.show();
+              if (this.show()) {
+                  this.settings.parent.style.pointerEvents = 'none';
 
-              this.settings.parent.style.pointerEvents = 'none';
+                  if (this.onOpen) {
+                      this.onOpen(this.colour);
+                  }
+              }
           }
 
 
@@ -685,9 +695,12 @@
                       doHide = true;
                   }
 
-              if (doHide) {
-                  this.hide();
+              if (doHide && this.hide()) {
                   this.settings.parent.style.pointerEvents = '';
+
+                  if (this.onClose) {
+                      this.onClose(this.colour);
+                  }
               }
           }
 
@@ -722,15 +735,15 @@
           value: function show() {
               var parent = this.settings.parent;
               if (!parent) {
-                  return;
+                  return false;
               }
 
               if (this.domElement) {
-                  this.domElement.style.display = '';
+                  var toggled = this._toggleDOM(true);
 
                   this._setPosition();
 
-                  return;
+                  return toggled;
               }
 
               var html = this.settings.template || '<div class="picker_wrapper"><div class="picker_arrow"></div><div class="picker_hue picker_slider"><div class="picker_selector"></div></div><div class="picker_sl"><div class="picker_selector"></div></div><div class="picker_alpha picker_slider"><div class="picker_selector"></div></div><div class="picker_editor"><input/></div><div class="picker_sample"></div><div class="picker_done"><button>Ok</button></div></div>';
@@ -763,15 +776,15 @@
                   this._setColor('#0cf');
               }
               this._bindEvents();
+
+              return true;
           }
 
 
       }, {
           key: 'hide',
           value: function hide() {
-              if (this.domElement) {
-                  this.domElement.style.display = 'none';
-              }
+              return this._toggleDOM(false);
           }
 
 
@@ -958,6 +971,22 @@
               } else {
                   actionElse && actionElse();
               }
+          }
+      }, {
+          key: '_toggleDOM',
+          value: function _toggleDOM(toVisible) {
+              var dom = this.domElement;
+              if (!dom) {
+                  return false;
+              }
+
+              var displayStyle = toVisible ? '' : 'none',
+                  toggle = dom.style.display !== displayStyle;
+
+              if (toggle) {
+                  dom.style.display = displayStyle;
+              }
+              return toggle;
           }
 
 
