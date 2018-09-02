@@ -191,12 +191,13 @@ class Picker {
     /**
      * Set/initialize the picker's color.
      * 
-     * @param {string} color - Color name, RGBA/HSLA/HEX string, or RGBA array.
+     * @param {string}  color  - Color name, RGBA/HSLA/HEX string, or RGBA array.
+     * @param {boolean} silent - If true, won't trigger onChange.
      */
-    setColor(color) {
-        this._setColor(color);
+    setColor(color, silent) {
+        this._setColor(color, { silent: silent });
     }
-    _setColor(color, fromEditor) {
+    _setColor(color, flags) {
         let c = new Color(color);
         if(!this.settings.alpha) {
             const hsla = c.hsla;
@@ -204,13 +205,13 @@ class Picker {
             c.hsla = hsla;
         }
         this.colour = this.color = c;
-        this._setHSLA(null, null, null, null, fromEditor);
+        this._setHSLA(null, null, null, null, flags);
     }
     /**
      * @see setColor
      */
-    setColour(colour) {
-        this.setColor(colour);
+    setColour(colour, silent) {
+        this.setColor(colour, silent);
     }
 
 
@@ -323,7 +324,7 @@ class Picker {
                     //Will throw on unknown colors
                     new Color(this.value);
     
-                    that._setColor(color, true);
+                    that._setColor(color, { fromEditor: true });
                 }
                 catch(ex) { }
             });
@@ -385,24 +386,26 @@ class Picker {
      * 
      * @private
      */
-    _setHSLA(h, s, l, a,  fromEditor) {
-        const arg = arguments,
-              col = this.colour;
+    _setHSLA(h, s, l, a,  flags) {
+        flags = flags || {};
 
-        const hsla = col.hsla;
+        const col = this.colour,
+              hsla = col.hsla;
+
         [h, s, l, a].forEach((x, i) => {
             if(x || (x === 0)) { hsla[i] = x; }
         });
         col.hsla = hsla;
 
-        this._updateUI(fromEditor);
+        this._updateUI(flags);
 
-        if(this.onChange) { this.onChange(col); }
+        if(this.onChange && !flags.silent) { this.onChange(col); }
     }
 
-    _updateUI(fromEditor) {
+    _updateUI(flags) {
         if(!this.domElement) { return; }
-        
+        flags = flags || {};
+
         const col = this.colour,
               hsl = col.hsla,
               cssHue  = `hsl(${hsl[0] * HUES}, 100%, 50%)`,
@@ -454,7 +457,7 @@ class Picker {
         
         //Don't update the editor if the user is typing.
         //That creates too much noise because of our auto-expansion of 3/4/6 -> 8 digit hex codes.
-        if(!fromEditor) {
+        if(!flags.fromEditor) {
             const hex = col.hex;
             this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
         }

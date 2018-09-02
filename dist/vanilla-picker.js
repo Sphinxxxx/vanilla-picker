@@ -729,12 +729,12 @@
 
       }, {
           key: 'setColor',
-          value: function setColor(color) {
-              this._setColor(color);
+          value: function setColor(color, silent) {
+              this._setColor(color, { silent: silent });
           }
       }, {
           key: '_setColor',
-          value: function _setColor(color, fromEditor) {
+          value: function _setColor(color, flags) {
               var c = new Color(color);
               if (!this.settings.alpha) {
                   var hsla = c.hsla;
@@ -742,13 +742,13 @@
                   c.hsla = hsla;
               }
               this.colour = this.color = c;
-              this._setHSLA(null, null, null, null, fromEditor);
+              this._setHSLA(null, null, null, null, flags);
           }
 
       }, {
           key: 'setColour',
-          value: function setColour(colour) {
-              this.setColor(colour);
+          value: function setColour(colour, silent) {
+              this.setColor(colour, silent);
           }
 
 
@@ -858,7 +858,7 @@
                       try {
                           new Color(this.value);
 
-                          that._setColor(color, true);
+                          that._setColor(color, { fromEditor: true });
                       } catch (ex) {}
                   });
               }
@@ -915,10 +915,12 @@
 
       }, {
           key: '_setHSLA',
-          value: function _setHSLA(h, s, l, a, fromEditor) {
-              var col = this.colour;
+          value: function _setHSLA(h, s, l, a, flags) {
+              flags = flags || {};
 
-              var hsla = col.hsla;
+              var col = this.colour,
+                  hsla = col.hsla;
+
               [h, s, l, a].forEach(function (x, i) {
                   if (x || x === 0) {
                       hsla[i] = x;
@@ -926,18 +928,19 @@
               });
               col.hsla = hsla;
 
-              this._updateUI(fromEditor);
+              this._updateUI(flags);
 
-              if (this.onChange) {
+              if (this.onChange && !flags.silent) {
                   this.onChange(col);
               }
           }
       }, {
           key: '_updateUI',
-          value: function _updateUI(fromEditor) {
+          value: function _updateUI(flags) {
               if (!this.domElement) {
                   return;
               }
+              flags = flags || {};
 
               var col = this.colour,
                   hsl = col.hsla,
@@ -977,7 +980,7 @@
               this._domA.style.backgroundImage = bg + ', ' + BG_TRANSP;
 
 
-              if (!fromEditor) {
+              if (!flags.fromEditor) {
                   var hex = col.hex;
                   this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
               }
