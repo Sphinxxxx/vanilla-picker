@@ -10,6 +10,8 @@
 //https://github.com/gulpjs/gulp/issues/1631
 
 
+import * as pkg from './package.json';
+
 import gulp from 'gulp';
 import file from 'gulp-file';
 import sass from 'node-sass';
@@ -26,7 +28,8 @@ import header from 'gulp-header';
 import rename from 'gulp-rename';
 import uglify from 'gulp-uglify';
 
-import * as pkg from './package.json';
+//Documentation
+import jsdoc from 'gulp-jsdoc3';
 
 //Automatically build/reload on file changes:
 import { spawn } from 'child_process';
@@ -47,7 +50,17 @@ const myBanner = `/*!
 `;
 
 
-gulp.task('build', function() {
+//https://github.com/cssmagic/gulp-stream-to-promise/blob/master/index.js
+function stream2Promise(stream) {
+	return new Promise(function(resolve, reject) {
+		stream.on('finish', resolve)
+		      //https://github.com/sindresorhus/gulp-size/issues/13
+			  .on('end', resolve)
+			  .on('error', reject);
+	});
+}
+
+gulp.task('build', function(cb) {
     return rollup({
         input: pkg.module,
         plugins: [
@@ -73,6 +86,18 @@ gulp.task('build', function() {
         });
     })
     .then(gen => {
+
+        /* Generate the JSDoc documentation */
+
+        //Looks like stream2Promise() won't wait until the docs are built here
+        //so we need to pass a callback to jsdoc()..
+        const promDocs = new Promise(function(resolve, reject) {
+            //https://github.com/mlucool/gulp-jsdoc3#usage
+            gulp.src([/*'README.md',*/ './src/**/*.js'], {read: false})
+                .pipe(jsdoc(resolve));
+        });
+        
+        /* Generate the /dist files */
         
         //  //Before we create the destination file, prepare the CSS which we'll paste into the JS code:
         //  //https://github.com/dlmanning/gulp-sass#basic-usage
@@ -95,26 +120,31 @@ gulp.task('build', function() {
         const html = pug.renderFile(pkg.module.replace('.js', '.pug'));
         //console.log('HTML:', html);
 
-        file(outFile + '.js', gen.code, { src: true })
-            .pipe(strip())
-            .pipe(replace( '## PLACEHOLDER-CSS ##', css.replace(/'/g, "\\'").trim() ))
-            .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
-
-            //Write un-minified:
-            .pipe(header(myBanner, { pkg : pkg }))
-            .pipe(gulp.dest(outFolder))
-
-            //Minify:
-            //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
-            //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
-            //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
-            .pipe(rename({ extname: '.min.js' }))
-            .pipe(uglify())
-
-            .pipe(header(myBanner, { pkg: pkg }))
-            .pipe(gulp.dest(outFolder));
+        const promDist = stream2Promise(
+            file(outFile + '.js', gen.code, { src: true })
+                .pipe(strip())
+                .pipe(replace( '## PLACEHOLDER-CSS ##', css.replace(/'/g, "\\'").trim() ))
+                .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
+    
+                //Write un-minified:
+                .pipe(header(myBanner, { pkg : pkg }))
+                .pipe(gulp.dest(outFolder))
+    
+                //Minify:
+                //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
+                //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
+                //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
+                .pipe(rename({ extname: '.min.js' }))
+                .pipe(uglify())
+    
+                .pipe(header(myBanner, { pkg: pkg }))
+                .pipe(gulp.dest(outFolder))
+        );
 
         //      });
+
+        //console.log('returning dist');
+        return Promise.all([promDocs, promDist]);
     });
 });
 

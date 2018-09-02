@@ -31,6 +31,7 @@
     "gulp": "^4.0.0",
     "gulp-file": "^0.4.0",
     "gulp-header": "^2.0.5",
+    "gulp-jsdoc3": "^2.0.0",
     "gulp-rename": "^1.2.3",
     "gulp-replace": "^1.0.0",
     "gulp-strip-comments": "^2.5.2",

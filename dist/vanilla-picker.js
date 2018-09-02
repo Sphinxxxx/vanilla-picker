@@ -590,6 +590,7 @@
 
   var Picker = function () {
 
+
       function Picker(options) {
           var _this = this;
 
@@ -606,6 +607,11 @@
           this._openProxy = function (e) {
               return _this.openHandler(e);
           };
+
+          this.onChange = null;
+          this.onDone = null;
+          this.onOpen = null;
+          this.onClose = null;
 
           this.setOptions(options);
       }

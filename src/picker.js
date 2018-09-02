@@ -27,10 +27,40 @@ document.documentElement.firstElementChild //<head>, or <body> if there is no <h
 
 class Picker {
 
+    //https://stackoverflow.com/questions/24214962/whats-the-proper-way-to-document-callbacks-with-jsdoc
+    /**
+     * A callback that gets the picker's current color value.
+     * 
+     * @callback Picker~colorCallback
+     * @param {Object} color
+     * @param {number[]} color.rgba       - RGBA color components.
+     * @param {number[]} color.hsla       - HSLA color components (all values between 0 and 1, inclusive).
+     * @param {string}   color.rgbString  - RGB CSS value (e.g. `rgb(255,215,0)`).
+     * @param {string}   color.rgbaString - RGBA CSS value (e.g. `rgba(255,215,0, .5)`).
+     * @param {string}   color.hslString  - HSL CSS value (e.g. `hsl(50.6,100%,50%)`).
+     * @param {string}   color.hslaString - HSLA CSS value (e.g. `hsla(50.6,100%,50%, .5)`).
+     * @param {string}   color.hex        - 8 digit #RRGGBBAA (not supported in all browsers).
+     */
+
     /**
      * Create a color picker.
      * 
-     * @param {Object} options - @see setOptions
+     * @example
+     * var picker = new Picker(myParentElement);
+     * picker.onDone = function(color) {
+     *     myParentElement.style.backgroundColor = color.rgbaString;
+     * };
+     * 
+     * @example
+     * var picker = new Picker({
+     *     parent: myParentElement,
+     *     color: 'gold',
+     *     onChange: function(color) {
+     *                   myParentElement.style.backgroundColor = color.rgbaString;
+     *               },
+     * });
+     * 
+     * @param {Object} options - @see {@linkcode Picker#setOptions|setOptions()}
      */
     constructor(options) {
 
@@ -48,6 +78,27 @@ class Picker {
         //https://stackoverflow.com/questions/46014034/es6-removeeventlistener-from-arrow-function-oop
         this._openProxy  = (e) => this.openHandler(e);
 
+        /**
+         * Callback whenever the color changes.
+         * @member {Picker~colorCallback}
+         */
+        this.onChange = null;
+        /**
+         * Callback when the user clicks "Ok".
+         * @member {Picker~colorCallback}
+         */
+        this.onDone = null;
+        /**
+         * Callback when the popup opens.
+         * @member {Picker~colorCallback}
+         */
+        this.onOpen = null;
+        /**
+         * Callback when the popup closes.
+         * @member {Picker~colorCallback}
+         */
+        this.onClose = null;
+        
         this.setOptions(options);
     }
 
@@ -55,15 +106,19 @@ class Picker {
     /**
      * Set the picker options.
      * 
-     * @param {Object}            options
-     * @param {HTMLElement}       options.parent       - Which element the picker should be attached to.
-     * @param {(string|boolean)} [options.popup=right] - If the picker is used as a popup, where to place it relative to the parent ("top"/"bottom"/"left"/"right"). `false` to add the picker as a normal element on the page.
-     * @param {boolean}          [options.alpha=true]  - Whether to enable adjusting the alpha channel.
-     * @param {string}           [options.color]       - Initial color for the picker.
-     * @param {function}         [options.onChange]    - Callback whenever the color changes.
-     * @param {function}         [options.onDone]      - Callback when the user clicks "Ok".
-     * @param {function}         [options.onOpen]      - Callback when the popup opens.
-     * @param {function}         [options.onClose]     - Callback when the popup closes.
+     * @param {Object}       options
+     * @param {HTMLElement}  options.parent          - Which element the picker should be attached to.
+     * @param {('top'|'bottom'|'left'|'right'|false)}
+     *                       [options.popup=right]    - If the picker is used as a popup, where to place it relative to the parent. `false` to add the picker as a normal child element of the parent.
+     * @param {string}       [options.template]       - Custom HTML string from which to build the picker. See /src/picker.pug for required elements and class names.
+     * @param {string}       [options.layout=default] - Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements.
+     * @param {boolean}      [options.alpha=true]     - Whether to enable adjusting the alpha channel.
+     * @param {boolean}      [options.editor=true]    - Whether to show a text field for color value editing.
+     * @param {string}       [options.color]          - Initial color for the picker.
+     * @param {function}     [options.onChange]       - @see {@linkcode Picker#onChange|onChange}
+     * @param {function}     [options.onDone]         - @see {@linkcode Picker#onDone|onDone}
+     * @param {function}     [options.onOpen]         - @see {@linkcode Picker#onOpen|onOpen}
+     * @param {function}     [options.onClose]        - @see {@linkcode Picker#onClose|onClose}
      */
     setOptions(options) {
         if(!options) { return; }
@@ -174,7 +229,7 @@ class Picker {
     /**
      * Move the popup to a different parent, optionally opening it at the same time.
      *
-     * @param {Object}  options - @see setOptions (Usually a new `.parent` and `.color`).
+     * @param {Object}  options - @see {@linkcode Picker#setOptions|setOptions()} (Usually a new `.parent` and `.color`).
      * @param {boolean} open    - Whether to open the popup immediately.
      */
     movePopup(options, open) {
@@ -208,7 +263,7 @@ class Picker {
         this._setHSLA(null, null, null, null, flags);
     }
     /**
-     * @see setColor
+     * @see {@linkcode Picker#setColor|setColor()}
      */
     setColour(colour, silent) {
         this.setColor(colour, silent);

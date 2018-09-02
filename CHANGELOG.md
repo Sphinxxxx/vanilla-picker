@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - `movePopup()`: Share a picker among multiple parents.
 - **silent** flag in `setColor()` (#4).
+- JSDoc documentation.
 
 
 ## [2.3.0] - 2018-08-16

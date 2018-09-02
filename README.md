@@ -41,20 +41,6 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
         You can do what you want with the chosen color using two callbacks: onChange and onDone.
     */
     picker.onChange = function(color) {
-
-        /*
-            You can get the color components from
-                color.rgba
-                color.hsla  (all values between 0 and 1, inclusive)
-    
-            ..or ready-to-use CSS values from
-                color.rgbString
-                color.rgbaString
-                color.hslString
-                color.hslaString
-                color.hex   (8 digit #RRGGBBAA, not supported in all browsers)
-        */
-
         parent.style.background = color.rgbaString;
     };
 
@@ -64,40 +50,9 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 ```
 
 
-## Options
+## API and advanced options
 
-```javascript
-var picker = new Picker({
-
-    parent:               /* Which element the picker should be attached to */
-    
-    /* If the picker is used as a popup, where to place it relative to the parent */
-    popup:     'right'    //Default
-               'left'
-               'top'
-               'bottom'
-                false     //No popup, just add the picker as a normal child element of the parent
-    
-    template:             /* Custom HTML string from which to build the picker. See src/picker.pug for required elements and class names */
-    
-    layout:    'default'  /* Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements */
-    
-    alpha:      true      /* Whether to enable adjusting the alpha channel */
-    
-    editor:     true      /* Whether to show a text field for color value editing */
-    
-    color:                /* Initial color for the picker        (or call picker.setColor()) */
-    
-    onChange:             /* Callback whenever the color changes (or set  picker.onChange) */
-    
-    onDone:               /* Callback when the user clicks "Ok"  (or set  picker.onDone) */
-    
-    onOpen:               /* Callback when popup opens           (or set  picker.onOpen) */
-    
-    onClose:              /* Callback when popup closes          (or set  picker.onClose) */
-
-});
-```
+https://rawgit.com/Sphinxxxx/vanilla-picker/master/docs/gen/Picker.html
 
 
 ## Credits
