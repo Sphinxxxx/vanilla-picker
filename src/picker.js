@@ -44,6 +44,10 @@ class Picker {
             editor: true,
         };
 
+        //Keep openHandler() pluggable, but call it in the right context:
+        //https://stackoverflow.com/questions/46014034/es6-removeeventlistener-from-arrow-function-oop
+        this._openProxy  = (e) => this.openHandler(e);
+
         this.setOptions(options);
     }
 
@@ -83,6 +87,12 @@ class Picker {
             //    transfer(options.popup, settings.popup);
             //    skipKeys.push('popup');
             //}
+            
+            //New parent?
+            if(settings.parent && options.parent && (settings.parent !== options.parent)) {
+                settings.parent.removeEventListener('click', this._openProxy, false);
+                this._popupInited = false;
+            }
 
             transfer(options, settings/*, skipKeys*/);
         }
@@ -101,7 +111,7 @@ class Picker {
         //Init popup behavior once we have all the parts we need:
         if(settings.parent && settings.popup && !this._popupInited) {
 
-            addEvent(settings.parent, 'click', (e) => this.openHandler(e));
+            addEvent(settings.parent, 'click', this._openProxy);
             
             //This must wait until we have created our DOM..
             //  addEvent(window, 'mousedown', (e) => this.closeHandler(e));
@@ -134,8 +144,12 @@ class Picker {
     closeHandler(e) {
         let doHide = false;
 
+        //Close programmatically:
+        if(!e) {
+            doHide = true;
+        }
         //Close by clicking outside the popup:
-        if(e.type === 'mousedown') {
+        else if(e.type === 'mousedown') {
             if(!this.domElement.contains(e.target)) {
                 doHide = true;
             }
@@ -158,9 +172,26 @@ class Picker {
 
 
     /**
+     * Move the popup to a different parent, optionally opening it at the same time.
+     *
+     * @param {Object}  options - @see setOptions (Usually a new `.parent` and `.color`).
+     * @param {boolean} open    - Whether to open the popup immediately.
+     */
+    movePopup(options, open) {
+        //Cleanup if the popup is currently open (at least revert the current parent's .pointerEvents);
+        this.closeHandler();
+        
+        this.setOptions(options);
+        if(open) {
+            this.openHandler();
+        }
+    }
+
+
+    /**
      * Set/initialize the picker's color.
      * 
-     * @param {string} color - RGBA/HSLA/HEX string, or RGBA array (*Not color name*).
+     * @param {string} color - Color name, RGBA/HSLA/HEX string, or RGBA array.
      */
     setColor(color) {
         this._setColor(color);

@@ -591,6 +591,8 @@
   var Picker = function () {
 
       function Picker(options) {
+          var _this = this;
+
           classCallCheck(this, Picker);
 
 
@@ -601,6 +603,10 @@
               editor: true
           };
 
+          this._openProxy = function (e) {
+              return _this.openHandler(e);
+          };
+
           this.setOptions(options);
       }
 
@@ -609,8 +615,6 @@
       createClass(Picker, [{
           key: 'setOptions',
           value: function setOptions(options) {
-              var _this = this;
-
               if (!options) {
                   return;
               }
@@ -629,6 +633,11 @@
               if (options instanceof HTMLElement) {
                   settings.parent = options;
               } else {
+
+                  if (settings.parent && options.parent && settings.parent !== options.parent) {
+                      settings.parent.removeEventListener('click', this._openProxy, false);
+                      this._popupInited = false;
+                  }
 
                   transfer(options, settings );
               }
@@ -653,9 +662,7 @@
 
               if (settings.parent && settings.popup && !this._popupInited) {
 
-                  addEvent(settings.parent, 'click', function (e) {
-                      return _this.openHandler(e);
-                  });
+                  addEvent(settings.parent, 'click', this._openProxy);
 
 
                   this._popupInited = true;
@@ -683,17 +690,20 @@
           value: function closeHandler(e) {
               var doHide = false;
 
-              if (e.type === 'mousedown') {
-                  if (!this.domElement.contains(e.target)) {
-                      doHide = true;
-                  }
+              if (!e) {
+                  doHide = true;
               }
-              else {
-                      e.preventDefault();
-                      e.stopPropagation();
-
-                      doHide = true;
+              else if (e.type === 'mousedown') {
+                      if (!this.domElement.contains(e.target)) {
+                          doHide = true;
+                      }
                   }
+                  else {
+                          e.preventDefault();
+                          e.stopPropagation();
+
+                          doHide = true;
+                      }
 
               if (doHide && this.hide()) {
                   this.settings.parent.style.pointerEvents = '';
@@ -701,6 +711,18 @@
                   if (this.onClose) {
                       this.onClose(this.colour);
                   }
+              }
+          }
+
+
+      }, {
+          key: 'movePopup',
+          value: function movePopup(options, open) {
+              this.closeHandler();
+
+              this.setOptions(options);
+              if (open) {
+                  this.openHandler();
               }
           }
 

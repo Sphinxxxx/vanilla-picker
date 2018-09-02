@@ -22,10 +22,22 @@
                               repeating-linear-gradient(90deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px);
         }
         
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
         #custom-toggler {
             position: absolute;
             padding: 1em;
             font: inherit;
+        }
+        
+        #shared li {
+            display: inline-block;
+            width: 2em;
+            height: 2em;
         }
         
         #main-color {
@@ -98,6 +110,13 @@
         </select>
     </div>
 
+    <h2>Shared picker</h2>
+    <ul id="shared">
+        <li id="shared-1" style="background-color:tomato;"></li>
+        <li id="shared-2" style="background-color:lime;"></li>
+        <li id="shared-3" style="background-color:dodgerblue;"></li>
+        <li id="shared-4" style="background-color:gold;"></li>
+    </ul>
 
     <script>
         "use strict";
@@ -107,9 +126,10 @@
             parentBasic = document.querySelector('#basic'),
             parentCustom = document.querySelector('#custom'),
             customPlacement = document.querySelector('#custom-placement'),
-            customToggler = document.querySelector('#custom-toggler');
+            customToggler = document.querySelector('#custom-toggler'),
+            parentShared = document.querySelector('#shared');
 
-        var popupBasic, popupCustom, pickerFixed;
+        var popupBasic, popupCustom, popupShared, pickerFixed;
 
 
         /* Basic example */
@@ -142,6 +162,23 @@
         };
 
 
+        /* Shared picker */
+        popupShared = new Picker({
+            onChange: function(color) {
+                this.settings.parent.style.backgroundColor = color.rgbaString;
+            }
+        });
+        parentShared.addEventListener('click', function(e) {
+            if(e.target.nodeName !== 'LI') { return; }
+            var parent = e.target;
+
+            popupShared.movePopup({
+                parent: parent,
+                color: parent.style.backgroundColor,
+            }, true);
+        });
+
+
         /* Non-popup picker */
         pickerFixed = new Picker({
             parent: parentMain,
@@ -156,7 +193,7 @@
 
 
         //*
-        [popupBasic, popupCustom, pickerFixed].forEach(p => {
+        [popupBasic, popupCustom, popupShared, pickerFixed].forEach(p => {
             p.onOpen  = function(color) { console.log('Opened', this.settings.parent.id, color.hex); };
             p.onClose = function(color) { console.log('Closed', this.settings.parent.id, color.hex); };
         });
