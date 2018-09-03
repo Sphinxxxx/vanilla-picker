@@ -1,0 +1,6 @@
+{
+    "opts": {
+        "destination": "./docs/gen",
+        "sort": false
+    }
+}

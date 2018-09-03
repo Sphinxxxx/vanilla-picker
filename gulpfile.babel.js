@@ -93,8 +93,9 @@ gulp.task('build', function(cb) {
         //so we need to pass a callback to jsdoc()..
         const promDocs = new Promise(function(resolve, reject) {
             //https://github.com/mlucool/gulp-jsdoc3#usage
-            gulp.src([/*'README.md',*/ './src/**/*.js'], {read: false})
-                .pipe(jsdoc(resolve));
+            const config = require('./docs/jsdocConfig');
+            gulp.src(['README.md', './src/**/*.js'], { read: false })
+                .pipe(jsdoc(config, resolve));
         });
         
         /* Generate the /dist files */

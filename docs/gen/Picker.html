@@ -11,7 +11,7 @@
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.cerulean.css">
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
 
 </head>
 
@@ -92,7 +92,7 @@
 
     
     <div class="description">
-        <p>Create a color picker.</p>
+        Create a color picker.
     </div>
     
 
@@ -144,7 +144,7 @@
 
             
 
-            <td class="description last"><p>@see <a href="Picker.html#setOptions"><code>setOptions()</code></a></p></td>
+            <td class="description last">@see <a href="Picker.html#setOptions"><code>setOptions()</code></a></td>
         </tr>
 
     
@@ -252,78 +252,7 @@ picker.onDone = function(color) {
 <dd>
     
     <div class="description">
-        <p>Callback whenever the color changes.</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="Picker.html#~colorCallback">Picker~colorCallback</a></span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="onClose">
-    <h4 id="onClose"><span class="type-signature"></span>onClose<span class="type-signature"> :<a href="Picker.html#~colorCallback">Picker~colorCallback</a></span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Callback when the popup closes.</p>
+        Callback whenever the color changes.
     </div>
     
 
@@ -394,7 +323,7 @@ picker.onDone = function(color) {
 <dd>
     
     <div class="description">
-        <p>Callback when the user clicks &quot;Ok&quot;.</p>
+        Callback when the user clicks "Ok".
     </div>
     
 
@@ -465,7 +394,78 @@ picker.onDone = function(color) {
 <dd>
     
     <div class="description">
-        <p>Callback when the popup opens.</p>
+        Callback when the popup opens.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="Picker.html#~colorCallback">Picker~colorCallback</a></span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="onClose">
+    <h4 id="onClose"><span class="type-signature"></span>onClose<span class="type-signature"> :<a href="Picker.html#~colorCallback">Picker~colorCallback</a></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Callback when the popup closes.
     </div>
     
 
@@ -535,7 +535,7 @@ picker.onDone = function(color) {
             
 <hr>
 <dt>
-    <h4 class="name" id="closeHandler"><span class="type-signature"></span>closeHandler()</h4>
+    <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions(options)</h4>
     
     
 </dt>
@@ -543,7 +543,601 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>Default behavior for closing the popup</p>
+        Set the picker options.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>parent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Which element the picker should be attached to.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>popup</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">'top'</span>
+|
+
+<span class="param-type">'bottom'</span>
+|
+
+<span class="param-type">'left'</span>
+|
+
+<span class="param-type">'right'</span>
+|
+
+<span class="param-type">false</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    right
+                
+                </td>
+            
+
+            <td class="description last">If the picker is used as a popup, where to place it relative to the parent. `false` to add the picker as a normal child element of the parent.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>template</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Custom HTML string from which to build the picker. See /src/picker.pug for required elements and class names.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layout</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    default
+                
+                </td>
+            
+
+            <td class="description last">Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>alpha</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">Whether to enable adjusting the alpha channel.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>editor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">Whether to show a text field for color value editing.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>color</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Initial color for the picker.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onChange</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">@see <a href="Picker.html#onChange"><code>onChange</code></a></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onDone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">@see <a href="Picker.html#onDone"><code>onDone</code></a></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onOpen</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">@see <a href="Picker.html#onOpen"><code>onOpen</code></a></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onClose</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">@see <a href="Picker.html#onClose"><code>onClose</code></a></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="openHandler"><span class="type-signature"></span>openHandler()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Default behavior for opening the popup
     </div>
     
 
@@ -613,7 +1207,7 @@ picker.onDone = function(color) {
             
 <hr>
 <dt>
-    <h4 class="name" id="hide"><span class="type-signature"></span>hide()</h4>
+    <h4 class="name" id="closeHandler"><span class="type-signature"></span>closeHandler()</h4>
     
     
 </dt>
@@ -621,7 +1215,7 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>Hide the picker.</p>
+        Default behavior for closing the popup
     </div>
     
 
@@ -699,7 +1293,7 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>Move the popup to a different parent, optionally opening it at the same time.</p>
+        Move the popup to a different parent, optionally opening it at the same time.
     </div>
     
 
@@ -751,7 +1345,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>@see <a href="Picker.html#setOptions"><code>setOptions()</code></a> (Usually a new <code>.parent</code> and <code>.color</code>).</p></td>
+            <td class="description last">@see <a href="Picker.html#setOptions"><code>setOptions()</code></a> (Usually a new `.parent` and `.color`).</td>
         </tr>
 
     
@@ -775,91 +1369,13 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>Whether to open the popup immediately.</p></td>
+            <td class="description last">Whether to open the popup immediately.</td>
         </tr>
 
     
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="openHandler"><span class="type-signature"></span>openHandler()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Default behavior for opening the popup</p>
-    </div>
-    
-
-    
-
-    
-
-    
     
 
     
@@ -929,7 +1445,7 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>Set/initialize the picker's color.</p>
+        Set/initialize the picker's color.
     </div>
     
 
@@ -981,7 +1497,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>Color name, RGBA/HSLA/HEX string, or RGBA array.</p></td>
+            <td class="description last">Color name, RGBA/HSLA/HEX string, or RGBA array.</td>
         </tr>
 
     
@@ -1005,7 +1521,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>If true, won't trigger onChange.</p></td>
+            <td class="description last">If true, won't trigger onChange.</td>
         </tr>
 
     
@@ -1154,7 +1670,7 @@ picker.onDone = function(color) {
             
 <hr>
 <dt>
-    <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions(options)</h4>
+    <h4 class="name" id="show"><span class="type-signature"></span>show()</h4>
     
     
 </dt>
@@ -1162,7 +1678,7 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>Set the picker options.</p>
+        Show/open the picker.
     </div>
     
 
@@ -1171,522 +1687,6 @@ picker.onDone = function(color) {
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>parent</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">HTMLElement</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Which element the picker should be attached to.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>popup</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">'top'</span>
-|
-
-<span class="param-type">'bottom'</span>
-|
-
-<span class="param-type">'left'</span>
-|
-
-<span class="param-type">'right'</span>
-|
-
-<span class="param-type">false</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    right
-                
-                </td>
-            
-
-            <td class="description last"><p>If the picker is used as a popup, where to place it relative to the parent. <code>false</code> to add the picker as a normal child element of the parent.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>template</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Custom HTML string from which to build the picker. See /src/picker.pug for required elements and class names.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layout</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    default
-                
-                </td>
-            
-
-            <td class="description last"><p>Suffix of a custom &quot;layout_...&quot; CSS class to handle the overall arrangement of the picker elements.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>alpha</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether to enable adjusting the alpha channel.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>editor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether to show a text field for color value editing.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Initial color for the picker.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onChange</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>@see <a href="Picker.html#onChange"><code>onChange</code></a></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onDone</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>@see <a href="Picker.html#onDone"><code>onDone</code></a></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onOpen</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>@see <a href="Picker.html#onOpen"><code>onOpen</code></a></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onClose</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>@see <a href="Picker.html#onClose"><code>onClose</code></a></p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -1748,7 +1748,7 @@ picker.onDone = function(color) {
             
 <hr>
 <dt>
-    <h4 class="name" id="show"><span class="type-signature"></span>show()</h4>
+    <h4 class="name" id="hide"><span class="type-signature"></span>hide()</h4>
     
     
 </dt>
@@ -1756,7 +1756,7 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>Show/open the picker.</p>
+        Hide the picker.
     </div>
     
 
@@ -1840,7 +1840,7 @@ picker.onDone = function(color) {
 
     
     <div class="description">
-        <p>A callback that gets the picker's current color value.</p>
+        A callback that gets the picker's current color value.
     </div>
     
 
@@ -1935,7 +1935,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>RGBA color components.</p></td>
+            <td class="description last">RGBA color components.</td>
         </tr>
 
     
@@ -1959,7 +1959,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>HSLA color components (all values between 0 and 1, inclusive).</p></td>
+            <td class="description last">HSLA color components (all values between 0 and 1, inclusive).</td>
         </tr>
 
     
@@ -1983,7 +1983,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>RGB CSS value (e.g. <code>rgb(255,215,0)</code>).</p></td>
+            <td class="description last">RGB CSS value (e.g. `rgb(255,215,0)`).</td>
         </tr>
 
     
@@ -2007,7 +2007,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>RGBA CSS value (e.g. <code>rgba(255,215,0, .5)</code>).</p></td>
+            <td class="description last">RGBA CSS value (e.g. `rgba(255,215,0, .5)`).</td>
         </tr>
 
     
@@ -2031,7 +2031,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>HSL CSS value (e.g. <code>hsl(50.6,100%,50%)</code>).</p></td>
+            <td class="description last">HSL CSS value (e.g. `hsl(50.6,100%,50%)`).</td>
         </tr>
 
     
@@ -2055,7 +2055,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>HSLA CSS value (e.g. <code>hsla(50.6,100%,50%, .5)</code>).</p></td>
+            <td class="description last">HSLA CSS value (e.g. `hsla(50.6,100%,50%, .5)`).</td>
         </tr>
 
     
@@ -2079,7 +2079,7 @@ picker.onDone = function(color) {
 
             
 
-            <td class="description last"><p>8 digit #RRGGBBAA (not supported in all browsers).</p></td>
+            <td class="description last">8 digit #RRGGBBAA (not supported in all browsers).</td>
         </tr>
 
     
@@ -2198,7 +2198,7 @@ picker.onDone = function(color) {
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on September 3rd 2018, 12:00:11 am
+		on 2018-09-03T21:16:08+00:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
@@ -2244,7 +2244,7 @@ $( function () {
 	} );
 
 	Sunlight.highlightAll( {
-		lineNumbers : true,
+		lineNumbers : false,
 		showMenu : true,
 		enableDoclinks : true
 	} );

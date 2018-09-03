@@ -1,7 +1,25 @@
 {
   "name": "vanilla-picker",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
+  "keywords": [
+    "ux",
+    "ui",
+    "color",
+    "colour",
+    "picker",
+    "vanilla",
+    "vanilla-js",
+    "color picker",
+    "color-picker",
+    "colorpicker",
+    "rgb",
+    "rgba",
+    "hsl",
+    "hsla",
+    "hex",
+    "alpha"
+  ],
   "author": "Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)",
   "homepage": "https://github.com/Sphinxxxx/vanilla-picker",
   "license": "ISC",
@@ -13,6 +31,7 @@
     "url": "https://github.com/Sphinxxxx/vanilla-picker/issues"
   },
   "main": "dist/vanilla-picker.js",
+  "unpkg": "dist/vanilla-picker.min.js",
   "module": "src/picker.js",
   "files": [
     "src/",
