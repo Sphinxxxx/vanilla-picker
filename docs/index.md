@@ -2,10 +2,7 @@
 
 A simple, easy to use vanilla JS (no dependencies) color picker with alpha selection.
 
-#### Demo
-
-https://rawgit.com/Sphinxxxx/vanilla-picker/master/demo/index.html  
-https://codepen.io/Sphinxxxx/pen/zRmKBX
+[Try it yourself!](https://codepen.io/Sphinxxxx/pen/zRmKBX?editors=1010)
 
 
 ## Getting Started
@@ -29,7 +26,6 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 <div id="parent">Click me</div>
 
 <script>
-
     // Create a new Picker instance and set the parent element.
     // By default, the color picker is a popup which appears when you click the parent.
     var parent = document.querySelector('#parent');
@@ -41,13 +37,11 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
     };
 
     // onDone is similar to onChange, but only called when you click 'Ok'.
-
 </script>
 ```
 
 
----
-
+## Documentation
 
 [API](./gen/Picker.html)  
 [Source](https://github.com/Sphinxxxx/vanilla-picker)
