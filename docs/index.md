@@ -49,6 +49,5 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 ---
 
 
-[API](./gen/Picker.html)
+[API](./gen/Picker.html)  
 [Source](https://github.com/Sphinxxxx/vanilla-picker)
-
