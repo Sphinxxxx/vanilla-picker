@@ -70,7 +70,7 @@ gulp.task('build', function(cb) {
             babel({
                 babelrc: false,
                 presets: [
-                  ["env", { modules: false }]
+                  ["env", { modules: false/*, loose: true*/ }]
                 ],
                 //We import ES6 modules (color-conversion and drag-tracker)..
                 //  exclude: 'node_modules/**',
@@ -93,7 +93,7 @@ gulp.task('build', function(cb) {
         //so we need to pass a callback to jsdoc()..
         const promDocs = new Promise(function(resolve, reject) {
             //https://github.com/mlucool/gulp-jsdoc3#usage
-            const config = require('./docs/jsdocConfig');
+            const config = require('./docs/jsdoc.json');
             gulp.src(['README.md', './src/**/*.js'], { read: false })
                 .pipe(jsdoc(config, resolve));
         });
