@@ -1,0 +1,12 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+
+.abo-linkbtn {
+    @extend .btn;
+    
+    margin: 0;
+    background-image: linear-gradient(mediumturquoise, lightseagreen);
+}

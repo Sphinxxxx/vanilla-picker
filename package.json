@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "keywords": [
     "ux",
@@ -21,7 +21,7 @@
     "alpha"
   ],
   "author": "Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)",
-  "homepage": "https://github.com/Sphinxxxx/vanilla-picker",
+  "homepage": "https://vanilla-picker.js.org",
   "license": "ISC",
   "repository": {
     "type": "git",

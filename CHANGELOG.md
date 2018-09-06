@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.4.2] - 2018-09-06
+### Added
+- js.org domain.
+
+
 ## [2.4.1] - 2018-09-03
 ### Changed
 - Minor documentation changes.
@@ -64,7 +69,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.1...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.2...HEAD
+[2.4.2]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.1...v2.4.2
 [2.4.1]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.0...v2.4.1
 [2.4.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.3.0...v2.4.0
 [2.3.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.2.1...v2.3.0

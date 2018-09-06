@@ -2,7 +2,7 @@
 
 A simple, easy to use vanilla JS (no dependencies) color picker with alpha selection.
 
-[Try it yourself!](https://codepen.io/Sphinxxxx/pen/zRmKBX?editors=1010)
+<a id="demo" class="abo-linkbtn" href="https://codepen.io/Sphinxxxx/pen/zRmKBX?editors=1010" >Try it yourself!</a>
 
 
 ## Getting Started
