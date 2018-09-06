@@ -4,9 +4,40 @@
 @import "{{ site.theme }}";
 
 
+.page-header {
+    position: relative;
+    background-image:
+        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.9)),
+        url('../img/steve-johnson-754951-unsplash_mod.jpg');
+    background-size: cover;
+    background-clip: content-box, border-box;
+
+    &::after {
+        content: 'Photo by Steve Johnson on Unsplash';
+        display: inline-block;
+        position: absolute;
+        right: 0; top: 100%;
+
+        padding: .2em .5em;
+        color: gray;
+        font-size: .85em;
+        font-style: italic;
+    }
+}
+
+
 .abo-linkbtn {
     @extend .btn;
-    
+
     margin: 0;
-    background-image: linear-gradient(mediumturquoise, lightseagreen);
+    background-image: linear-gradient(gold, orangered); //linear-gradient(mediumturquoise, lightseagreen);
+    background-clip: padding-box;
+    color: white;
+    border-color: white;
+
+    &:hover {
+        background-image: linear-gradient(gold, orange);
+        color: white;
+        border-color: white;
+    }
 }
