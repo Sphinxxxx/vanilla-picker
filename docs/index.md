@@ -1,5 +1,18 @@
 # vanilla-picker
 
+<div id="example-container">
+    <div id="example-picker"></div>
+    <script src="https://unpkg.com/vanilla-picker"></script>
+    <script>
+        new Picker({
+            parent: document.querySelector('#example-picker'),
+            popup: false,
+            color: 'dodgerblue',
+            onChange: function(color) { this.settings.parent.style.color = color.rgbaString; },
+        });
+    </script>
+</div>
+
 A simple, easy to use vanilla JS (no dependencies) color picker with alpha selection.
 
 <a id="demo" class="abo-linkbtn" href="https://codepen.io/Sphinxxxx/pen/zRmKBX?editors=1010" >Try it yourself!</a>

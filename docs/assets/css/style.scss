@@ -4,8 +4,14 @@
 @import "{{ site.theme }}";
 
 
+h2 {
+    clear: both;
+}
+
+
 .page-header {
     position: relative;
+    background-color: orange;
     background-image:
         linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.9)),
         url('../img/steve-johnson-754951-unsplash_mod.jpg');
@@ -42,5 +48,26 @@
         background-image: linear-gradient(gold, orange);
         color: white;
         border-color: white;
+    }
+}
+
+
+#example-container {
+    width:  290px;
+    height: 330px;
+    float: right;
+    @media (max-width: 600px) {
+        float: none;
+    }
+
+    #example-picker {
+        display: inline-block;
+        border: 30px solid currentColor;
+        border-radius: 100%;
+        box-shadow: 0 2px 4px 0 black;
+    }
+
+    .picker_wrapper {
+        position: absolute;
     }
 }

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.4.3] - 2018-09-09
+### Added
+- README changes.
+
+
 ## [2.4.2] - 2018-09-06
 ### Added
 - js.org domain.

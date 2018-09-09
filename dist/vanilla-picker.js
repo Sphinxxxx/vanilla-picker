@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.4.2
+ * vanilla-picker v2.4.3
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -640,30 +640,31 @@
                   settings.parent = options;
               } else {
 
+
                   if (settings.parent && options.parent && settings.parent !== options.parent) {
                       settings.parent.removeEventListener('click', this._openProxy, false);
                       this._popupInited = false;
                   }
 
                   transfer(options, settings );
-              }
 
-              if (options.onChange) {
-                  this.onChange = options.onChange;
-              }
-              if (options.onDone) {
-                  this.onDone = options.onDone;
-              }
-              if (options.onOpen) {
-                  this.onOpen = options.onOpen;
-              }
-              if (options.onClose) {
-                  this.onClose = options.onClose;
-              }
+                  if (options.onChange) {
+                      this.onChange = options.onChange;
+                  }
+                  if (options.onDone) {
+                      this.onDone = options.onDone;
+                  }
+                  if (options.onOpen) {
+                      this.onOpen = options.onOpen;
+                  }
+                  if (options.onClose) {
+                      this.onClose = options.onClose;
+                  }
 
-              var col = options.color || options.colour;
-              if (col) {
-                  this._setColor(col);
+                  var col = options.color || options.colour;
+                  if (col) {
+                      this._setColor(col);
+                  }
               }
 
               if (settings.parent && settings.popup && !this._popupInited) {
