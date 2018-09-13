@@ -4,6 +4,12 @@ import Color from '@sphinxxxx/color-conversion';
 import dragTracker from 'drag-tracker';
 
 
+const BG_TRANSP = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E")`;
+const HUES = 360;
+//We need to use keydown instead of keypress to handle Esc from the editor textbox:
+const EVENT_KEY = 'keydown'; //'keypress'
+
+
 function parseHTML(htmlString) {
     //https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
     const div = document.createElement('div');
@@ -11,13 +17,26 @@ function parseHTML(htmlString) {
     return div.firstElementChild;
 }
 
+function $(selector, context) {
+    return (context || document).querySelector(selector);
+}
+
 function addEvent(target, type, handler) {
     target.addEventListener(type, handler, false);
 }
-
-
-const BG_TRANSP = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E")`;
-const HUES = 360;
+function stopEvent(e) {
+    //Stop an event from bubbling up to the parent:
+    e.preventDefault();
+    e.stopPropagation();
+}
+function onKey(target, keys, handler, stop) {
+    addEvent(target, EVENT_KEY, function(e) {
+        if(keys.indexOf(e.key) >= 0) {
+            if(stop) { stopEvent(e); }
+            handler(e);
+        }
+    });
+}
 
 
 /* Inlined Picker CSS */
@@ -176,9 +195,17 @@ class Picker {
         }
         
         //Init popup behavior once we have all the parts we need:
-        if(settings.parent && settings.popup && !this._popupInited) {
+        const parent = settings.parent;
+        if(parent && settings.popup && !this._popupInited) {
 
-            addEvent(settings.parent, 'click', this._openProxy);
+            addEvent(parent, 'click', this._openProxy);
+
+            //Keyboard navigation: Open on [Space] or [Enter] (but stop the event to avoid typing a " " in the editor textbox).
+            //No, don't stop the event, as that would disable normal input behavior (typing a " " or clicking the Ok button with [Enter]).
+            //Fix: setTimeout() in openHandler()..
+            //
+            //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values#Whitespace_keys
+            onKey(parent, [' ', 'Spacebar', 'Enter'], this._openProxy/*, true*/);
             
             //This must wait until we have created our DOM..
             //  addEvent(window, 'mousedown', (e) => this.closeHandler(e));
@@ -197,8 +224,16 @@ class Picker {
      */
     openHandler(e) {
         if(this.show()) {
+            //If the parent is an <a href="#"> element, avoid scrolling to the top:
+            e && e.preventDefault();
+            
             //A trick to avoid re-opening the dialog if you click the parent element while the dialog is open:
             this.settings.parent.style.pointerEvents = 'none';
+
+            //Recommended popup behavior with keyboard navigation from http://whatsock.com/tsg/Coding%20Arena/Popups/Popup%20(Internal%20Content)/demo.htm
+            //Wait a little before focusing the textbox, in case the dialog was just opened with [Space] (would overwrite the color value with a " "):
+            const toFocus = (e && (e.type === EVENT_KEY)) ? this._domEdit : this.domElement;
+            setTimeout(() => toFocus.focus(), 100);
 
             if(this.onOpen) { this.onOpen(this.colour); }
         }
@@ -215,23 +250,29 @@ class Picker {
         if(!e) {
             doHide = true;
         }
-        //Close by clicking outside the popup:
-        else if(e.type === 'mousedown') {
+        //Close by clicking/tabbing outside the popup:
+        else if((e.type === 'mousedown') || (e.type === 'focusin')) {
+
+            //Note: Now that we have added the 'focusin' event,
+            //this trick requires the picker wrapper to be focusable (via `tabindex` - see /src/picker.pug),
+            //or else the popup loses focus if you click anywhere on the picker's background.
             if(!this.domElement.contains(e.target)) {
                 doHide = true;
             }
         }
-        //Close by clicking "Ok":
+        //Close by clicking "Ok" or pressing "Esc":
         else {
             //Don't bubble the click up to the parent, because that's the trigger to re-open the popup:
-            e.preventDefault();
-            e.stopPropagation();
-    
+            stopEvent(e);
+
             doHide = true;
         }
 
         if(doHide && this.hide()) {
             this.settings.parent.style.pointerEvents = '';
+
+            //Recommended popup behavior from http://whatsock.com/tsg/Coding%20Arena/Popups/Popup%20(Internal%20Content)/demo.htm
+            this.settings.parent.focus();
 
             if(this.onClose) { this.onClose(this.colour); }
         }
@@ -303,12 +344,12 @@ class Picker {
         const wrapper = parseHTML(html);
         
         this.domElement = wrapper;
-        this._domH  = wrapper.querySelector('.picker_hue');
-        this._domSL = wrapper.querySelector('.picker_sl');
-        this._domA  = wrapper.querySelector('.picker_alpha');
-        this._domEdit = wrapper.querySelector('.picker_editor input');
-        this._domSample = wrapper.querySelector('.picker_sample');
-        this._domOkay   = wrapper.querySelector('.picker_done button');
+        this._domH      = $('.picker_hue', wrapper);
+        this._domSL     = $('.picker_sl', wrapper);
+        this._domA      = $('.picker_alpha', wrapper);
+        this._domEdit   = $('.picker_editor input', wrapper);
+        this._domSample = $('.picker_sample', wrapper);
+        this._domOkay   = $('.picker_done button', wrapper);
 
         wrapper.classList.add('layout_' + this.settings.layout);
         if(!this.settings.alpha) { wrapper.classList.add('no_alpha'); }
@@ -344,7 +385,12 @@ class Picker {
      * @private
      */
     _bindEvents() {
-        const that = this;
+        const that = this,
+              dom = this.domElement;
+        
+        //Prevent clicks while dragging from bubbling up to the parent:
+        addEvent(dom, 'click', e => e.preventDefault());
+
 
         /* Draggable color selection */
 
@@ -383,10 +429,14 @@ class Picker {
         
         
         /* Direct color value editing */
-        
-        if(this.settings.editor) {
-            addEvent(this._domEdit, 'input', function(e) {
-                const color = this.value;
+
+        //Always init the editor, for accessibility and screen readers (we'll hide it with CSS if `!settings.editor`)
+        const editInput = this._domEdit;
+        /*if(this.settings.editor)*/ {
+            addEvent(editInput, 'input', function(e) {
+                const color = (this.value || '').trim();
+                if(!color) { return; }
+
                 try {
                     //Will throw on unknown colors
                     new Color(this.value);
@@ -395,20 +445,33 @@ class Picker {
                 }
                 catch(ex) { }
             });
+            //Select all text on focus:
+            addEvent(editInput, 'focus', function(e) {
+                const input = this;
+                //If no current selection:
+                if(input.selectionStart === input.selectionEnd) {
+                    input.select();
+                }
+            });
         }
 
 
         /* Close the dialog */
 
-        addEvent(window, 'mousedown', (e) =>
-            this._ifPopup(() => this.closeHandler(e))
-        );
-
-        addEvent(this._domOkay, 'click', (e) => {
+        const popupCloseProxy = (e) => {
             this._ifPopup(() => this.closeHandler(e));
-            
+        };
+        const onDoneProxy = (e) => {
+            this._ifPopup(() => this.closeHandler(e));
             if(this.onDone) { this.onDone(this.colour); }
-        });
+        };
+
+        addEvent(window, 'mousedown', popupCloseProxy);
+        addEvent(window, 'focusin',   popupCloseProxy); //Keyboard navigation, closeHandler() will check if focus has moved outside the popup.
+        onKey(dom, ['Esc', 'Escape'], popupCloseProxy);
+
+        addEvent(this._domOkay, 'click', onDoneProxy);
+        onKey(dom, ['Enter'], onDoneProxy);
     }
 
 
@@ -481,7 +544,10 @@ class Picker {
 
         const uiH  = this._domH,
               uiSL = this._domSL,
-              uiA  = this._domA;
+              uiA  = this._domA,
+              thumbH  = $('.picker_selector', uiH),
+              thumbSL = $('.picker_selector', uiSL),
+              thumbA  = $('.picker_selector', uiA);
         
         function posX(parent, child, relX) {
             child.style.left = (relX * 100) + '%'; //(parent.clientWidth * relX) + 'px';
@@ -489,11 +555,11 @@ class Picker {
         function posY(parent, child, relY) {
             child.style.top  = (relY * 100) + '%'; //(parent.clientHeight * relY) + 'px';
         }
-        
-        
+
+
         /* Hue */
         
-        posX(uiH,  uiH.firstElementChild,  hsl[0]);
+        posX(uiH, thumbH, hsl[0]);
         
         //Use the fully saturated hue on the SL panel and Hue thumb:
         this._domSL.style.backgroundColor = this._domH.style.color = cssHue;
@@ -501,8 +567,8 @@ class Picker {
 
         /* S/L */
         
-        posX(uiSL, uiSL.firstElementChild, hsl[1]);
-        posY(uiSL, uiSL.firstElementChild, 1 - hsl[2]);
+        posX(uiSL, thumbSL, hsl[1]);
+        posY(uiSL, thumbSL, 1 - hsl[2]);
         
         //Use the opaque HSL on the SL thumb:
         uiSL.style.color = cssHSL;
@@ -510,7 +576,7 @@ class Picker {
 
         /* Alpha */
         
-        posY(uiA,  uiA.firstElementChild,  1 - hsl[3]);
+        posY(uiA,  thumbA,  1 - hsl[3]);
 
         const opaque = cssHSL,
               transp = opaque.replace('hsl', 'hsla').replace(')', ', 0)'),

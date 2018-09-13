@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.4.3
+ * vanilla-picker v2.5.0
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -572,21 +572,41 @@
   }
 
 
+  var BG_TRANSP = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E")';
+  var HUES = 360;
+  var EVENT_KEY = 'keydown'; 
+
+
   function parseHTML(htmlString) {
       var div = document.createElement('div');
       div.innerHTML = htmlString;
       return div.firstElementChild;
   }
 
+  function $(selector, context) {
+      return (context || document).querySelector(selector);
+  }
+
   function addEvent(target, type, handler) {
       target.addEventListener(type, handler, false);
   }
-
-  var BG_TRANSP = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E")';
-  var HUES = 360;
+  function stopEvent(e) {
+      e.preventDefault();
+      e.stopPropagation();
+  }
+  function onKey(target, keys, handler, stop) {
+      addEvent(target, EVENT_KEY, function (e) {
+          if (keys.indexOf(e.key) >= 0) {
+              if (stop) {
+                  stopEvent(e);
+              }
+              handler(e);
+          }
+      });
+  }
 
   document.documentElement.firstElementChild 
-  .appendChild(document.createElement('style')).textContent = '.picker_wrapper.no_alpha .picker_alpha,.picker_wrapper.no_editor .picker_editor{display:none}.layout_default.picker_wrapper{display:flex;flex-flow:row wrap;justify-content:space-between;align-items:stretch;font-size:10px;width:25em;padding:.5em}.layout_default.picker_wrapper input,.layout_default.picker_wrapper button{font-size:1rem}.layout_default.picker_wrapper>*{margin:.5em}.layout_default.picker_wrapper::before{content:\'\';display:block;width:100%;height:0;order:1}.layout_default .picker_slider,.layout_default .picker_selector{padding:1em}.layout_default .picker_hue{width:100%}.layout_default .picker_sl{flex:1 1 auto}.layout_default .picker_sl::before{content:\'\';display:block;padding-bottom:100%}.layout_default .picker_editor{order:1;width:6rem}.layout_default .picker_editor input{width:calc(100% + 2px);height:calc(100% + 2px)}.layout_default .picker_sample{order:1;flex:1 1 auto}.layout_default .picker_done{order:1}.picker_wrapper{box-sizing:border-box;background:#f2f2f2;cursor:default;font-family:sans-serif;pointer-events:auto}.picker_wrapper button,.picker_wrapper input{margin:-1px}.picker_selector{position:absolute;z-index:1;display:block;transform:translate(-50%, -50%);border:2px solid white;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);box-shadow:0 0 0 1px silver}.picker_sl{position:relative;box-shadow:0 0 0 1px silver;background-image:linear-gradient(180deg, white, rgba(255,255,255,0) 50%),linear-gradient(0deg, black, rgba(0,0,0,0) 50%),linear-gradient(90deg, gray, rgba(128,128,128,0))}.picker_alpha,.picker_sample{position:relative;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") left top/contain white;box-shadow:0 0 0 1px silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_editor input{box-sizing:border-box;font-family:monospace;padding:.1em .2em}.picker_sample::before{content:\'\';position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_done button{box-sizing:border-box;padding:.2em .5em;cursor:pointer}.picker_arrow{position:absolute;z-index:-1}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,0.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;transform:skew(45deg);transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
+  .appendChild(document.createElement('style')).textContent = '.picker_wrapper.no_alpha .picker_alpha{display:none}.picker_wrapper.no_editor .picker_editor{position:absolute;z-index:-1;opacity:0}.layout_default.picker_wrapper{display:flex;flex-flow:row wrap;justify-content:space-between;align-items:stretch;font-size:10px;width:25em;padding:.5em}.layout_default.picker_wrapper input,.layout_default.picker_wrapper button{font-size:1rem}.layout_default.picker_wrapper>*{margin:.5em}.layout_default.picker_wrapper::before{content:\'\';display:block;width:100%;height:0;order:1}.layout_default .picker_slider,.layout_default .picker_selector{padding:1em}.layout_default .picker_hue{width:100%}.layout_default .picker_sl{flex:1 1 auto}.layout_default .picker_sl::before{content:\'\';display:block;padding-bottom:100%}.layout_default .picker_editor{order:1;width:6rem}.layout_default .picker_editor input{width:calc(100% + 2px);height:calc(100% + 2px)}.layout_default .picker_sample{order:1;flex:1 1 auto}.layout_default .picker_done{order:1}.picker_wrapper{box-sizing:border-box;background:#f2f2f2;box-shadow:0 0 0 1px silver;cursor:default;font-family:sans-serif;color:#444;pointer-events:auto}.picker_wrapper:focus{outline:none}.picker_wrapper button,.picker_wrapper input{margin:-1px}.picker_selector{position:absolute;z-index:1;display:block;transform:translate(-50%, -50%);border:2px solid white;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);box-shadow:0 0 0 1px silver}.picker_sl{position:relative;box-shadow:0 0 0 1px silver;background-image:linear-gradient(180deg, white, rgba(255,255,255,0) 50%),linear-gradient(0deg, black, rgba(0,0,0,0) 50%),linear-gradient(90deg, gray, rgba(128,128,128,0))}.picker_alpha,.picker_sample{position:relative;background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E") left top/contain white;box-shadow:0 0 0 1px silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_editor input{box-sizing:border-box;font-family:monospace;padding:.1em .2em}.picker_sample::before{content:\'\';position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_done button{box-sizing:border-box;padding:.2em .5em;cursor:pointer}.picker_arrow{position:absolute;z-index:-1}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,0.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;transform:skew(45deg);transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
 
   var Picker = function () {
 
@@ -667,9 +687,12 @@
                   }
               }
 
-              if (settings.parent && settings.popup && !this._popupInited) {
+              var parent = settings.parent;
+              if (parent && settings.popup && !this._popupInited) {
 
-                  addEvent(settings.parent, 'click', this._openProxy);
+                  addEvent(parent, 'click', this._openProxy);
+
+                  onKey(parent, [' ', 'Spacebar', 'Enter'], this._openProxy );
 
 
                   this._popupInited = true;
@@ -683,7 +706,14 @@
           key: 'openHandler',
           value: function openHandler(e) {
               if (this.show()) {
+                  e && e.preventDefault();
+
                   this.settings.parent.style.pointerEvents = 'none';
+
+                  var toFocus = e && e.type === EVENT_KEY ? this._domEdit : this.domElement;
+                  setTimeout(function () {
+                      return toFocus.focus();
+                  }, 100);
 
                   if (this.onOpen) {
                       this.onOpen(this.colour);
@@ -700,20 +730,22 @@
               if (!e) {
                   doHide = true;
               }
-              else if (e.type === 'mousedown') {
+              else if (e.type === 'mousedown' || e.type === 'focusin') {
+
                       if (!this.domElement.contains(e.target)) {
                           doHide = true;
                       }
                   }
                   else {
-                          e.preventDefault();
-                          e.stopPropagation();
+                          stopEvent(e);
 
                           doHide = true;
                       }
 
               if (doHide && this.hide()) {
                   this.settings.parent.style.pointerEvents = '';
+
+                  this.settings.parent.focus();
 
                   if (this.onClose) {
                       this.onClose(this.colour);
@@ -775,16 +807,16 @@
                   return toggled;
               }
 
-              var html = this.settings.template || '<div class="picker_wrapper"><div class="picker_arrow"></div><div class="picker_hue picker_slider"><div class="picker_selector"></div></div><div class="picker_sl"><div class="picker_selector"></div></div><div class="picker_alpha picker_slider"><div class="picker_selector"></div></div><div class="picker_editor"><input/></div><div class="picker_sample"></div><div class="picker_done"><button>Ok</button></div></div>';
+              var html = this.settings.template || '<div class="picker_wrapper" tabindex="-1"><div class="picker_arrow"></div><div class="picker_hue picker_slider"><div class="picker_selector"></div></div><div class="picker_sl"><div class="picker_selector"></div></div><div class="picker_alpha picker_slider"><div class="picker_selector"></div></div><div class="picker_editor"><input aria-label="Type a color name or hex value"/></div><div class="picker_sample"></div><div class="picker_done"><button>Ok</button></div></div>';
               var wrapper = parseHTML(html);
 
               this.domElement = wrapper;
-              this._domH = wrapper.querySelector('.picker_hue');
-              this._domSL = wrapper.querySelector('.picker_sl');
-              this._domA = wrapper.querySelector('.picker_alpha');
-              this._domEdit = wrapper.querySelector('.picker_editor input');
-              this._domSample = wrapper.querySelector('.picker_sample');
-              this._domOkay = wrapper.querySelector('.picker_done button');
+              this._domH = $('.picker_hue', wrapper);
+              this._domSL = $('.picker_sl', wrapper);
+              this._domA = $('.picker_alpha', wrapper);
+              this._domEdit = $('.picker_editor input', wrapper);
+              this._domSample = $('.picker_sample', wrapper);
+              this._domOkay = $('.picker_done button', wrapper);
 
               wrapper.classList.add('layout_' + this.settings.layout);
               if (!this.settings.alpha) {
@@ -822,7 +854,12 @@
           value: function _bindEvents() {
               var _this2 = this;
 
-              var that = this;
+              var that = this,
+                  dom = this.domElement;
+
+              addEvent(dom, 'click', function (e) {
+                  return e.preventDefault();
+              });
 
 
               function createDragConfig(container, callbackRelative) {
@@ -859,33 +896,49 @@
               }
 
 
-              if (this.settings.editor) {
-                  addEvent(this._domEdit, 'input', function (e) {
-                      var color = this.value;
+              var editInput = this._domEdit;
+{
+                  addEvent(editInput, 'input', function (e) {
+                      var color = (this.value || '').trim();
+                      if (!color) {
+                          return;
+                      }
+
                       try {
                           new Color(this.value);
 
                           that._setColor(color, { fromEditor: true });
                       } catch (ex) {}
                   });
+                  addEvent(editInput, 'focus', function (e) {
+                      var input = this;
+                      if (input.selectionStart === input.selectionEnd) {
+                          input.select();
+                      }
+                  });
               }
 
 
-              addEvent(window, 'mousedown', function (e) {
-                  return _this2._ifPopup(function () {
-                      return _this2.closeHandler(e);
-                  });
-              });
-
-              addEvent(this._domOkay, 'click', function (e) {
+              var popupCloseProxy = function popupCloseProxy(e) {
                   _this2._ifPopup(function () {
                       return _this2.closeHandler(e);
                   });
-
+              };
+              var onDoneProxy = function onDoneProxy(e) {
+                  _this2._ifPopup(function () {
+                      return _this2.closeHandler(e);
+                  });
                   if (_this2.onDone) {
                       _this2.onDone(_this2.colour);
                   }
-              });
+              };
+
+              addEvent(window, 'mousedown', popupCloseProxy);
+              addEvent(window, 'focusin', popupCloseProxy); 
+              onKey(dom, ['Esc', 'Escape'], popupCloseProxy);
+
+              addEvent(this._domOkay, 'click', onDoneProxy);
+              onKey(dom, ['Enter'], onDoneProxy);
           }
 
 
@@ -957,7 +1010,10 @@
 
               var uiH = this._domH,
                   uiSL = this._domSL,
-                  uiA = this._domA;
+                  uiA = this._domA,
+                  thumbH = $('.picker_selector', uiH),
+                  thumbSL = $('.picker_selector', uiSL),
+                  thumbA = $('.picker_selector', uiA);
 
               function posX(parent, child, relX) {
                   child.style.left = relX * 100 + '%'; 
@@ -967,18 +1023,18 @@
               }
 
 
-              posX(uiH, uiH.firstElementChild, hsl[0]);
+              posX(uiH, thumbH, hsl[0]);
 
               this._domSL.style.backgroundColor = this._domH.style.color = cssHue;
 
 
-              posX(uiSL, uiSL.firstElementChild, hsl[1]);
-              posY(uiSL, uiSL.firstElementChild, 1 - hsl[2]);
+              posX(uiSL, thumbSL, hsl[1]);
+              posY(uiSL, thumbSL, 1 - hsl[2]);
 
               uiSL.style.color = cssHSL;
 
 
-              posY(uiA, uiA.firstElementChild, 1 - hsl[3]);
+              posY(uiA, thumbA, 1 - hsl[3]);
 
               var opaque = cssHSL,
                   transp = opaque.replace('hsl', 'hsla').replace(')', ', 0)'),

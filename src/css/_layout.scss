@@ -1,6 +1,11 @@
-.picker_wrapper.no_alpha  .picker_alpha,
-.picker_wrapper.no_editor .picker_editor {
+.picker_wrapper.no_alpha  .picker_alpha {
     display: none;
+}
+//Always keep the editor on-screen, for screen readers:
+.picker_wrapper.no_editor .picker_editor {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
 }
 
 

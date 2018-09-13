@@ -1,11 +1,18 @@
 .picker_wrapper {
     box-sizing: border-box;
     background: $color-bg;
+    @include border-deco();
+
     cursor: default;
     font-family: sans-serif;
+    color: #444;
 
     //Needed for the default popup behavior, where the parent is temporarily disabled via "pointer-events: none"
     pointer-events: auto;
+    //The wrapper needs to be focusable (via `tabindex`), or else the popup loses focus
+    //if you click anywhere on the picker's background, and closeHandler() closes the popup.
+    //However, we don't want all the decoration:
+    &:focus { outline: none; }
     
     //Align borders with the other elements' border-deco():
     button, input {

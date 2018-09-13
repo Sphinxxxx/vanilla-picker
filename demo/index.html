@@ -6,7 +6,8 @@
     <title>vanilla-picker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="../dist/vanilla-picker.js"></script>
+    <script src="../dist/vanilla-picker.js?31415926"></script>
+    <script _src="https://unpkg.com/vanilla-picker@2.4"></script>
 
     <style>
         body {
@@ -18,8 +19,13 @@
 
             font-family: Georgia, sans-serif;
             background-color: white;
-            background-image: repeating-linear-gradient( 0deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px),
+            __background-image: repeating-linear-gradient( 0deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px),
                               repeating-linear-gradient(90deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px);
+        }
+        h1 sub {
+            font-size: .5em;
+            color: darkslategray;
+            font-style: italic;
         }
         
         ul {
@@ -59,6 +65,9 @@
             font-size: 20px;
             text-align: center;
         }
+        .popup-parent:focus {
+            outline: 0.3em dashed rgba(255, 165, 0, 0.7);
+        }
         
         @media(max-width: 500px) {
             .layout_default.picker_wrapper {
@@ -90,25 +99,7 @@
 <body>
     <h1><a href="https://vanilla-picker.js.org">vanilla-picker</a> demo</h1>
 
-
     <div id="main-color"></div>
-
-    <div id="basic" class="popup-parent" style="top:45%;left:1em;">
-        Click me!
-    </div>
-
-    <button id="custom-toggler" style="bottom:20%;left:5%;">
-        Open "Custom" popup
-    </button>
-    <div id="custom" class="popup-parent" style="bottom:20%;left:40%;">
-        Custom
-        <select id="custom-placement" onclick="event.stopPropagation();">
-            <option selected>top</option>
-            <option>bottom</option>
-            <option>left</option>
-            <option>right</option>
-        </select>
-    </div>
 
     <h2>Shared picker</h2>
     <ul id="shared">
@@ -118,16 +109,40 @@
         <li id="shared-4" style="background-color:gold;"></li>
     </ul>
 
+    <a href="#" id="basic" class="popup-parent" style="top:45%;left:1em;">
+        Click me!
+    </a>
+
+    <button id="custom-toggler" style="bottom:20%;left:5%;">
+        Open "Custom" popup
+    </button>
+    <a href="#" id="custom" class="popup-parent" style="bottom:20%;left:40%;">
+        Custom
+        <select id="custom-placement" onclick="event.stopPropagation();">
+            <option selected>top</option>
+            <option>bottom</option>
+            <option>left</option>
+            <option>right</option>
+        </select>
+    </a>
+
     <script>
         "use strict";
         /*global Picker*/
+        
+        function $(selector, context) {
+            return (context || document).querySelector(selector);
+        }
+        
+        $('h1').insertAdjacentElement('beforeend', document.createElement('sub')).textContent = $('script[src]').src.replace(/.*\//, ' ');
 
-        var parentMain = document.querySelector('#main-color'),
-            parentBasic = document.querySelector('#basic'),
-            parentCustom = document.querySelector('#custom'),
-            customPlacement = document.querySelector('#custom-placement'),
-            customToggler = document.querySelector('#custom-toggler'),
-            parentShared = document.querySelector('#shared');
+
+        var parentMain      = $('#main-color'),
+            parentBasic     = $('#basic'),
+            parentCustom    = $('#custom'),
+            customPlacement = $('#custom-placement'),
+            customToggler   = $('#custom-toggler'),
+            parentShared    = $('#shared');
 
         var popupBasic, popupCustom, popupShared, pickerFixed;
 
@@ -155,10 +170,11 @@
                 popup: customPlacement.value,
             });
         };
-        //Disable the normal open/close behavior and implement our own:
-        popupCustom.openHandler = /*popupCustom.closeHandler =*/ function() { };
+        //Disable the normal open behavior and implement our own:
+        const openDefault = popupCustom.openHandler.bind(popupCustom);
+        popupCustom.openHandler = function() { };
         customToggler.onclick = function(e) {
-            popupCustom.show();
+            openDefault();
         };
 
 

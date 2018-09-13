@@ -53,21 +53,36 @@ h2 {
 
 
 #example-container {
-    width:  290px;
-    height: 330px;
+    margin-left: 1em;
     float: right;
-    @media (max-width: 600px) {
+    @media (max-width: 740px) {
         float: none;
     }
 
     #example-picker {
-        display: inline-block;
-        border: 30px solid currentColor;
-        border-radius: 100%;
-        box-shadow: 0 2px 4px 0 black;
+        display: inline-flex;
+
+        &::after {
+            content: '';
+            display: inline-block;
+            width:  60px;
+            height: 60px;
+            margin-left: 10px;
+            border-radius: 100%;
+            box-shadow: 0 2px 4px 0 black;
+            background: currentColor;
+        }
+    }
+}
+
+
+#installing + ul {
+
+    p {
+        margin: 0;
     }
 
-    .picker_wrapper {
-        position: absolute;
+    ul {
+        margin-bottom: 1em;
     }
 }
