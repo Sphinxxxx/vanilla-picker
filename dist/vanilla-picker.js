@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.5.1
+ * vanilla-picker v2.5.2
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -574,8 +574,9 @@
 
   var BG_TRANSP = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'2\' height=\'2\'%3E%3Cpath d=\'M1,0H0V1H2V2H1\' fill=\'lightgrey\'/%3E%3C/svg%3E")';
   var HUES = 360;
-  var EVENT_KEY = 'keydown'; 
-
+  var EVENT_KEY = 'keydown',
+  EVENT_CLICK_OUTSIDE = 'mousedown',
+      EVENT_TAB_MOVE = 'focusin';
 
   function parseHTML(htmlString) {
       var div = document.createElement('div');
@@ -725,12 +726,13 @@
       }, {
           key: 'closeHandler',
           value: function closeHandler(e) {
+              var event = e && e.type;
               var doHide = false;
 
               if (!e) {
                   doHide = true;
               }
-              else if (e.type === 'mousedown' || e.type === 'focusin') {
+              else if (event === EVENT_CLICK_OUTSIDE || event === EVENT_TAB_MOVE) {
 
                       if (!this.domElement.contains(e.target)) {
                           doHide = true;
@@ -745,7 +747,9 @@
               if (doHide && this.hide()) {
                   this.settings.parent.style.pointerEvents = '';
 
-                  this.settings.parent.focus();
+                  if (event !== EVENT_CLICK_OUTSIDE) {
+                      this.settings.parent.focus();
+                  }
 
                   if (this.onClose) {
                       this.onClose(this.colour);
@@ -941,8 +945,8 @@
                   }
               };
 
-              addEvent(window, 'mousedown', popupCloseProxy);
-              addEvent(window, 'focusin', popupCloseProxy); 
+              addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
+              addEvent(window, EVENT_TAB_MOVE, popupCloseProxy); 
               onKey(dom, ['Esc', 'Escape'], popupCloseProxy);
 
               addEvent(this._domOkay, 'click', onDoneProxy);
