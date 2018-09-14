@@ -6,8 +6,12 @@
     <title>vanilla-picker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="../dist/vanilla-picker.js?31415926"></script>
-    <script _src="https://unpkg.com/vanilla-picker@2.4"></script>
+    <script src="../dist/vanilla-picker.js?123456"></script>
+    <script _src="https://unpkg.com/vanilla-picker@2.5"></script>
+    
+    <script>
+        window.onerror = function(msg, url, line) { alert('Error: '+msg+'\nURL: '+url+'\nLine: '+line); };
+    </script>
 
     <style>
         body {
@@ -71,7 +75,7 @@
         
         @media(max-width: 500px) {
             .layout_default.picker_wrapper {
-                font-size: 7px;
+                __font-size: 7px;
             }
             .layout_default .picker_editor {
                 width: 100%;

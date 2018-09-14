@@ -60,6 +60,12 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 https://vanilla-picker.js.org/gen/Picker.html
 
 
+## Accessibility
+
+The color picker is built to support basic keyboard navigation and use with screen readers.
+I would be very interested in feedback on improvements that could be done here!
+
+
 ## Credits
 
 * Based on https://github.com/dissimulate/Picker by **Adam Brooks**

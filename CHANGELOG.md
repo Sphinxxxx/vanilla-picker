@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.5.1] - 2018-09-13
+### Fixed
+- Bug in `setColor()`.
+
+
 ## [2.5.0] - 2018-09-13
 ### Added
 - Keyboard navigation and basic accessibility.
@@ -78,7 +83,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.1...HEAD
+[2.5.1]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.0...v2.5.1
 [2.5.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.3...v2.5.0
 [2.4.3]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.2...v2.4.3
 [2.4.2]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.1...v2.4.2

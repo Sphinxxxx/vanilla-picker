@@ -306,7 +306,20 @@ class Picker {
         this._setColor(color, { silent: silent });
     }
     _setColor(color, flags) {
-        let c = new Color(color);
+        if(typeof color === 'string') { color = color.trim(); }
+        if (!color) { return; }
+
+        flags = flags || {};
+        let c;
+        try {
+            //Will throw on unknown colors:
+            c = new Color(color);
+        }
+        catch (ex) {
+            if(flags.failSilently) { return; }
+            throw ex;
+        }
+
         if(!this.settings.alpha) {
             const hsla = c.hsla;
             hsla[3] = 1;
@@ -434,16 +447,7 @@ class Picker {
         const editInput = this._domEdit;
         /*if(this.settings.editor)*/ {
             addEvent(editInput, 'input', function(e) {
-                const color = (this.value || '').trim();
-                if(!color) { return; }
-
-                try {
-                    //Will throw on unknown colors
-                    new Color(this.value);
-    
-                    that._setColor(color, { fromEditor: true });
-                }
-                catch(ex) { }
+                that._setColor(this.value, { fromEditor: true, failSilently: true });
             });
             //Select all text on focus:
             addEvent(editInput, 'focus', function(e) {

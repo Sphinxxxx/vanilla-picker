@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.5.0
+ * vanilla-picker v2.5.1
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -774,7 +774,24 @@
       }, {
           key: '_setColor',
           value: function _setColor(color, flags) {
-              var c = new Color(color);
+              if (typeof color === 'string') {
+                  color = color.trim();
+              }
+              if (!color) {
+                  return;
+              }
+
+              flags = flags || {};
+              var c = void 0;
+              try {
+                  c = new Color(color);
+              } catch (ex) {
+                  if (flags.failSilently) {
+                      return;
+                  }
+                  throw ex;
+              }
+
               if (!this.settings.alpha) {
                   var hsla = c.hsla;
                   hsla[3] = 1;
@@ -899,16 +916,7 @@
               var editInput = this._domEdit;
 {
                   addEvent(editInput, 'input', function (e) {
-                      var color = (this.value || '').trim();
-                      if (!color) {
-                          return;
-                      }
-
-                      try {
-                          new Color(this.value);
-
-                          that._setColor(color, { fromEditor: true });
-                      } catch (ex) {}
+                      that._setColor(this.value, { fromEditor: true, failSilently: true });
                   });
                   addEvent(editInput, 'focus', function (e) {
                       var input = this;

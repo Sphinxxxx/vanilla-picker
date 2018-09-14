@@ -56,5 +56,5 @@ A simple, easy to use vanilla JS (no dependencies) color picker with alpha selec
 
 ## Documentation
 
-[API](./gen/Picker.html)  
+[API and advanced options](./gen/Picker.html)  
 [Source](https://github.com/Sphinxxxx/vanilla-picker)
