@@ -61,6 +61,7 @@ h2 {
 
     #example-picker {
         display: inline-flex;
+        position: relative;
 
         &::before, &::after {
             content: '';
