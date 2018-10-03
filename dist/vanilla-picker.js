@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.5.2
+ * vanilla-picker v2.5.3
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)

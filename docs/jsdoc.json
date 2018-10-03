@@ -3,5 +3,11 @@
         "destination": "./docs/gen",
         "sort": false
     },
-    "plugins": ["plugins/markdown"]
+    "plugins": ["plugins/markdown"],
+    "templates": {
+        "includeDate": false,
+        "default": {
+            "includeDate": false
+        }
+    }
 }

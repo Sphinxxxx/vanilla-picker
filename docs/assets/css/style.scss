@@ -62,14 +62,25 @@ h2 {
     #example-picker {
         display: inline-flex;
 
-        &::after {
+        &::before, &::after {
             content: '';
             display: inline-block;
+            border-radius: 100%;
+        }
+        &::before {
+            position: absolute;
+            top: 30px; right: 20px;
+            width:  10px;
+            height: 10px;
+            color: #888;
+            background: currentColor;
+            box-shadow: 0 0 20px 20px currentColor;
+        }
+        &::after {
+            position: relative;
             width:  60px;
             height: 60px;
             margin-left: 10px;
-            border-radius: 100%;
-            box-shadow: 0 2px 4px 0 black;
             background: currentColor;
         }
     }

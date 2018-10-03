@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.5.3] - 2018-10-03
+### Changed
+- Minor documentation changes.
+
+
 ## [2.5.2] - 2018-09-14
 ### Fixed
 - Focusing and mouse interaction.
@@ -88,7 +93,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.2...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.3...HEAD
+[2.5.3]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.2...v2.5.3
 [2.5.2]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.1...v2.5.2
 [2.5.1]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.0...v2.5.1
 [2.5.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.4.3...v2.5.0
