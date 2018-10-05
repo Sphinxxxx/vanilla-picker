@@ -36,9 +36,7 @@ import { spawn } from 'child_process';
 
 
 const globalName = 'Picker',
-      outFolder = 'dist/',
-      //Remove scope (if any) from output path:
-      outFile = pkg.name.replace(/.*\//, '');
+      entry = 'src/picker.js';
 
 const myBanner = `/*!
  * <%= pkg.name %> v<%= pkg.version %>
@@ -61,23 +59,56 @@ function stream2Promise(stream) {
 }
 
 gulp.task('build', function(cb) {
-    return rollup({
-        input: pkg.module,
-        plugins: [
-            resolve({
-                module: true,
-            }),
-            babel({
-                babelrc: false,
-                presets: [
-                  ["env", { modules: false/*, loose: true*/ }]
-                ],
-                //We import ES6 modules (color-conversion and drag-tracker)..
-                //  exclude: 'node_modules/**',
+    /* First, inline the CSS and HTML to create a working ES6 module: */
 
-                plugins: ["external-helpers"],
-            }),
-        ],
+    //  //https://github.com/dlmanning/gulp-sass#basic-usage
+    //  gulp.src(entry.replace('.js', '.scss'))
+    //      .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+    //  
+    //      //https://stackoverflow.com/questions/41523743/can-i-convert-a-gulp-stream-into-a-string
+    //      .on('data', function(cssStream) {
+    //          const css = cssStream.contents.toString();
+    //          //console.log(css);
+
+    //Easier to use the normal node packages to read the HTML and CSS we'll inline into the JS:
+    const sassed = sass.renderSync({
+        file: entry.replace('.js', '.scss'),
+        outputStyle: 'compressed',
+    });
+    const css = sassed.css.toString(); //(Buffer.toString())
+
+    const html = pug.renderFile(entry.replace('.js', '.pug'));
+
+    return stream2Promise(
+        //file(outFile + '.js', gen.code, { src: true })
+        gulp.src(entry)
+            .pipe(replace( '## PLACEHOLDER-CSS ##', css.trim() ))
+            .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
+            .pipe(rename(pkg.module))
+            .pipe(gulp.dest('.'))
+    )
+    
+    /* Now, transpile to an ES5 library */
+
+    .then(x => {
+        return rollup({
+            input: pkg.module,
+            plugins: [
+                resolve({
+                    module: true,
+                }),
+                babel({
+                    babelrc: false,
+                    presets: [
+                      ["env", { modules: false/*, loose: true*/ }]
+                    ],
+                    //We import ES6 modules (color-conversion and drag-tracker)..
+                    //  exclude: 'node_modules/**',
+    
+                    plugins: ["external-helpers"],
+                }),
+            ],
+        });
     })
     .then(bundle => {
         return bundle.generate({
@@ -100,36 +131,13 @@ gulp.task('build', function(cb) {
         
         /* Generate the /dist files */
         
-        //  //Before we create the destination file, prepare the CSS which we'll paste into the JS code:
-        //  //https://github.com/dlmanning/gulp-sass#basic-usage
-        //  gulp.src(pkg.module.replace('.js', '.scss'))
-        //      .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-        //  
-        //      //https://stackoverflow.com/questions/41523743/can-i-convert-a-gulp-stream-into-a-string
-        //      .on('data', function(cssStream) {
-        //          const css = cssStream.contents.toString();
-        //          //console.log(css);
-
-        //Easier to use the normal node packages to read the HTML and CSS we'll inline into the JS:
-        const sassed = sass.renderSync({
-            file: pkg.module.replace('.js', '.scss'),
-            outputStyle: 'compressed',
-        });
-        const css = sassed.css.toString(); //(Buffer.toString())
-        //console.log('CSS:', css);
-        
-        const html = pug.renderFile(pkg.module.replace('.js', '.pug'));
-        //console.log('HTML:', html);
-
         const promDist = stream2Promise(
-            file(outFile + '.js', gen.code, { src: true })
-                .pipe(strip())
-                .pipe(replace( '## PLACEHOLDER-CSS ##', css.replace(/'/g, "\\'").trim() ))
-                .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
-    
+            file(pkg.main, gen.code, { src: true })
+
                 //Write un-minified:
+                .pipe(strip())
                 .pipe(header(myBanner, { pkg : pkg }))
-                .pipe(gulp.dest(outFolder))
+                .pipe(gulp.dest('.'))
     
                 //Minify:
                 //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
@@ -137,12 +145,9 @@ gulp.task('build', function(cb) {
                 //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
                 .pipe(rename({ extname: '.min.js' }))
                 .pipe(uglify())
-    
                 .pipe(header(myBanner, { pkg: pkg }))
-                .pipe(gulp.dest(outFolder))
+                .pipe(gulp.dest('.'))
         );
-
-        //      });
 
         //console.log('returning dist');
         return Promise.all([promDocs, promDist]);
