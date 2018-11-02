@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.6.0
+ * vanilla-picker v2.6.1
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -622,7 +622,8 @@
               popup: 'right',
               layout: 'default',
               alpha: true,
-              editor: true
+              editor: true,
+              colorSpecification: 'hex'
           };
 
           this._openProxy = function (e) {
@@ -1056,8 +1057,21 @@
 
 
               if (!flags.fromEditor) {
-                  var hex = col.hex;
-                  this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
+                  let value;
+
+                  switch (this.settings.colorSpecification) {
+                      case 'rgb':
+                          value = this.settings.alpha ? col.rgbaString : col.rgbString;
+                          break;
+                      case 'hsl':
+                          value = this.settings.alpha ? col.hslaString : col.hslString;
+                          break;
+                      default:
+                          value = this.settings.alpha ? col.hex : col.hex.substr(0, 7);
+
+                  }
+
+                  this._domEdit.value = value;
               }
 
 

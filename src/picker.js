@@ -93,6 +93,7 @@ class Picker {
             layout: 'default',
             alpha:  true,
             editor: true,
+            colorSpecification: 'hex'
         };
 
         //Keep openHandler() pluggable, but call it in the right context:
@@ -135,6 +136,9 @@ class Picker {
      * @param {string}       [options.layout=default] - Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements.
      * @param {boolean}      [options.alpha=true]     - Whether to enable adjusting the alpha channel.
      * @param {boolean}      [options.editor=true]    - Whether to show a text field for color value editing.
+     * @param {('hex'|'hsl'|'rgb')}
+     *                       [options.colorSpecification=hex]
+     *                                                - How to specify the color value for a editor's text field.
      * @param {string}       [options.color]          - Initial color for the picker.
      * @param {function}     [options.onChange]       - @see {@linkcode Picker#onChange|onChange}
      * @param {function}     [options.onDone]         - @see {@linkcode Picker#onDone|onDone}
@@ -601,9 +605,23 @@ class Picker {
         
         //Don't update the editor if the user is typing.
         //That creates too much noise because of our auto-expansion of 3/4/6 -> 8 digit hex codes.
-        if(!flags.fromEditor) {
-            const hex = col.hex;
-            this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
+        //Now you can get value as HEX, RGB or HSL string
+        if (!flags.fromEditor) {
+            let value;
+
+            switch (this.settings.colorSpecification) {
+                case 'rgb':
+                    value = this.settings.alpha ? col.rgbaString : col.rgbString;
+                    break;
+                case 'hsl':
+                    value = this.settings.alpha ? col.hslaString : col.hslString;
+                    break;
+                default:
+                    value = this.settings.alpha ? col.hex : col.hex.substr(0, 7);
+
+            }
+
+            this._domEdit.value = value;
         }
 
 
