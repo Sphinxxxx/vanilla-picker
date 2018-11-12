@@ -49,6 +49,9 @@
             width: 2em;
             height: 2em;
         }
+        #shared .picker_editor {
+            width: 100%;
+        }
         
         #main-color {
             display: inline-block;
@@ -56,6 +59,9 @@
         }
         #main-color .picker_sample, #main-color .picker_done {
             display: none;
+        }
+        #main-color .picker_editor {
+            width: 100%;
         }
 
         .popup-parent {
@@ -184,6 +190,7 @@
 
         /* Shared picker */
         popupShared = new Picker({
+            editorFormat: 'hsl',
             onChange: function(color) {
                 this.settings.parent.style.backgroundColor = color.rgbaString;
             }
@@ -204,7 +211,8 @@
             parent: parentMain,
             popup: false,
             alpha: false,
-            editor: false,
+            //editor: false,
+            editorFormat: 'rgb',
             color: '#cef6',
             onChange: function(color) {
                 document.body.style.backgroundColor = color.rgbaString;

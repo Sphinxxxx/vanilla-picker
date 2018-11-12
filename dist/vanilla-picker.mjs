@@ -93,6 +93,7 @@ class Picker {
             layout: 'default',
             alpha:  true,
             editor: true,
+            editorFormat: 'hex',
         };
 
         //Keep openHandler() pluggable, but call it in the right context:
@@ -128,13 +129,15 @@ class Picker {
      * Set the picker options.
      * 
      * @param {Object}       options
-     * @param {HTMLElement}  options.parent          - Which element the picker should be attached to.
+     * @param {HTMLElement}  options.parent           - Which element the picker should be attached to.
      * @param {('top'|'bottom'|'left'|'right'|false)}
      *                       [options.popup=right]    - If the picker is used as a popup, where to place it relative to the parent. `false` to add the picker as a normal child element of the parent.
      * @param {string}       [options.template]       - Custom HTML string from which to build the picker. See /src/picker.pug for required elements and class names.
      * @param {string}       [options.layout=default] - Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements.
      * @param {boolean}      [options.alpha=true]     - Whether to enable adjusting the alpha channel.
      * @param {boolean}      [options.editor=true]    - Whether to show a text field for color value editing.
+     * @param {('hex'|'hsl'|'rgb')}
+     *                       [options.editorFormat=hex] - How to display the selected color in the text field (the text field still supports *input* in any format).
      * @param {string}       [options.color]          - Initial color for the picker.
      * @param {function}     [options.onChange]       - @see {@linkcode Picker#onChange|onChange}
      * @param {function}     [options.onDone]         - @see {@linkcode Picker#onDone|onDone}
@@ -602,8 +605,16 @@ class Picker {
         //Don't update the editor if the user is typing.
         //That creates too much noise because of our auto-expansion of 3/4/6 -> 8 digit hex codes.
         if(!flags.fromEditor) {
-            const hex = col.hex;
-            this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
+            const format = this.settings.editorFormat,
+                  alpha = this.settings.alpha;
+
+            let value;
+            switch (format) {
+                case 'rgb': value = col.printRGB(alpha); break;
+                case 'hsl': value = col.printHSL(alpha); break;
+                default:    value = col.printHex(alpha);
+            }
+            this._domEdit.value = value;
         }
 
 

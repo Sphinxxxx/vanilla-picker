@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.6.0
+ * vanilla-picker v2.7.0
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2018 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -85,6 +85,13 @@
   var colorNames = '735AACA770//Xub218Pj/mo5+uvX6mdAP//gtpf//Ur258P//q1d9fXcxop/+TEq9zAAAAqfg/+vN6m1AAD/ngoiiviqt6pSoqzyo3riHxvdX56grk1f/8Aax10mkeqts/39QxbtZJXttkb//jcyxm3BQ86rmAP//wl5AACLwqqAIuL3y8uIYLwv1qampniqAGQAns5vbdrmohiwCLw5uVWsvsdd/4wAsegmTLMqagiwAAsqi6ZZ6uz6j7yPxtzSD2Lxk3L09PudbAM7RwsolADT0kz/xSTfuhAL//vfhaWlpyuxHpD/43rsiIiwn9//rw39uIosi9bp/wD/6w73Nzc9s5+Pj/6v8/9cA3b42qUg6vxgICArmaAIAAtdfrf8vf9n8P/wek3/2m0xnczVxc3bvSwCCsdt///wrvp8OaMs5i5ub6iyk//D1e8ifPwAoui//rNpyxrdjmw9c8ICAq4i4P//mx9+vrSq8t09PTx1ukO6Qqlv/7bBuuy/6B690uILKqpfdh876sd9d4iZnehsMTe0dv///g71lAP8A4nmMs0ys9u+vDmg9d/wD/4pmgAAAcurZs2qzllAADN4lkulXT6txk3Db66qPLNxozre2juokuAPqalj3SNHMgdkxxWF60pGRlwxfl9f/6hr5/+Thx6q/+S1m85/96tutd/fXmszxgIAAe4ma44j8rl/6UAmu0/0UA8so2nDWji87uiqumqmPuY9xbr+7u4rs23CTsb8/+/V95a/9q577xzYU/78z/8DL7b53aDdsu1sODmb11gACAy5nZjOZ1so/wAAlvevI+Pn09QWnhm7ui0UT94q+oBy7ei9KRg5aqLotXad5oFItasmwMDAaihh87r9fdalrN9p9cICQ7gz//r6k5uAP9/4qhRoK01te0rSM7cwAICA91x2L/Yclr/2NHcw1QODQd6w7oLuua09d6zudh////t359fX1enn//8Ao0ims0y';
   var colorNamesDeser = void 0;
 
+  function printNum(num) {
+  	var decs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  	var str = decs > 0 ? num.toFixed(decs).replace(/0+$/, '').replace(/\.$/, '') : num.toString();
+  	return str || '0';
+  }
+
   var Color = function () {
   	function Color(r, g, b, a) {
   		classCallCheck(this, Color);
@@ -143,7 +150,7 @@
   			}
 
   			else if (b === undefined) {
-  					var color = r && ('' + r).trim();
+  					var color = r && '' + r;
   					if (color) {
   						parseString(color.toLowerCase());
   					}
@@ -154,6 +161,39 @@
 
 
   	createClass(Color, [{
+  		key: 'printRGB',
+  		value: function printRGB(alpha) {
+  			var rgb = alpha ? this.rgba : this.rgba.slice(0, 3),
+  			    vals = rgb.map(function (x, i) {
+  				return printNum(x, i === 3 ? 3 : 0);
+  			});
+
+  			return alpha ? 'rgba(' + vals + ')' : 'rgb(' + vals + ')';
+  		}
+  	}, {
+  		key: 'printHSL',
+  		value: function printHSL(alpha) {
+  			var mults = [360, 100, 100, 1],
+  			    suff = ['', '%', '%', ''];
+
+  			var hsl = alpha ? this.hsla : this.hsla.slice(0, 3),
+
+  			vals = hsl.map(function (x, i) {
+  				return printNum(x * mults[i], i === 3 ? 3 : 1) + suff[i];
+  			});
+
+  			return alpha ? 'hsla(' + vals + ')' : 'hsl(' + vals + ')';
+  		}
+  	}, {
+  		key: 'printHex',
+  		value: function printHex(alpha) {
+  			var hex = this.hex;
+  			return alpha ? hex : hex.substring(0, 7);
+  		}
+
+
+
+  	}, {
   		key: 'rgba',
   		get: function get$$1() {
   			if (this._rgba) {
@@ -173,18 +213,18 @@
   			this._rgba = rgb;
   			this._hsla = null;
   		}
-
-
   	}, {
   		key: 'rgbString',
   		get: function get$$1() {
-  			return 'rgb(' + this.rgba.slice(0, 3) + ')';
+  			return this.printRGB();
   		}
   	}, {
   		key: 'rgbaString',
   		get: function get$$1() {
-  			return 'rgba(' + this.rgba + ')';
+  			return this.printRGB(true);
   		}
+
+
   	}, {
   		key: 'hsla',
   		get: function get$$1() {
@@ -205,20 +245,18 @@
   			this._hsla = hsl;
   			this._rgba = null;
   		}
-
-
   	}, {
   		key: 'hslString',
   		get: function get$$1() {
-  			var c = this.hsla;
-  			return 'hsl(' + c[0] * 360 + ',' + c[1] * 100 + '%,' + c[2] * 100 + '%)';
+  			return this.printHSL();
   		}
   	}, {
   		key: 'hslaString',
   		get: function get$$1() {
-  			var c = this.hsla;
-  			return 'hsla(' + c[0] * 360 + ',' + c[1] * 100 + '%,' + c[2] * 100 + '%,' + c[3] + ')';
+  			return this.printHSL(true);
   		}
+
+
   	}, {
   		key: 'hex',
   		get: function get$$1() {
@@ -234,9 +272,6 @@
   		set: function set$$1(hex) {
   			this.rgba = Color.hexToRgb(hex);
   		}
-
-
-
   	}], [{
   		key: 'hexToRgb',
   		value: function hexToRgb(input) {
@@ -622,7 +657,8 @@
               popup: 'right',
               layout: 'default',
               alpha: true,
-              editor: true
+              editor: true,
+              editorFormat: 'hex'
           };
 
           this._openProxy = function (e) {
@@ -1056,8 +1092,19 @@
 
 
               if (!flags.fromEditor) {
-                  var hex = col.hex;
-                  this._domEdit.value = this.settings.alpha ? hex : hex.substr(0, 7);
+                  var format = this.settings.editorFormat,
+                      alpha = this.settings.alpha;
+
+                  var value = void 0;
+                  switch (format) {
+                      case 'rgb':
+                          value = col.printRGB(alpha);break;
+                      case 'hsl':
+                          value = col.printHSL(alpha);break;
+                      default:
+                          value = col.printHex(alpha);
+                  }
+                  this._domEdit.value = value;
               }
 
 
