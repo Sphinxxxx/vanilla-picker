@@ -8,8 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.7.1] - 2019-01-11
+### Added
+- CSS vendor prefixes with Autoprefixer.
+
+### Changed
+- Updated dependencies.
+
+
 ## [2.7.0] - 2018-11-12
-### Fixed
+### Added
 - `options.editorFormat` (#7).
 
 
@@ -103,7 +111,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.7.1...HEAD
+[2.7.1]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.7.0...v2.7.1
 [2.7.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.6.0...v2.7.0
 [2.6.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.3...v2.6.0
 [2.5.3]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.5.2...v2.5.3

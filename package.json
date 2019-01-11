@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "keywords": [
     "ux",
@@ -43,26 +43,29 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "autoprefixer": "^9.4.4",
     "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "gulp": "^4.0.0",
     "gulp-file": "^0.4.0",
-    "gulp-header": "^2.0.5",
+    "gulp-header": "^2.0.7",
     "gulp-jsdoc3": "^2.0.0",
     "gulp-rename": "^1.4.0",
     "gulp-replace": "^1.0.0",
     "gulp-strip-comments": "^2.5.2",
     "gulp-uglify": "^3.0.1",
-    "node-sass": "^4.10.0",
+    "node-sass": "^4.11.0",
+    "postcss-cli": "^6.1.1",
     "pug": "^2.0.3",
-    "rollup": "^0.67.1",
+    "rollup": "^0.67.4",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-node-resolve": "^3.4.0"
   },
   "dependencies": {
-    "@sphinxxxx/color-conversion": "^2.2.0",
+    "@sphinxxxx/color-conversion": "^2.2.1",
     "drag-tracker": "^1.0.0"
-  }
+  },
+  "browserslist": "last 2 versions"
 }

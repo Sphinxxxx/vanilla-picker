@@ -3,6 +3,10 @@
 //
 //  npm i -D  babel-core  gulp@next gulp-file gulp-sass  rollup rollup-plugin-node-resolve rollup-plugin-babel babel-preset-env babel-plugin-external-helpers
 //
+//Autoprefixer
+//
+//  npm i -D  postcss-cli autoprefixer
+//
 //For cleanup/minification:
 //  npm i -D  gulp-strip-comments gulp-header gulp-uglify gulp-rename
 //
@@ -15,6 +19,8 @@ import * as pkg from './package.json';
 import gulp from 'gulp';
 import file from 'gulp-file';
 import sass from 'node-sass';
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
 import pug  from 'pug';
 import { rollup } from 'rollup';
 import babel from 'rollup-plugin-babel';
@@ -71,22 +77,32 @@ gulp.task('build', function(cb) {
     //          //console.log(css);
 
     //Easier to use the normal node packages to read the HTML and CSS we'll inline into the JS:
-    const sassed = sass.renderSync({
-        file: entry.replace('.js', '.scss'),
-        outputStyle: 'compressed',
-    });
-    const css = sassed.css.toString(); //(Buffer.toString())
-
     const html = pug.renderFile(entry.replace('.js', '.pug'));
 
-    return stream2Promise(
+    let css;
+    const sassFile = entry.replace('.js', '.scss'),
+          sassed = sass.renderSync({ file: sassFile, outputStyle: 'compressed' });
+
+    const prefixer = postcss([ autoprefixer ]).process(
+        sassed.css.toString(),
+        { from: sassFile }
+    )
+    .then(result => {
+        result.warnings().forEach(warn => console.warn('CSS: ' + warn.toString()));
+        css = result.css;
+    });
+
+    //Return the rest of the work as a chain of Promises:
+    return prefixer
+
+    .then(x => stream2Promise(
         //file(outFile + '.js', gen.code, { src: true })
         gulp.src(entry)
             .pipe(replace( '## PLACEHOLDER-CSS ##', css.trim() ))
             .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
             .pipe(rename(pkg.module))
             .pipe(gulp.dest('.'))
-    )
+    ))
     
     /* Now, transpile to an ES5 library */
 
