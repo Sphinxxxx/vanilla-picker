@@ -430,7 +430,6 @@ class Picker {
                 container:     container,
                 dragOutside:   false,
                 callback:      relayDrag,
-                callbackClick: relayDrag,
                 //Respond at once (mousedown), don't wait for click or drag:
                 callbackDragStart: relayDrag,
                 //When interacting with a picker, this allows other open picker popups to close:
@@ -673,7 +672,6 @@ const flipped = true;
                 container:     container,
                 //dragOutside:   false,
                 callback:      relayDrag,
-                callbackClick: relayDrag,
                 //Respond at once (mousedown), don't wait for click or drag:
                 callbackDragStart: relayDrag,
             };

@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.7.1
+ * vanilla-picker v2.7.2
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2019 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -920,7 +920,6 @@
                       container: container,
                       dragOutside: false,
                       callback: relayDrag,
-                      callbackClick: relayDrag,
                       callbackDragStart: relayDrag,
                       propagateEvents: true
                   };
