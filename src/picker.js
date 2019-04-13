@@ -237,10 +237,20 @@ class Picker {
 
             //Recommended popup behavior with keyboard navigation from http://whatsock.com/tsg/Coding%20Arena/Popups/Popup%20(Internal%20Content)/demo.htm
             //Wait a little before focusing the textbox, in case the dialog was just opened with [Space] (would overwrite the color value with a " "):
-            const toFocus = (e && (e.type === EVENT_KEY)) ? this._domEdit : this.domElement;
-            setTimeout(() => toFocus.focus(), 100);
 
-            if(this.onOpen) { this.onOpen(this.colour); }
+            const keyboardInitiated = e && (e.type === EVENT_KEY);
+
+            if (keyboardInitiated) {
+                setTimeout(() => this._domEdit.focus(), 100);
+            }
+
+            if (this.onOpen) {
+                this.onOpen(this.colour);
+
+                if (!keyboardInitiated) {
+                    this.domElement.focus();
+                }
+            }            
         }
     }
 
@@ -432,8 +442,14 @@ class Picker {
                 callback:      relayDrag,
                 //Respond at once (mousedown), don't wait for click or drag:
                 callbackDragStart: relayDrag,
+
                 //When interacting with a picker, this allows other open picker popups to close:
-                propagateEvents: true,
+                //propagateEvents: true
+                
+                // Given that clicking outside of a picker closes it, there will only be one picker open at any time.
+                // When this is true, the picker immediately closes when clicked in a shadow DOM.
+                // Setting to false seems to allow the picker to work correctly in a shadow DOM.
+                propagateEvents: false, 
             };
             return config;
         }
@@ -681,5 +697,10 @@ const flipped = true;
 
 }
 
+Picker.getStyle = () => {
+    const style = document.createElement('style');
+    style.textContent = `## PLACEHOLDER-CSS ##`;
+    return style;
+};
 
 export default Picker;
