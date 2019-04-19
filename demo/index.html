@@ -128,13 +128,16 @@
     </button>
     <a href="#" id="custom" class="popup-parent" style="bottom:20%;left:40%;">
         Custom
-        <select id="custom-placement" onclick="event.stopPropagation();">
+        <select id="custom-placement" _onclick="event.stopPropagation();">
             <option selected>top</option>
             <option>bottom</option>
             <option>left</option>
             <option>right</option>
         </select>
     </a>
+    
+    <h2>Shadow DOM</h2>
+    <div id="shadow"></div>
 
     <script>
         "use strict";
@@ -152,9 +155,22 @@
             parentCustom    = $('#custom'),
             customPlacement = $('#custom-placement'),
             customToggler   = $('#custom-toggler'),
-            parentShared    = $('#shared');
+            parentShared    = $('#shared'),
+            containerShadow = $('#shadow');
+        var parentShadow;
+        
+        //Shadow DOM:
+        //https://github.com/Sphinxxxx/vanilla-picker/issues/15
+        if(containerShadow.attachShadow) {
+            var shadow = containerShadow.attachShadow({ mode: 'open' });
+            shadow.appendChild(Picker.StyleElement.cloneNode(true));
 
-        var popupBasic, popupCustom, popupShared, pickerFixed;
+            parentShadow = document.createElement('button');
+            parentShadow.textContent = 'Shadow DOM';
+            shadow.appendChild(parentShadow);
+        }
+
+        var popupBasic, popupCustom, popupShared, pickerFixed, popupShadow;
 
 
         /* Basic example */
@@ -219,6 +235,20 @@
             },
         });
         pickerFixed.setColor('lime', true);
+
+
+        /* Shadow DOM */
+        if(parentShadow) {
+            popupShadow = new Picker({
+                parent: parentShadow,
+                onChange: function(color) {
+                    parentShadow.style.color = color.rgbaString;
+                },
+                onDone: function(color) {
+                    parentShadow.style.backgroundColor = color.rgbaString;
+                },
+            });
+        }
 
 
         //*
