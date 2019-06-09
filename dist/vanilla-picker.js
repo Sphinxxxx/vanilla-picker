@@ -1,5 +1,5 @@
 /*!
- * vanilla-picker v2.8.0
+ * vanilla-picker v2.8.1
  * https://vanilla-picker.js.org
  *
  * Copyright 2017-2019 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
@@ -759,13 +759,18 @@
               if (!e) {
                   doHide = true;
               }
-              else {
-                      if (event === 'click' || event === EVENT_KEY) {
-                          stopEvent(e);
-                      }
+              else if (event === EVENT_CLICK_OUTSIDE || event === EVENT_TAB_MOVE) {
 
-                      doHide = true;
+                      var knownTime = (this.__containedEvent || 0) + 100;
+                      if (e.timeStamp > knownTime) {
+                          doHide = true;
+                      }
                   }
+                  else {
+                          stopEvent(e);
+
+                          doHide = true;
+                      }
 
               if (doHide && this.hide()) {
                   this.settings.parent.style.pointerEvents = '';
@@ -953,15 +958,6 @@
               }
 
 
-              var onDoneProxy = function onDoneProxy(e) {
-                  _this2._ifPopup(function () {
-                      return _this2.closeHandler(e);
-                  });
-                  if (_this2.onDone) {
-                      _this2.onDone(_this2.colour);
-                  }
-              };
-
               this._ifPopup(function () {
                   var popupCloseProxy = function popupCloseProxy(e) {
                       return _this2.closeHandler(e);
@@ -971,14 +967,21 @@
                   addEvent(window, EVENT_TAB_MOVE, popupCloseProxy);
                   onKey(dom, ['Esc', 'Escape'], popupCloseProxy);
 
-                  addEvent(dom, EVENT_CLICK_OUTSIDE, stopEvent);
-                  addEvent(dom, EVENT_TAB_MOVE, stopEvent);
-
-                  addEvent(_this2._domEdit, EVENT_CLICK_OUTSIDE, function (e) {
-                      return _this2._domEdit.focus();
-                  });
+                  var timeKeeper = function timeKeeper(e) {
+                      _this2.__containedEvent = e.timeStamp;
+                  };
+                  addEvent(dom, EVENT_CLICK_OUTSIDE, timeKeeper);
+                  addEvent(dom, EVENT_TAB_MOVE, timeKeeper);
               });
 
+              var onDoneProxy = function onDoneProxy(e) {
+                  _this2._ifPopup(function () {
+                      return _this2.closeHandler(e);
+                  });
+                  if (_this2.onDone) {
+                      _this2.onDone(_this2.colour);
+                  }
+              };
               addEvent(this._domOkay, 'click', onDoneProxy);
               onKey(dom, ['Enter'], onDoneProxy);
           }

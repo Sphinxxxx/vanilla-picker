@@ -258,25 +258,22 @@ class Picker {
         if(!e) {
             doHide = true;
         }
-        /*
         //Close by clicking/tabbing outside the popup:
         else if((event === EVENT_CLICK_OUTSIDE) || (event === EVENT_TAB_MOVE)) {
-        
-            //Note: Now that we have added the 'focusin' event,
-            //this trick requires the picker wrapper to be focusable (via `tabindex` - see /src/picker.pug),
-            //or else the popup loses focus if you click anywhere on the picker's background.
-            if(!this.domElement.contains(e.target)) {
+
+            //See comments in `_bindEvents()`.
+            //Undesirable behavior in Firefox though: When clicking (mousedown) the [Ok] button or the textbox,
+            //a `focusout` is raised on `picker_wrapper`, followed by a `focusin` on the parent (if it is focusable).
+            //To keep that new event from closing the popup, we add 100ms to our time control:
+            const knownTime = (this.__containedEvent || 0) + 100;
+            if(e.timeStamp > knownTime) {
                 doHide = true;
             }
         }
-        /**/
         //Close by mouse/touch or key events:
         else {
             //Don't bubble [Ok] clicks or [Enter] keys up to the parent, because that's the trigger to re-open the popup.
-            //However, we do need to propagate the other individual mouse events, or else the editor text box can't be clicked(!)
-            if((event === 'click') || (event === EVENT_KEY)) {
-                stopEvent(e);
-            }
+            stopEvent(e);
 
             doHide = true;
         }
@@ -478,37 +475,39 @@ class Picker {
 
         /* Close the dialog */
 
-        const onDoneProxy = (e) => {
-            this._ifPopup(() => this.closeHandler(e));
-            if(this.onDone) { this.onDone(this.colour); }
-        };
-
+        //onClose:
         this._ifPopup(() => {
             //Keep closeHandler() pluggable, but call it in the right context:
             const popupCloseProxy = (e) => this.closeHandler(e);
-            
+
             addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
             addEvent(window, EVENT_TAB_MOVE,      popupCloseProxy);
             onKey(   dom,    ['Esc', 'Escape'],   popupCloseProxy);
 
-
-            //Above, we added events on `window` to close the popup.
-            //Now, we must make sure that events from within the picker don't reach the window and cause the popup to close.
-            //We do it this way instead of checking `e.target` in `closeHandler()` for two reasons:
-            //  * If used in a shadow DOM, the original `target` isn't available once the event reaches `window` (issue #15)
-            //  * Events bubble differently in different browsers. E.g. in Firefox, the parent gets a `focusin` event if you click the editor or Ok button (issue #17).
+            //Above, we added events on `window` to close the popup if the user clicks outside or tabs away from the picker.
+            //Now, we must make sure that clicks and tabs within the picker don't cause the popup to close.
+            //Things we have tried:
+            //  * Check `e.target` in `closeHandler()` and see if it's a child element of the picker.
+            //      - That won't work if used in a shadow DOM, where the original `target` isn't available once the event reaches `window` (issue #15).
+            //  * Stop the events from propagating past the popup element (using `e.stopPropagation()`).
+            //      - ..but stopping mouse events interferes with text selection in the editor.
             //
-            addEvent(dom, EVENT_CLICK_OUTSIDE, stopEvent);
+            //So, next attempt: Note the `timeStamp` of the contained event, and check it in `closeHandler()`.
+            //That should be a unique identifier of the event, and the time seems to be preserved when retargeting shadow DOM events:
+            const timeKeeper = (e) => {
+                this.__containedEvent = e.timeStamp;
+            }
+            addEvent(dom, EVENT_CLICK_OUTSIDE, timeKeeper);
             //Note: Now that we have added the 'focusin' event, this trick requires the picker wrapper to be focusable (via `tabindex` - see /src/picker.pug),
             //or else the popup loses focus if you click anywhere on the picker's background.
-            addEvent(dom, EVENT_TAB_MOVE,      stopEvent);
-
-
-            //Just one thing.. The stopEvent() on clicks above makes the editor text box unresponsive to mouse clicks.
-            //So here's a hack to get around that:
-            addEvent(this._domEdit, EVENT_CLICK_OUTSIDE, e => this._domEdit.focus());
+            addEvent(dom, EVENT_TAB_MOVE,      timeKeeper);
         });
 
+        //onDone:
+        const onDoneProxy = (e) => {
+            this._ifPopup(() => this.closeHandler(e));
+            if(this.onDone) { this.onDone(this.colour); }
+        };
         addEvent(this._domOkay, 'click',   onDoneProxy);
         onKey(   dom,           ['Enter'], onDoneProxy);
     }
