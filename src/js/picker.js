@@ -89,6 +89,7 @@ class Picker {
             alpha:  true,
             editor: true,
             editorFormat: 'hex',
+            cancelButton: false,
         };
 
         //Keep openHandler() pluggable, but call it in the right context:
@@ -133,6 +134,7 @@ class Picker {
      * @param {boolean}      [options.editor=true]    - Whether to show a text field for color value editing.
      * @param {('hex'|'hsl'|'rgb')}
      *                       [options.editorFormat=hex] - How to display the selected color in the text field (the text field still supports *input* in any format).
+     * @param {boolean}      [options.cancelButton=false] - Whether to have a "Cancel" button which closes the popup.
      * @param {string}       [options.color]          - Initial color for the picker.
      * @param {function}     [options.onChange]       - @see {@linkcode Picker#onChange|onChange}
      * @param {function}     [options.onDone]         - @see {@linkcode Picker#onDone|onDone}
@@ -370,10 +372,12 @@ class Picker {
         this._domEdit   = $('.picker_editor input', wrapper);
         this._domSample = $('.picker_sample', wrapper);
         this._domOkay   = $('.picker_done button', wrapper);
+        this._domCancel = $('.picker_cancel button', wrapper);
 
         wrapper.classList.add('layout_' + this.settings.layout);
         if(!this.settings.alpha) { wrapper.classList.add('no_alpha'); }
         if(!this.settings.editor) { wrapper.classList.add('no_editor'); }
+        if(!this.settings.cancelButton) { wrapper.classList.add('no_cancel'); }
         this._ifPopup(() => wrapper.classList.add('popup'));
         
         this._setPosition();
@@ -473,6 +477,9 @@ class Picker {
             //Note: Now that we have added the 'focusin' event, this trick requires the picker wrapper to be focusable (via `tabindex` - see /src/picker.pug),
             //or else the popup loses focus if you click anywhere on the picker's background.
             addEvent(dom, EVENT_TAB_MOVE,      timeKeeper);
+            
+            //Cancel button:
+            addEvent(this._domCancel, 'click', popupCloseProxy);
         });
 
         //onDone:

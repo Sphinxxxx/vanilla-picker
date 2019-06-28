@@ -186,6 +186,8 @@
         popupCustom = new Picker({
             parent: parentCustom,
             popup: customPlacement.value,
+            editor: false,
+            cancelButton: true,
             color: '#dbeb',
             onDone: function(color) {
                 parentCustom.style.background = color.rgbaString;
@@ -241,6 +243,8 @@
         if(parentShadow) {
             popupShadow = new Picker({
                 parent: parentShadow,
+                editor: false,
+                cancelButton: true,
                 onChange: function(color) {
                     parentShadow.style.color = color.rgbaString;
                 },

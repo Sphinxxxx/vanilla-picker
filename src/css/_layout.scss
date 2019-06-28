@@ -7,6 +7,9 @@
     z-index: -1;
     opacity: 0;
 }
+.picker_wrapper.no_cancel  .picker_cancel {
+    display: none;
+}
 
 
 .layout_default {
@@ -90,7 +93,7 @@
     }
     
     
-    .picker_done {
+    .picker_done, .picker_cancel {
         order: 1;
     }
 
