@@ -23,6 +23,8 @@ import autoprefixer from 'autoprefixer';
 import postcss from 'postcss';
 import pug  from 'pug';
 import { rollup } from 'rollup';
+import cleanup from 'rollup-plugin-cleanup';
+//import * as babel from 'babel-core';
 import babel from 'rollup-plugin-babel';
 //If the code imports modules from /node_modules
 import resolve from 'rollup-plugin-node-resolve';
@@ -42,7 +44,7 @@ import { spawn } from 'child_process';
 
 
 const globalName = 'Picker',
-      entry = 'src/picker.js';
+      entry = 'src/index.js';
 
 const myBanner = `/*!
  * <%= pkg.name %> v<%= pkg.version %>
@@ -65,90 +67,108 @@ function stream2Promise(stream) {
 }
 
 gulp.task('build', function(cb) {
-    /* First, inline the CSS and HTML to create a working ES6 module: */
-
-    //  //https://github.com/dlmanning/gulp-sass#basic-usage
-    //  gulp.src(entry.replace('.js', '.scss'))
-    //      .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-    //  
-    //      //https://stackoverflow.com/questions/41523743/can-i-convert-a-gulp-stream-into-a-string
-    //      .on('data', function(cssStream) {
-    //          const css = cssStream.contents.toString();
-    //          //console.log(css);
-
-    //Easier to use the normal node packages to read the HTML and CSS we'll inline into the JS:
-    const html = pug.renderFile(entry.replace('.js', '.pug'));
-
-    let css;
-    const sassFile = entry.replace('.js', '.scss'),
-          sassed = sass.renderSync({ file: sassFile, outputStyle: 'compressed' });
-
-    const prefixer = postcss([ autoprefixer ]).process(
-        sassed.css.toString(),
-        { from: sassFile }
-    )
-    .then(result => {
-        result.warnings().forEach(warn => console.warn('CSS: ' + warn.toString()));
-        css = result.css;
-    });
-
-    //Return the rest of the work as a chain of Promises:
-    return prefixer
-
-    .then(x => stream2Promise(
-        //file(outFile + '.js', gen.code, { src: true })
-        gulp.src(entry)
-            .pipe(replace( '## PLACEHOLDER-CSS ##', css.trim() ))
-            .pipe(replace( '## PLACEHOLDER-HTML ##', html ))
-            .pipe(rename(pkg.module))
-            .pipe(gulp.dest('.'))
-    ))
+    const ESPath = pkg.module;
     
-    /* Now, transpile to an ES5 library */
-
-    .then(x => {
-        return rollup({
-            input: pkg.module,
-            plugins: [
-                resolve({
-                    module: true,
-                }),
-                babel({
-                    babelrc: false,
-                    presets: [
-                      ["env", { modules: false/*, loose: true*/ }]
-                    ],
-                    //We import ES6 modules (color-conversion and drag-tracker)..
-                    //  exclude: 'node_modules/**',
-    
-                    plugins: ["external-helpers"],
-                }),
-            ],
-        });
-    })
-    .then(bundle => {
-        return bundle.generate({
-          format: 'umd',
-          name: globalName,
-        });
-    })
-    .then(gen => {
-
-        /* Generate the JSDoc documentation */
-
+    //Generate the JSDoc documentation:
+    function generateDocs() {
         //Looks like stream2Promise() won't wait until the docs are built here
         //so we need to pass a callback to jsdoc()..
-        const promDocs = new Promise(function(resolve, reject) {
+        return new Promise(function(resolve, reject) {
             //https://github.com/mlucool/gulp-jsdoc3#usage
             const config = require('./docs/jsdoc.json');
             gulp.src(['README.md', './src/**/*.js'], { read: false })
                 .pipe(jsdoc(config, resolve));
         });
-        
-        /* Generate the /dist files */
-        
-        const promDist = stream2Promise(
-            file(pkg.main, gen.code, { src: true })
+    }
+    
+    //Prepare the CSS and HTML we'll inline later:
+    function prepareAssets() {
+        //  //https://github.com/dlmanning/gulp-sass#basic-usage
+        //  gulp.src(entry.replace('.js', '.scss'))
+        //      .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+        //  
+        //      //https://stackoverflow.com/questions/41523743/can-i-convert-a-gulp-stream-into-a-string
+        //      .on('data', function(cssStream) {
+        //          const css = cssStream.contents.toString();
+        //          //console.log(css);
+    
+        //Easier to use the normal node packages to create the HTML and CSS:
+        const html = pug.renderFile(entry.replace('.js', '.pug'));
+    
+        const sassFile = entry.replace('.js', '.scss'),
+              sassed = sass.renderSync({ file: sassFile, outputStyle: 'compressed' });
+    
+        return postcss([ autoprefixer ]).process(
+            sassed.css.toString(),
+            { from: sassFile }
+        )
+        .then(result => {
+            result.warnings().forEach(warn => console.warn('CSS: ' + warn.toString()));
+            return {
+                html,
+                css: result.css,
+            };
+        });
+    }
+
+    //Bundle everything into an ES6 module:
+    function buildBundle(assets) {
+        return rollup({
+            input: entry,
+            plugins: [
+                resolve({
+                    module: true,
+                }),
+                cleanup({
+                    comments: 'none',
+                    //compactComments: false,
+                    maxEmptyLines: 1,
+                }),
+            ],
+        })
+        .then(bundle => {
+            return bundle.generate({
+              format: 'esm',
+            })
+            .then(gen => stream2Promise(
+                file(ESPath, gen.code, { src: true })
+                    .pipe(replace( '## PLACEHOLDER-CSS ##', assets.css.trim() ))
+                    .pipe(replace( '## PLACEHOLDER-HTML ##', assets.html ))
+                    //.pipe(rename(ESPath))
+                    .pipe(gulp.dest('.'))
+            ));
+        });
+    }
+    
+    //transpile to an ES5 library
+    function transpile() {
+        /*
+        const es5 = babel.transformFileSync(ESPath, {
+            babelrc: false,
+            presets: [
+                ["env", { /*modules: false, loose: true* }]
+            ],
+        });
+        */
+        //The reason we use Rollup again here (and not plain Babel) is that Rollup creates the UMD wrapper for us:
+        return rollup({
+            input: ESPath,
+            plugins: [
+                babel({
+                    babelrc: false,
+                    presets: [
+                      ["env", { modules: false/*, loose: true*/ }]
+                    ],
+                    plugins: ["external-helpers"],
+                }),
+            ],
+        })
+        .then(bundle => bundle.generate({
+            format: 'umd',
+            name: globalName,
+        }))
+        .then(es5 => stream2Promise(
+            file(pkg.main, es5.code, { src: true })
 
                 //Write un-minified:
                 .pipe(strip())
@@ -163,11 +183,14 @@ gulp.task('build', function(cb) {
                 .pipe(uglify())
                 .pipe(header(myBanner, { pkg: pkg }))
                 .pipe(gulp.dest('.'))
-        );
+        ));
+    }
+    
+    return Promise.all([
+        generateDocs(),
+        prepareAssets().then(buildBundle).then(transpile)
+    ]);
 
-        //console.log('returning dist');
-        return Promise.all([promDocs, promDist]);
-    });
 });
 
 
