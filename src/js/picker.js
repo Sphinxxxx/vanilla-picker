@@ -1,7 +1,7 @@
 /*global HTMLElement*/
 
 import Color from '@sphinxxxx/color-conversion';
-import dragTracker from 'drag-tracker';
+import * as utils from './utils.js';
 
 
 const BG_TRANSP = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E")`;
@@ -11,13 +11,6 @@ const EVENT_KEY = 'keydown', //'keypress'
       EVENT_CLICK_OUTSIDE = 'mousedown',
       EVENT_TAB_MOVE = 'focusin';
 
-
-function parseHTML(htmlString) {
-    //https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
-    const div = document.createElement('div');
-    div.innerHTML = htmlString;
-    return div.firstElementChild;
-}
 
 function $(selector, context) {
     return (context || document).querySelector(selector);
@@ -368,7 +361,7 @@ class Picker {
         }
 
         const html = this.settings.template || `## PLACEHOLDER-HTML ##`;
-        const wrapper = parseHTML(html);
+        const wrapper = utils.parseHTML(html);
         
         this.domElement = wrapper;
         this._domH      = $('.picker_hue', wrapper);
@@ -421,36 +414,15 @@ class Picker {
 
         /* Draggable color selection */
 
-        function createDragConfig(container, callbackRelative) {
-
-            //Convert the px coordinates to relative coordinates (0-1) before invoking the callback:
-            function relayDrag(_, pos) {
-                const relX = pos[0]/container.clientWidth,
-                      relY = pos[1]/container.clientHeight;
-                callbackRelative(relX, relY);
-            }
-
-            const config = {
-                container:     container,
-                dragOutside:   false,
-                callback:      relayDrag,
-                //Respond at once (mousedown), don't wait for click or drag:
-                callbackDragStart: relayDrag,
-                //When interacting with a picker, this allows other open picker popups to close:
-                propagateEvents: true,
-            };
-            return config;
-        }
-
         //Select hue
-        dragTracker(createDragConfig(this._domH,  (x, y) => that._setHSLA(x)));
+        utils.dragTrack(this._domH,  (x, y) => that._setHSLA(x));
 
         //Select saturation/lightness
-        dragTracker(createDragConfig(this._domSL, (x, y) => that._setHSLA(null, x, 1 - y)));
+        utils.dragTrack(this._domSL, (x, y) => that._setHSLA(null, x, 1 - y));
 
         //Select alpha
         if(this.settings.alpha) {
-            dragTracker(createDragConfig(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y)));
+            utils.dragTrack(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y));
         }
         
         

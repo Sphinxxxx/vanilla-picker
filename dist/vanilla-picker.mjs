@@ -215,212 +215,69 @@ class Color {
 
 }
 
-const root = window;
+function parseHTML(htmlString) {
 
-function dragTracker(options) {
+    const div = document.createElement('div');
+    div.innerHTML = htmlString;
+    return div.firstElementChild;
+}
 
-    const ep = Element.prototype;
-    if (!ep.matches)
-         ep.matches = ep.msMatchesSelector || ep.webkitMatchesSelector;
-    if (!ep.closest)
-         ep.closest = function(s) {
-            var node = this;
-            do {
-                if(node.matches(s)) return node;
-
-                node = (node.tagName === 'svg') ? node.parentNode : node.parentElement;
-            } while(node);
-
-            return null;
-        };
-
-    options = options || {};
-    const container = options.container || document.documentElement,
-          selector = options.selector,
-
-          callback = options.callback || console.log,
-          callbackStart = options.callbackDragStart,
-          callbackEnd = options.callbackDragEnd,
-
-          callbackClick = options.callbackClick,
-          propagate = options.propagateEvents,
-
-          roundCoords = (options.roundCoords !== false),
-          dragOutside = (options.dragOutside !== false),
-
-          handleOffset = options.handleOffset || (options.handleOffset !== false)
-    ;
-
-    let offsetToCenter = null;
-    switch(handleOffset) {
-        case 'center':
-            offsetToCenter = true; break;
-        case 'topleft':
-        case 'top-left':
-            offsetToCenter = false; break;
-    }
-
-    let dragState;
-
-    function getMousePos(e, elm, offset, stayWithin) {
-        let x = e.clientX,
-            y = e.clientY;
-
-        function respectBounds(value, min, max) {
-            return Math.max(min, Math.min(value, max));
-        }
-
-        if(elm) {
-            const bounds = elm.getBoundingClientRect();
-            x -= bounds.left;
-            y -= bounds.top;
-
-            if(offset) {
-                x -= offset[0];
-                y -= offset[1];
-            }
-            if(stayWithin) {
-                x = respectBounds(x, 0, bounds.width);
-                y = respectBounds(y, 0, bounds.height);
-            }
-
-            if(elm !== container) {
-                const center = (offsetToCenter !== null)
-                    ? offsetToCenter
-
-                    : (elm.nodeName === 'circle') || (elm.nodeName === 'ellipse');
-
-                if(center) {
-                    x -= bounds.width/2;
-                    y -= bounds.height/2;
-                }
-            }
-        }
-        return (roundCoords ? [Math.round(x), Math.round(y)] : [x, y]);
-    }
-
-    function stopEvent(e) {
-        e.preventDefault();
-        if(!propagate) {
-            e.stopPropagation();
-        }
-    }
-
-    function onDown(e) {
-        let target;
-        if(selector) {
-            target = (selector instanceof Element)
-                            ? (selector.contains(e.target) ? selector : null)
-                            : e.target.closest(selector);
-        }
-        else {
-
-            target = {};
-        }
-
-        if(target) {
-            stopEvent(e);
-
-            const mouseOffset = (selector && handleOffset) ? getMousePos(e, target) : [0, 0],
-                  startPos = getMousePos(e, container, mouseOffset);
-            dragState = {
-                target,
-                mouseOffset,
-                startPos,
-                actuallyDragged: false,
-            };
-
-            if(callbackStart) {
-                callbackStart(target, startPos);
-            }
-        }
-    }
-
-    function onMove(e) {
-        if(!dragState) { return; }
-        stopEvent(e);
-
-        const start = dragState.startPos,
-              pos = getMousePos(e, container, dragState.mouseOffset, !dragOutside);
-
-        dragState.actuallyDragged = dragState.actuallyDragged || (start[0] !== pos[0]) || (start[1] !== pos[1]);
-
-        callback(dragState.target, pos, start);
-    }
-
-    function onEnd(e, cancelled) {
-        if(!dragState) { return; }
-
-        if(callbackEnd || callbackClick) {
-            const isClick = !dragState.actuallyDragged,
-                  pos = isClick ? dragState.startPos : getMousePos(e, container, dragState.mouseOffset, !dragOutside);
-
-            if(callbackClick && isClick && !cancelled) {
-                callbackClick(dragState.target, pos);
-            }
-
-            if(callbackEnd) {
-                callbackEnd(dragState.target, pos, dragState.startPos, cancelled || (isClick && callbackClick));
-            }
-        }
-        dragState = null;
-    }
-
-    addEvent(container, 'mousedown', function(e) {
-        if(isLeftButton(e)) {
-            onDown(e);
-        }
-        else {
-            onEnd(e, true);
-        }
-    });
-    addEvent(container, 'touchstart', e => relayTouch(e, onDown));
-
-    addEvent(root, 'mousemove', function(e) {
-        if(!dragState) { return; }
-
-        if(isLeftButton(e)) {
-            onMove(e);
-        }
-
-        else {
-            onEnd(e);
-        }
-    });
-    addEvent(root, 'touchmove', e => relayTouch(e, onMove));
-
-    addEvent(container, 'mouseup', function(e) {
-
-        if(dragState && !isLeftButton(e)) { onEnd(e); }
-    });
-    function onTouchEnd(e, cancelled) { onEnd(tweakTouch(e), cancelled); }
-    addEvent(container, 'touchend',    e => onTouchEnd(e));
-    addEvent(container, 'touchcancel', e => onTouchEnd(e, true));
+function dragTrack(area, callback) {
+    var dragging = false;
 
     function addEvent(target, type, handler) {
-        target.addEventListener(type, handler);
+        target.addEventListener(type, handler, false);
     }
-    function isLeftButton(e) {
-        return (e.buttons !== undefined)
-            ? (e.buttons === 1)
-
-            : (e.which === 1);
+    function clamp(val, min, max) {
+        return Math.max(min, Math.min(val, max));
     }
-    function relayTouch(e, handler) {
 
-        if(e.touches.length !== 1) { onEnd(e, true); return; }
+    function onMove(e, info, starting) {
+        if (starting) { dragging = true; }
+        if (!dragging) { return; }
 
-        handler(tweakTouch(e));
+        e.preventDefault();
+
+        var bounds = area.getBoundingClientRect(),
+            w = bounds.width,
+            h = bounds.height,
+            x = info.clientX,
+            y = info.clientY;
+
+        var relX = clamp(x - bounds.left, 0, w),
+            relY = clamp(y - bounds.top, 0, h);
+
+        callback(relX / w, relY / h);
     }
-    function tweakTouch(e) {
-        let touch = e.targetTouches[0];
 
-        if(!touch) { touch = e.changedTouches[0]; }
+    function onMouse(e, starting) {
+        var button = (e.buttons === undefined) ? e.which : e.buttons;
+        if (button === 1) {
+            onMove(e, e, starting);
+        }
 
-        touch.preventDefault = e.preventDefault.bind(e);
-        touch.stopPropagation = e.stopPropagation.bind(e);
-        return touch;
+        else {
+            dragging = false;
+        }
     }
+
+    function onTouch(e, starting) {
+        if (e.touches.length === 1) {
+            onMove(e, e.touches[0], starting);
+        }
+
+        else {
+            dragging = false;
+        }
+    }
+
+    addEvent(area,   'mousedown',   function(e) { onMouse(e, true); });
+    addEvent(area,   'touchstart',  function(e) { onTouch(e, true); });
+    addEvent(window, 'mousemove',   onMouse);
+    addEvent(area,   'touchmove',   onTouch);
+    addEvent(window, 'mouseup',     function(e) { dragging = false; });
+    addEvent(area,   'touchend',    function(e) { dragging = false; });
+    addEvent(area,   'touchcancel', function(e) { dragging = false; });
 }
 
 const BG_TRANSP = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E")`;
@@ -429,13 +286,6 @@ const HUES = 360;
 const EVENT_KEY = 'keydown',
       EVENT_CLICK_OUTSIDE = 'mousedown',
       EVENT_TAB_MOVE = 'focusin';
-
-function parseHTML(htmlString) {
-
-    const div = document.createElement('div');
-    div.innerHTML = htmlString;
-    return div.firstElementChild;
-}
 
 function $(selector, context) {
     return (context || document).querySelector(selector);
@@ -676,32 +526,12 @@ class Picker {
 
         addEvent(dom, 'click', e => e.preventDefault());
 
-        function createDragConfig(container, callbackRelative) {
+        dragTrack(this._domH,  (x, y) => that._setHSLA(x));
 
-            function relayDrag(_, pos) {
-                const relX = pos[0]/container.clientWidth,
-                      relY = pos[1]/container.clientHeight;
-                callbackRelative(relX, relY);
-            }
-
-            const config = {
-                container:     container,
-                dragOutside:   false,
-                callback:      relayDrag,
-
-                callbackDragStart: relayDrag,
-
-                propagateEvents: true,
-            };
-            return config;
-        }
-
-        dragTracker(createDragConfig(this._domH,  (x, y) => that._setHSLA(x)));
-
-        dragTracker(createDragConfig(this._domSL, (x, y) => that._setHSLA(null, x, 1 - y)));
+        dragTrack(this._domSL, (x, y) => that._setHSLA(null, x, 1 - y));
 
         if(this.settings.alpha) {
-            dragTracker(createDragConfig(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y)));
+            dragTrack(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y));
         }
 
         const editInput = this._domEdit;
