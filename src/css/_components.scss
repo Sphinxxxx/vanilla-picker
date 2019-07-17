@@ -14,9 +14,29 @@
     //However, we don't want all the decoration:
     &:focus { outline: none; }
     
-    //Align borders with the other elements' border-deco():
+    //Reset custom styles on certain Firefox installs (#21)
     button, input {
-        margin: -1px;
+        box-sizing: border-box;
+        border: none;
+        @include border-deco();
+        
+        outline: none;
+        &:focus, &:active {
+        	box-shadow: 0 0 2px 1px dodgerblue;
+        }
+    }
+    button {
+        padding: .4em .6em;
+        cursor: pointer;
+
+        background-color: whitesmoke;
+        background-image: linear-gradient(0deg, gainsboro, transparent);
+        &:active {
+            background-image: linear-gradient(0deg, transparent, gainsboro);
+        }
+        &:hover {
+            background-color: white;
+        }
     }
 }
 
@@ -95,9 +115,8 @@
 
 .picker_editor {
     input {
-        box-sizing: border-box;
         font-family: monospace;
-        padding: .1em .2em;
+        padding: .2em .4em;
     }
 }
 
@@ -112,11 +131,4 @@
         height: 100%;
         background: currentColor;
     }
-}
-
-
-.picker_done button, .picker_cancel button {
-    box-sizing: border-box;
-    padding: .2em .5em;
-    cursor: pointer;
 }

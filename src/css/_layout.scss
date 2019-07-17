@@ -76,11 +76,11 @@
     .picker_editor {
         order: 1;
         //width: 100%;
-        width: 6rem;
+        width: 6.5rem;
 
         input {
-            width:  calc(100% + 2px);
-            height: calc(100% + 2px);
+            width:  100%;
+            height: 100%;
         }
     }
     

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 
+## [2.9.1] - 2019-07-17
+### Fixed
+- Normalized CSS for `input` and `button` (#21).
+
+
 ## [2.9.0] - 2019-06-28
 ### Added
 - `options.cancelButton` (#18).
@@ -139,7 +144,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.9.1...HEAD
+[2.9.1]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.9.0...v2.9.1
 [2.9.0]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.8.2...v2.9.0
 [2.8.2]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.8.1...v2.8.2
 [2.8.1]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.8.0...v2.8.1
