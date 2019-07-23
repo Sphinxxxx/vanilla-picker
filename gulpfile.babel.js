@@ -23,6 +23,7 @@ import autoprefixer from 'autoprefixer';
 import postcss from 'postcss';
 import pug  from 'pug';
 import { rollup } from 'rollup';
+import replace from 'rollup-plugin-replace';
 import cleanup from 'rollup-plugin-cleanup';
 //import * as babel from 'babel-core';
 import babel from 'rollup-plugin-babel';
@@ -30,7 +31,7 @@ import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 
 //Cleanup & minification step:
-import replace from 'gulp-replace';
+//import replace from 'gulp-replace';
 import strip  from 'gulp-strip-comments';
 import header from 'gulp-header';
 import rename from 'gulp-rename';
@@ -124,71 +125,64 @@ gulp.task('build', function(cb) {
                     //compactComments: false,
                     maxEmptyLines: 1,
                 }),
+                replace({
+                    include: '/**/*.js',
+                    delimiters: ['', ''],
+                    values: {
+                        '\t': '    ',
+                        '## PLACEHOLDER-CSS ##':  assets.css.trim(),
+                        '## PLACEHOLDER-HTML ##': assets.html,
+                    }
+                }),
+                babel({
+                    babelrc: false,
+                    presets: [
+                        ["env", { modules: false/*, loose: true*/ }]
+                    ],
+                    //We import ES6 modules (color-conversion)..
+                    //  exclude: 'node_modules/**',
+
+                    plugins: ["external-helpers"],
+                }),
             ],
         })
         .then(bundle => {
+            //Build ES module..
             return bundle.generate({
               format: 'esm',
             })
             .then(gen => stream2Promise(
                 file(ESPath, gen.code, { src: true })
-                    .pipe(replace( '## PLACEHOLDER-CSS ##', assets.css.trim() ))
-                    .pipe(replace( '## PLACEHOLDER-HTML ##', assets.html ))
-                    //.pipe(rename(ESPath))
+                    .pipe(gulp.dest('.'))
+            ))
+            //..and a traditional UMD:
+            .then(() => bundle.generate({
+                format: 'umd',
+                name: globalName,
+            }))
+            .then(es5 => stream2Promise(
+                file(pkg.main, es5.code, { src: true })
+
+                    //Write un-minified:
+                    .pipe(strip())
+                    .pipe(header(myBanner, { pkg : pkg }))
+                    .pipe(gulp.dest('.'))
+
+                    //Minify:
+                    //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
+                    //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
+                    //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
+                    .pipe(rename({ extname: '.min.js' }))
+                    .pipe(uglify())
+                    .pipe(header(myBanner, { pkg: pkg }))
                     .pipe(gulp.dest('.'))
             ));
         });
     }
     
-    //transpile to an ES5 library
-    function transpile() {
-        /*
-        const es5 = babel.transformFileSync(ESPath, {
-            babelrc: false,
-            presets: [
-                ["env", { /*modules: false, loose: true* }]
-            ],
-        });
-        */
-        //The reason we use Rollup again here (and not plain Babel) is that Rollup creates the UMD wrapper for us:
-        return rollup({
-            input: ESPath,
-            plugins: [
-                babel({
-                    babelrc: false,
-                    presets: [
-                      ["env", { modules: false/*, loose: true*/ }]
-                    ],
-                    plugins: ["external-helpers"],
-                }),
-            ],
-        })
-        .then(bundle => bundle.generate({
-            format: 'umd',
-            name: globalName,
-        }))
-        .then(es5 => stream2Promise(
-            file(pkg.main, es5.code, { src: true })
-
-                //Write un-minified:
-                .pipe(strip())
-                .pipe(header(myBanner, { pkg : pkg }))
-                .pipe(gulp.dest('.'))
-    
-                //Minify:
-                //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
-                //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
-                //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
-                .pipe(rename({ extname: '.min.js' }))
-                .pipe(uglify())
-                .pipe(header(myBanner, { pkg: pkg }))
-                .pipe(gulp.dest('.'))
-        ));
-    }
-    
     return Promise.all([
         generateDocs(),
-        prepareAssets().then(buildBundle).then(transpile)
+        prepareAssets().then(buildBundle)//.then(transpile)
     ]);
 
 });

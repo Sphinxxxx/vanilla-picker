@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "keywords": [
     "ux",
@@ -62,10 +62,11 @@
     "rollup": "^0.67.4",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-cleanup": "^3.1.1",
-    "rollup-plugin-node-resolve": "^3.4.0"
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-replace": "^2.2.0"
   },
   "dependencies": {
     "@sphinxxxx/color-conversion": "^2.2.1"
   },
-  "browserslist": "last 2 versions"
+  "browserslist": ">.1%, last 2 versions, Firefox ESR, not dead"
 }
