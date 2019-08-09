@@ -66,7 +66,7 @@
     "rollup-plugin-replace": "^2.2.0"
   },
   "dependencies": {
-    "@sphinxxxx/color-conversion": "^2.2.1"
+    "@sphinxxxx/color-conversion": "^2.2.2"
   },
   "browserslist": ">.1%, last 2 versions, Firefox ESR, not dead"
 }

@@ -129,7 +129,6 @@ gulp.task('build', function(cb) {
                     include: '/**/*.js',
                     delimiters: ['', ''],
                     values: {
-                        '\t': '    ',
                         '## PLACEHOLDER-CSS ##':  assets.css.trim(),
                         '## PLACEHOLDER-HTML ##': assets.html,
                     }
