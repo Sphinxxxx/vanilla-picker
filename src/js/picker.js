@@ -16,16 +16,13 @@ function $(selector, context) {
     return (context || document).querySelector(selector);
 }
 
-function addEvent(target, type, handler) {
-    target.addEventListener(type, handler, false);
-}
 function stopEvent(e) {
     //Stop an event from bubbling up to the parent:
     e.preventDefault();
     e.stopPropagation();
 }
-function onKey(target, keys, handler, stop) {
-    addEvent(target, EVENT_KEY, function(e) {
+function onKey(bucket, target, keys, handler, stop) {
+    bucket.add(target, EVENT_KEY, function(e) {
         if(keys.indexOf(e.key) >= 0) {
             if(stop) { stopEvent(e); }
             handler(e);
@@ -91,10 +88,8 @@ class Picker {
             editorFormat: 'hex',
             cancelButton: false,
         };
-
-        //Keep openHandler() pluggable, but call it in the right context:
-        //https://stackoverflow.com/questions/46014034/es6-removeeventlistener-from-arrow-function-oop
-        this._openProxy  = (e) => this.openHandler(e);
+        
+        this._events = new utils.EventBucket();
 
         /**
          * Callback whenever the color changes.
@@ -178,7 +173,7 @@ class Picker {
             
             //New parent?
             if(settings.parent && options.parent && (settings.parent !== options.parent)) {
-                settings.parent.removeEventListener('click', this._openProxy, false);
+                this._events.remove(settings.parent); //.removeEventListener('click', this._openProxy, false);
                 this._popupInited = false;
             }
 
@@ -200,14 +195,17 @@ class Picker {
         const parent = settings.parent;
         if(parent && settings.popup && !this._popupInited) {
 
-            addEvent(parent, 'click', this._openProxy);
+            //Keep openHandler() pluggable, but call it in the right context:
+            const openProxy = (e) => this.openHandler(e);
+
+            this._events.add(parent, 'click', openProxy);
 
             //Keyboard navigation: Open on [Space] or [Enter] (but stop the event to avoid typing a " " in the editor textbox).
             //No, don't stop the event, as that would disable normal input behavior (typing a " " or clicking the Ok button with [Enter]).
             //Fix: setTimeout() in openHandler()..
             //
             //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values#Whitespace_keys
-            onKey(parent, [' ', 'Spacebar', 'Enter'], this._openProxy/*, true*/);
+            onKey(this._events, parent, [' ', 'Spacebar', 'Enter'], openProxy/*, true*/);
             
             //This must wait until we have created our DOM..
             //  addEvent(window, 'mousedown', (e) => this.closeHandler(e));
@@ -401,6 +399,17 @@ class Picker {
     hide() {
         return this._toggleDOM(false);
     }
+    
+    
+    /**
+     * Release all resources used by this picker instance.
+     */
+    destroy() {
+        this._events.destroy();
+        if(this.domElement) {
+            this.settings.parent.removeChild(this.domElement);
+        }
+    }
 
 
     /*
@@ -410,7 +419,13 @@ class Picker {
      */
     _bindEvents() {
         const that = this,
-              dom = this.domElement;
+              dom = this.domElement,
+              events = this._events;
+        
+        function addEvent(target, type, handler) {
+            events.add(target, type, handler);
+        }
+        
         
         //Prevent clicks while dragging from bubbling up to the parent:
         addEvent(dom, 'click', e => e.preventDefault());
@@ -419,14 +434,14 @@ class Picker {
         /* Draggable color selection */
 
         //Select hue
-        utils.dragTrack(this._domH,  (x, y) => that._setHSLA(x));
+        utils.dragTrack(events, this._domH,  (x, y) => that._setHSLA(x));
 
         //Select saturation/lightness
-        utils.dragTrack(this._domSL, (x, y) => that._setHSLA(null, x, 1 - y));
+        utils.dragTrack(events, this._domSL, (x, y) => that._setHSLA(null, x, 1 - y));
 
         //Select alpha
         if(this.settings.alpha) {
-            utils.dragTrack(this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y));
+            utils.dragTrack(events, this._domA,  (x, y) => that._setHSLA(null, null, null, 1 - y));
         }
         
         
@@ -458,7 +473,7 @@ class Picker {
 
             addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
             addEvent(window, EVENT_TAB_MOVE,      popupCloseProxy);
-            onKey(   dom,    ['Esc', 'Escape'],   popupCloseProxy);
+            onKey(events, dom, ['Esc', 'Escape'], popupCloseProxy);
 
             //Above, we added events on `window` to close the popup if the user clicks outside or tabs away from the picker.
             //Now, we must make sure that clicks and tabs within the picker don't cause the popup to close.
@@ -488,7 +503,7 @@ class Picker {
             if(this.onDone) { this.onDone(this.colour); }
         };
         addEvent(this._domOkay, 'click',   onDoneProxy);
-        onKey(   dom,           ['Enter'], onDoneProxy);
+        onKey(events, dom,      ['Enter'], onDoneProxy);
     }
 
 

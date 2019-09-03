@@ -1,3 +1,40 @@
+class EventBucket {
+    constructor() {
+        this._events = [];
+    }
+
+    add(target, type, handler) {
+        target.addEventListener(type, handler, false);
+        this._events.push({
+            target,
+            type,
+            handler,
+        });
+    }
+    
+    remove(target, type, handler) {
+        this._events = this._events.filter(e => {
+            let isMatch = true;
+            if(target  && (target  !== e.target))  { isMatch = false; }
+            if(type    && (type    !== e.type))    { isMatch = false; }
+            if(handler && (handler !== e.handler)) { isMatch = false; }
+
+            if(isMatch) {
+                EventBucket._doRemove(e.target, e.type, e.handler);
+            }
+            return !isMatch;
+        });
+    }
+    static _doRemove(target, type, handler) {
+        target.removeEventListener(type, handler, false);
+    }
+    
+    destroy() {
+        this._events.forEach(e => EventBucket._doRemove(e.target, e.type, e.handler));
+        this._events = [];
+    }
+}
+
 function parseHTML(htmlString) {
     //https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
     const div = document.createElement('div');
@@ -5,12 +42,9 @@ function parseHTML(htmlString) {
     return div.firstElementChild;
 }
 
-function dragTrack(area, callback) {
+function dragTrack(eventBucket, area, callback) {
     var dragging = false;
 
-    function addEvent(target, type, handler) {
-        target.addEventListener(type, handler, false);
-    }
     function clamp(val, min, max) {
         return Math.max(min, Math.min(val, max));
     }
@@ -60,14 +94,14 @@ function dragTrack(area, callback) {
     //  https://stackoverflow.com/a/51750458/1869660
     //  "Mouse moves = *hover* like behavior. Touch moves = *drags* like behavior"
     //
-    addEvent(area,   'mousedown',   function(e) { onMouse(e, true); });
-    addEvent(area,   'touchstart',  function(e) { onTouch(e, true); });
-    addEvent(window, 'mousemove',   onMouse);
-    addEvent(area,   'touchmove',   onTouch);
-    addEvent(window, 'mouseup',     function(e) { dragging = false; });
-    addEvent(area,   'touchend',    function(e) { dragging = false; });
-    addEvent(area,   'touchcancel', function(e) { dragging = false; });
+    eventBucket.add(area,   'mousedown',   function(e) { onMouse(e, true); });
+    eventBucket.add(area,   'touchstart',  function(e) { onTouch(e, true); });
+    eventBucket.add(window, 'mousemove',   onMouse);
+    eventBucket.add(area,   'touchmove',   onTouch);
+    eventBucket.add(window, 'mouseup',     function(e) { dragging = false; });
+    eventBucket.add(area,   'touchend',    function(e) { dragging = false; });
+    eventBucket.add(area,   'touchcancel', function(e) { dragging = false; });
 }
 
 
-export { parseHTML, dragTrack };
+export { EventBucket, parseHTML, dragTrack };

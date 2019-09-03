@@ -69,7 +69,7 @@ String.prototype.padStart = String.prototype.padStart || function (len, pad) {
     }return str;
 };
 
-var colorNames = { aliceblue: '#f0f8ff', antiquewhite: '#faebd7', aqua: '#00ffff', aquamarine: '#7fffd4', azure: '#f0ffff', beige: '#f5f5dc', bisque: '#ffe4c4', black: '#000000', blanchedalmond: '#ffebcd', blue: '#0000ff', blueviolet: '#8a2be2', brown: '#a52a2a', burlywood: '#deb887', cadetblue: '#5f9ea0', chartreuse: '#7fff00', chocolate: '#d2691e', coral: '#ff7f50', cornflowerblue: '#6495ed', cornsilk: '#fff8dc', crimson: '#dc143c', cyan: '#00ffff', darkblue: '#00008b', darkcyan: '#008b8b', darkgoldenrod: '#b8860b', darkgray: '#a9a9a9', darkgreen: '#006400', darkgrey: '#a9a9a9', darkkhaki: '#bdb76b', darkmagenta: '#8b008b', darkolivegreen: '#556b2f', darkorange: '#ff8c00', darkorchid: '#9932cc', darkred: '#8b0000', darksalmon: '#e9967a', darkseagreen: '#8fbc8f', darkslateblue: '#483d8b', darkslategray: '#2f4f4f', darkslategrey: '#2f4f4f', darkturquoise: '#00ced1', darkviolet: '#9400d3', deeppink: '#ff1493', deepskyblue: '#00bfff', dimgray: '#696969', dimgrey: '#696969', dodgerblue: '#1e90ff', firebrick: '#b22222', floralwhite: '#fffaf0', forestgreen: '#228b22', fuchsia: '#ff00ff', gainsboro: '#dcdcdc', ghostwhite: '#f8f8ff', gold: '#ffd700', goldenrod: '#daa520', gray: '#808080', green: '#008000', greenyellow: '#adff2f', grey: '#808080', honeydew: '#f0fff0', hotpink: '#ff69b4', indianred: '#cd5c5c', indigo: '#4b0082', ivory: '#fffff0', khaki: '#f0e68c', lavender: '#e6e6fa', lavenderblush: '#fff0f5', lawngreen: '#7cfc00', lemonchiffon: '#fffacd', lightblue: '#add8e6', lightcoral: '#f08080', lightcyan: '#e0ffff', lightgoldenrodyellow: '#fafad2', lightgray: '#d3d3d3', lightgreen: '#90ee90', lightgrey: '#d3d3d3', lightpink: '#ffb6c1', lightsalmon: '#ffa07a', lightseagreen: '#20b2aa', lightskyblue: '#87cefa', lightslategray: '#778899', lightslategrey: '#778899', lightsteelblue: '#b0c4de', lightyellow: '#ffffe0', lime: '#00ff00', limegreen: '#32cd32', linen: '#faf0e6', magenta: '#ff00ff', maroon: '#800000', mediumaquamarine: '#66cdaa', mediumblue: '#0000cd', mediumorchid: '#ba55d3', mediumpurple: '#9370db', mediumseagreen: '#3cb371', mediumslateblue: '#7b68ee', mediumspringgreen: '#00fa9a', mediumturquoise: '#48d1cc', mediumvioletred: '#c71585', midnightblue: '#191970', mintcream: '#f5fffa', mistyrose: '#ffe4e1', moccasin: '#ffe4b5', navajowhite: '#ffdead', navy: '#000080', oldlace: '#fdf5e6', olive: '#808000', olivedrab: '#6b8e23', orange: '#ffa500', orangered: '#ff4500', orchid: '#da70d6', palegoldenrod: '#eee8aa', palegreen: '#98fb98', paleturquoise: '#afeeee', palevioletred: '#db7093', papayawhip: '#ffefd5', peachpuff: '#ffdab9', peru: '#cd853f', pink: '#ffc0cb', plum: '#dda0dd', powderblue: '#b0e0e6', purple: '#800080', rebeccapurple: '#663399', red: '#ff0000', rosybrown: '#bc8f8f', royalblue: '#4169e1', saddlebrown: '#8b4513', salmon: '#fa8072', sandybrown: '#f4a460', seagreen: '#2e8b57', seashell: '#fff5ee', sienna: '#a0522d', silver: '#c0c0c0', skyblue: '#87ceeb', slateblue: '#6a5acd', slategray: '#708090', slategrey: '#708090', snow: '#fffafa', springgreen: '#00ff7f', steelblue: '#4682b4', tan: '#d2b48c', teal: '#008080', thistle: '#d8bfd8', tomato: '#ff6347', turquoise: '#40e0d0', violet: '#ee82ee', wheat: '#f5deb3', white: '#ffffff', whitesmoke: '#f5f5f5', yellow: '#ffff00', yellowgreen: '#9acd32' };
+var colorNames = { cb: '0f8ff', tqw: 'aebd7', q: '-ffff', qmrn: '7fffd4', zr: '0ffff', bg: '5f5dc', bsq: 'e4c4', bck: '---', nch: 'ebcd', b: '--ff', bvt: '8a2be2', brwn: 'a52a2a', brw: 'deb887', ctb: '5f9ea0', hrt: '7fff-', chcT: 'd2691e', cr: '7f50', rnw: '6495ed', crns: '8dc', crms: 'dc143c', cn: '-ffff', Db: '--8b', Dcn: '-8b8b', Dgnr: 'b8860b', Dgr: 'a9a9a9', Dgrn: '-64-', Dkhk: 'bdb76b', Dmgn: '8b-8b', Dvgr: '556b2f', Drng: '8c-', Drch: '9932cc', Dr: '8b--', Dsmn: 'e9967a', Dsgr: '8fbc8f', DsTb: '483d8b', DsTg: '2f4f4f', Dtrq: '-ced1', Dvt: '94-d3', ppnk: '1493', pskb: '-bfff', mgr: '696969', grb: '1e90ff', rbrc: 'b22222', rwht: 'af0', stg: '228b22', chs: '-ff', gnsb: 'dcdcdc', st: '8f8ff', g: 'd7-', gnr: 'daa520', gr: '808080', grn: '-8-0', grnw: 'adff2f', hnw: '0fff0', htpn: '69b4', nnr: 'cd5c5c', ng: '4b-82', vr: '0', khk: '0e68c', vnr: 'e6e6fa', nrb: '0f5', wngr: '7cfc-', mnch: 'acd', Lb: 'add8e6', Lcr: '08080', Lcn: 'e0ffff', Lgnr: 'afad2', Lgr: 'd3d3d3', Lgrn: '90ee90', Lpnk: 'b6c1', Lsmn: 'a07a', Lsgr: '20b2aa', Lskb: '87cefa', LsTg: '778899', Lstb: 'b0c4de', Lw: 'e0', m: '-ff-', mgrn: '32cd32', nn: 'af0e6', mgnt: '-ff', mrn: '8--0', mqm: '66cdaa', mmb: '--cd', mmrc: 'ba55d3', mmpr: '9370db', msg: '3cb371', mmsT: '7b68ee', '': '-fa9a', mtr: '48d1cc', mmvt: 'c71585', mnLb: '191970', ntc: '5fffa', mstr: 'e4e1', mccs: 'e4b5', vjw: 'dead', nv: '--80', c: 'df5e6', v: '808-0', vrb: '6b8e23', rng: 'a5-', rngr: '45-', rch: 'da70d6', pgnr: 'eee8aa', pgrn: '98fb98', ptrq: 'afeeee', pvtr: 'db7093', ppwh: 'efd5', pchp: 'dab9', pr: 'cd853f', pnk: 'c0cb', pm: 'dda0dd', pwrb: 'b0e0e6', prp: '8-080', cc: '663399', r: '--', sbr: 'bc8f8f', rb: '4169e1', sbrw: '8b4513', smn: 'a8072', nbr: '4a460', sgrn: '2e8b57', ssh: '5ee', snn: 'a0522d', svr: 'c0c0c0', skb: '87ceeb', sTb: '6a5acd', sTgr: '708090', snw: 'afa', n: '-ff7f', stb: '4682b4', tn: 'd2b48c', t: '-8080', thst: 'd8bfd8', tmT: '6347', trqs: '40e0d0', vt: 'ee82ee', whT: '5deb3', wht: '', hts: '5f5f5', w: '-', wgrn: '9acd32' };
 
 function printNum(num) {
     var decs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -261,10 +261,9 @@ var Color = function () {
         key: 'nameToRgb',
         value: function nameToRgb(input) {
 
-            var hex = colorNames[input];
-            if (hex) {
-                return Color.hexToRgb(hex);
-            }
+            var hash = input.toLowerCase().replace('at', 'T').replace(/[aeiouyldf]/g, '').replace('ght', 'L').replace('rk', 'D').slice(-5, 4),
+                hex = colorNames[hash];
+            return hex === undefined ? hex : Color.hexToRgb(hex.replace(/\-/g, '00').padStart(6, 'f'));
         }
     }, {
         key: 'rgbToHsl',
@@ -346,6 +345,61 @@ var Color = function () {
     return Color;
 }();
 
+var EventBucket = function () {
+    function EventBucket() {
+        classCallCheck(this, EventBucket);
+
+        this._events = [];
+    }
+
+    createClass(EventBucket, [{
+        key: 'add',
+        value: function add(target, type, handler) {
+            target.addEventListener(type, handler, false);
+            this._events.push({
+                target: target,
+                type: type,
+                handler: handler
+            });
+        }
+    }, {
+        key: 'remove',
+        value: function remove(target, type, handler) {
+            this._events = this._events.filter(function (e) {
+                var isMatch = true;
+                if (target && target !== e.target) {
+                    isMatch = false;
+                }
+                if (type && type !== e.type) {
+                    isMatch = false;
+                }
+                if (handler && handler !== e.handler) {
+                    isMatch = false;
+                }
+
+                if (isMatch) {
+                    EventBucket._doRemove(e.target, e.type, e.handler);
+                }
+                return !isMatch;
+            });
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this._events.forEach(function (e) {
+                return EventBucket._doRemove(e.target, e.type, e.handler);
+            });
+            this._events = [];
+        }
+    }], [{
+        key: '_doRemove',
+        value: function _doRemove(target, type, handler) {
+            target.removeEventListener(type, handler, false);
+        }
+    }]);
+    return EventBucket;
+}();
+
 function parseHTML(htmlString) {
 
     var div = document.createElement('div');
@@ -353,12 +407,9 @@ function parseHTML(htmlString) {
     return div.firstElementChild;
 }
 
-function dragTrack(area, callback) {
+function dragTrack(eventBucket, area, callback) {
     var dragging = false;
 
-    function addEvent(target, type, handler) {
-        target.addEventListener(type, handler, false);
-    }
     function clamp(val, min, max) {
         return Math.max(min, Math.min(val, max));
     }
@@ -402,21 +453,21 @@ function dragTrack(area, callback) {
         }
     }
 
-    addEvent(area, 'mousedown', function (e) {
+    eventBucket.add(area, 'mousedown', function (e) {
         onMouse(e, true);
     });
-    addEvent(area, 'touchstart', function (e) {
+    eventBucket.add(area, 'touchstart', function (e) {
         onTouch(e, true);
     });
-    addEvent(window, 'mousemove', onMouse);
-    addEvent(area, 'touchmove', onTouch);
-    addEvent(window, 'mouseup', function (e) {
+    eventBucket.add(window, 'mousemove', onMouse);
+    eventBucket.add(area, 'touchmove', onTouch);
+    eventBucket.add(window, 'mouseup', function (e) {
         dragging = false;
     });
-    addEvent(area, 'touchend', function (e) {
+    eventBucket.add(area, 'touchend', function (e) {
         dragging = false;
     });
-    addEvent(area, 'touchcancel', function (e) {
+    eventBucket.add(area, 'touchcancel', function (e) {
         dragging = false;
     });
 }
@@ -432,16 +483,13 @@ function $(selector, context) {
     return (context || document).querySelector(selector);
 }
 
-function addEvent(target, type, handler) {
-    target.addEventListener(type, handler, false);
-}
 function stopEvent(e) {
 
     e.preventDefault();
     e.stopPropagation();
 }
-function onKey(target, keys, handler, stop) {
-    addEvent(target, EVENT_KEY, function (e) {
+function onKey(bucket, target, keys, handler, stop) {
+    bucket.add(target, EVENT_KEY, function (e) {
         if (keys.indexOf(e.key) >= 0) {
             if (stop) {
                 stopEvent(e);
@@ -457,8 +505,6 @@ document.documentElement.firstElementChild.appendChild(_style);
 
 var Picker = function () {
     function Picker(options) {
-        var _this = this;
-
         classCallCheck(this, Picker);
 
 
@@ -472,9 +518,7 @@ var Picker = function () {
             cancelButton: false
         };
 
-        this._openProxy = function (e) {
-            return _this.openHandler(e);
-        };
+        this._events = new EventBucket();
 
         this.onChange = null;
 
@@ -490,6 +534,8 @@ var Picker = function () {
     createClass(Picker, [{
         key: 'setOptions',
         value: function setOptions(options) {
+            var _this = this;
+
             if (!options) {
                 return;
             }
@@ -510,7 +556,7 @@ var Picker = function () {
             } else {
 
                 if (settings.parent && options.parent && settings.parent !== options.parent) {
-                    settings.parent.removeEventListener('click', this._openProxy, false);
+                    this._events.remove(settings.parent);
                     this._popupInited = false;
                 }
 
@@ -538,9 +584,13 @@ var Picker = function () {
             var parent = settings.parent;
             if (parent && settings.popup && !this._popupInited) {
 
-                addEvent(parent, 'click', this._openProxy);
+                var openProxy = function openProxy(e) {
+                    return _this.openHandler(e);
+                };
 
-                onKey(parent, [' ', 'Spacebar', 'Enter'], this._openProxy);
+                this._events.add(parent, 'click', openProxy);
+
+                onKey(this._events, parent, [' ', 'Spacebar', 'Enter'], openProxy);
 
                 this._popupInited = true;
             } else if (options.parent && !settings.popup) {
@@ -709,27 +759,40 @@ var Picker = function () {
             return this._toggleDOM(false);
         }
     }, {
+        key: 'destroy',
+        value: function destroy() {
+            this._events.destroy();
+            if (this.domElement) {
+                this.settings.parent.removeChild(this.domElement);
+            }
+        }
+    }, {
         key: '_bindEvents',
         value: function _bindEvents() {
             var _this2 = this;
 
             var that = this,
-                dom = this.domElement;
+                dom = this.domElement,
+                events = this._events;
+
+            function addEvent(target, type, handler) {
+                events.add(target, type, handler);
+            }
 
             addEvent(dom, 'click', function (e) {
                 return e.preventDefault();
             });
 
-            dragTrack(this._domH, function (x, y) {
+            dragTrack(events, this._domH, function (x, y) {
                 return that._setHSLA(x);
             });
 
-            dragTrack(this._domSL, function (x, y) {
+            dragTrack(events, this._domSL, function (x, y) {
                 return that._setHSLA(null, x, 1 - y);
             });
 
             if (this.settings.alpha) {
-                dragTrack(this._domA, function (x, y) {
+                dragTrack(events, this._domA, function (x, y) {
                     return that._setHSLA(null, null, null, 1 - y);
                 });
             }
@@ -757,7 +820,7 @@ var Picker = function () {
 
                 addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
                 addEvent(window, EVENT_TAB_MOVE, popupCloseProxy);
-                onKey(dom, ['Esc', 'Escape'], popupCloseProxy);
+                onKey(events, dom, ['Esc', 'Escape'], popupCloseProxy);
 
                 var timeKeeper = function timeKeeper(e) {
                     _this2.__containedEvent = e.timeStamp;
@@ -778,7 +841,7 @@ var Picker = function () {
                 }
             };
             addEvent(this._domOkay, 'click', onDoneProxy);
-            onKey(dom, ['Enter'], onDoneProxy);
+            onKey(events, dom, ['Enter'], onDoneProxy);
         }
     }, {
         key: '_setPosition',

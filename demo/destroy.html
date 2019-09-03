@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>vanilla-picker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="../dist/vanilla-picker.js"></script>
+    <script _src="https://unpkg.com/vanilla-picker@2.5"></script>
+    
+    <script>
+        window.onerror = function(msg, url, line) { alert('Error: '+msg+'\nURL: '+url+'\nLine: '+line); };
+    </script>
+
+    <style>
+    </style>
+</head>
+
+<body>
+    <h1><a href="https://vanilla-picker.js.org">vanilla-picker</a> demo</h1>
+
+    <a href="#" id="basic" class="popup-parent" style="top:45%;left:1em;">
+        Click me!
+    </a>
+    
+    <button id="remove">Remove</button>
+
+    <script>
+        "use strict";
+        /*global Picker*/
+        
+        function $(selector, context) {
+            return (context || document).querySelector(selector);
+        }
+        
+        $('h1').insertAdjacentElement('beforeend', document.createElement('sub')).textContent = $('script[src]').src.replace(/.*\//, ' ');
+
+
+        var parentBasic = $('#basic'),
+            popupBasic = new Picker(parentBasic);
+        popupBasic.onDone = function(color) {
+            parentBasic.style.background = color.rgbaString;
+        };
+        //Open the popup manually:
+        popupBasic.openHandler();
+        
+        
+        $('#remove').onclick = (e) => {
+            popupBasic.destroy();
+            popupBasic = null;
+        };
+    </script>
+
+</body>
+
+</html>
