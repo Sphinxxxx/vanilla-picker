@@ -374,9 +374,12 @@ class Picker {
 
         wrapper.classList.add('layout_' + this.settings.layout);
         if(!this.settings.alpha) { wrapper.classList.add('no_alpha'); }
+          else { wrapper.classList.remove('no_alpha'); }
         if(!this.settings.editor) { wrapper.classList.add('no_editor'); }
+          else { wrapper.classList.remove('no_editor'); }
         if(!this.settings.cancelButton) { wrapper.classList.add('no_cancel'); }
-        this._ifPopup(() => wrapper.classList.add('popup'));
+          else { wrapper.classList.remove('no_cancel'); }
+        this._ifPopup(() => wrapper.classList.add('popup'));// here wrapper.classList.remove too?
         
         this._setPosition();
 
