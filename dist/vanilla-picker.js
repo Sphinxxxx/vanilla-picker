@@ -528,7 +528,8 @@
               alpha: true,
               editor: true,
               editorFormat: 'hex',
-              cancelButton: false
+              cancelButton: false,
+              defaultColor: '#0cf'
           };
 
           this._events = new EventBucket();
@@ -760,7 +761,7 @@
               if (this.colour) {
                   this._updateUI();
               } else {
-                  this._setColor('#0cf');
+                  this._setColor(this.settings.defaultColor);
               }
               this._bindEvents();
 

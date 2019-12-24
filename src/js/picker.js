@@ -87,6 +87,7 @@ class Picker {
             editor: true,
             editorFormat: 'hex',
             cancelButton: false,
+            defaultColor: '#0cf'
         };
         
         this._events = new utils.EventBucket();
@@ -385,7 +386,7 @@ class Picker {
             this._updateUI();
         }
         else {
-            this._setColor('#0cf');
+            this._setColor(this.settings.defaultColor);
         }
         this._bindEvents();
         
