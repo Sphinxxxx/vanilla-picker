@@ -31,7 +31,7 @@ function onKey(bucket, target, keys, handler, stop) {
 }
 
 
-/* Inlined Picker CSS */
+/* Picker CSS */
 const _style = document.createElement('style');
 _style.textContent = `## PLACEHOLDER-CSS ##`;
 document.documentElement.firstElementChild //<head>, or <body> if there is no <head>
@@ -700,7 +700,7 @@ const flipped = true;
 */
 
     /**
-     * The inlined `<style>` element for picker CSS.
+     * The `<style>` element for picker CSS which is added to the document.
      */
     static get StyleElement() {
         return _style;
