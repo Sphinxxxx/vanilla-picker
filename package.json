@@ -68,5 +68,6 @@
   "dependencies": {
     "@sphinxxxx/color-conversion": "^2.2.2"
   },
-  "browserslist": ">.1%, last 2 versions, Firefox ESR, not dead"
+  "browserslist": ">.1%, last 2 versions, Firefox ESR, not dead",
+  "typings": "src/index.d.ts"
 }
