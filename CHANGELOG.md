@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 -->
 
 
+## [2.11.0] - 2020-11-12
+### Added
+- TypeScript declaration (#37).
+
+
 ## [2.10.1] - 2019-12-29
 ### Added
 - `options.defaultColor` (#29).
@@ -166,7 +171,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.10.1...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.11.0...HEAD
+[2.11.0]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.10.1...v2.11.0
 [2.10.1]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.10.0...v2.10.1
 [2.10.0]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.9.2...v2.10.0
 [2.9.2]:      https://github.com/Sphinxxxx/vanilla-picker/compare/v2.9.1...v2.9.2
