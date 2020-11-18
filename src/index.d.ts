@@ -28,7 +28,11 @@ declare module 'vanilla-picker' {
   }
 
   class Picker {
-    constructor(options: Options);
+    constructor(options: Options | HTMLElement);
+    onChange: ColorCallback;
+    onDone: ColorCallback;
+    onOpen: ColorCallback;
+    onClose: ColorCallback;
     setOptions(options: Options): void;
     openHandler(e: Event): void;
     closeHandler(e: Event): void;
