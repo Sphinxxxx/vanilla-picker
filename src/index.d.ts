@@ -12,7 +12,7 @@ declare module 'vanilla-picker' {
   type ColorCallback = (color: Color) => void;
 
   interface Options {
-    parent: HTMLElement;
+    parent?: HTMLElement;
     popup?: 'top' | 'bottom' | 'left' | 'right' | false;
     template?: string;
     layout?: string;
@@ -26,14 +26,16 @@ declare module 'vanilla-picker' {
     onOpen?: ColorCallback;
     onClose?: ColorCallback;
   }
+  
+  type Configuration = Options | HTMLElement;
 
   class Picker {
-    constructor(options: Options | HTMLElement);
+    constructor(options: Configuration);
     onChange: ColorCallback;
     onDone: ColorCallback;
     onOpen: ColorCallback;
     onClose: ColorCallback;
-    setOptions(options: Options): void;
+    setOptions(options: Configuration): void;
     openHandler(e: Event): void;
     closeHandler(e: Event): void;
     movePopup(options: Options, open: boolean): void;
