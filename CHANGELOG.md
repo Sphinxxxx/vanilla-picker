@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 -->
 
 
-## [2.11.1] - 2021-01-23
+## [2.11.2] - 2021-01-23
 ### Fixed
-- Updated TypeScript definitions (#38).
+- Updated TypeScript definitions (#38, #42).
 
 
 ## [2.11.0] - 2020-11-12
@@ -176,8 +176,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.11.1...HEAD
-[2.11.1]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.11.0...v2.11.1
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.11.2...HEAD
+[2.11.2]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.11.0...v2.11.2
 [2.11.0]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.10.1...v2.11.0
 [2.10.1]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.10.0...v2.10.1
 [2.10.0]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.9.2...v2.10.0
