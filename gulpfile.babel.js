@@ -18,7 +18,7 @@ import * as pkg from './package.json';
 
 import gulp from 'gulp';
 import file from 'gulp-file';
-import sass from 'node-sass';
+import sass from 'sass';
 import autoprefixer from 'autoprefixer';
 import postcss from 'postcss';
 import pug  from 'pug';
@@ -150,17 +150,20 @@ gulp.task('build', function(cb) {
             return bundle.generate({
               format: 'esm',
             })
-            .then(gen => stream2Promise(
-                file(ESPath, gen.code, { src: true })
-                    .pipe(gulp.dest('.'))
-            ))
+            .then(gen => {
+                //https://rollupjs.org/guide/en/#rolluprollup
+                const code = gen.output[0].code;
+                return stream2Promise(
+                    file(ESPath, code, { src: true }).pipe(gulp.dest('.'))
+                );
+            })
             //..and a traditional UMD:
             .then(() => bundle.generate({
                 format: 'umd',
                 name: globalName,
             }))
             .then(es5 => stream2Promise(
-                file(pkg.main, es5.code, { src: true })
+                file(pkg.main, es5.output[0].code, { src: true })
 
                     //Write un-minified:
                     .pipe(strip())
