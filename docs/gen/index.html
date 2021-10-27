@@ -110,6 +110,16 @@
 </ul>
 <pre class="prettyprint source"><code>&lt;script src=&quot;https://unpkg.com/vanilla-picker@2&quot;>&lt;/script>
 </code></pre>
+<blockquote>
+<p><strong><em>Note:</em></strong></p>
+<p>The script adds a <code>&lt;style&gt;</code> element to the page, with all the needed CSS. If your site's <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">Content Security Policy</a> doesn't allow that, use the CSP build with a separate CSS file instead:</p>
+<pre class="prettyprint source"><code>import Picker from 'vanilla-picker/csp';
+</code></pre>
+<p>..or</p>
+<pre class="prettyprint source"><code>&lt;script src=&quot;vanilla-picker.csp.min.js&quot;>&lt;/script>
+&lt;link  href=&quot;vanilla-picker.csp.css&quot; rel=&quot;stylesheet&quot;>
+</code></pre>
+</blockquote>
 <h4>Usage</h4>
 <pre class="prettyprint source lang-html"><code>&lt;div id=&quot;parent&quot;>Click me&lt;/div>
 

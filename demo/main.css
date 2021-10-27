@@ -1,0 +1,99 @@
+body {
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 0;
+    min-height: 100vh;
+    align-items: center;
+
+    font-family: Georgia, sans-serif;
+    background-color: white;
+    /*
+    background-image: repeating-linear-gradient( 0deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px),
+                      repeating-linear-gradient(90deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px);
+    */
+}
+h1 sub {
+    font-size: .5em;
+    color: darkslategray;
+    font-style: italic;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#custom-toggler {
+    position: absolute;
+    padding: 1em;
+    font: inherit;
+}
+
+#main-color {
+    display: inline-block;
+    border: 4px dashed tomato;
+}
+#main-color .picker_sample, #main-color .picker_done {
+    display: none;
+}
+#main-color .picker_editor {
+    width: 100%;
+}
+
+#shared li {
+    display: inline-block;
+    width: 2em;
+    height: 2em;
+}
+#shared .picker_editor {
+    width: 100%;
+}
+#shared-1 { background-color:tomato; }
+#shared-2 { background-color:lime; }
+#shared-3 { background-color:dodgerblue; }
+#shared-4 { background-color:gold; }
+
+#basic { top:45%; left:1em; }
+
+#custom-toggler { bottom:20%; left:5%; }
+#custom { bottom:20%; left:40%; }
+
+.popup-parent {
+    position: absolute;
+    background: dodgerblue;
+    color: white;
+    padding: 10px 16px;
+    width: 100px;
+    font-family: sans-serif;
+    font-weight: 100;
+    font-size: 20px;
+    text-align: center;
+}
+.popup-parent:focus {
+    outline: 0.3em dashed rgba(255, 165, 0, 0.7);
+}
+
+@media(max-width: 500px) {
+    .layout_default.picker_wrapper {
+        font-size: 7px;
+    }
+    .layout_default .picker_editor {
+        width: 100%;
+    }
+}
+
+
+/* //DEBUG
+.picker_hue {
+    background: none;
+}
+.picker_hue::before {
+    content:  '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);
+    outline: 1px solid silver;
+}
+*/

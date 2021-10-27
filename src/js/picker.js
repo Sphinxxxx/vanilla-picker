@@ -4,7 +4,9 @@ import Color from '@sphinxxxx/color-conversion';
 import * as utils from './utils.js';
 
 
-const BG_TRANSP = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E")`;
+//https://stackoverflow.com/a/51117224/1869660
+const BG_TRANSP = `linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%) 0 0 / 2em 2em,
+                   linear-gradient(45deg, lightgrey 25%,       white 25%,       white 75%, lightgrey 75%) 1em 1em / 2em 2em`;
 const HUES = 360;
 //We need to use keydown instead of keypress to handle Esc from the editor textbox:
 const EVENT_KEY = 'keydown', //'keypress'
@@ -29,13 +31,6 @@ function onKey(bucket, target, keys, handler, stop) {
         }
     });
 }
-
-
-/* Picker CSS */
-const _style = document.createElement('style');
-_style.textContent = `## PLACEHOLDER-CSS ##`;
-document.documentElement.firstElementChild //<head>, or <body> if there is no <head>
-    .appendChild(_style);
 
 
 class Picker {
@@ -616,7 +611,7 @@ class Picker {
               bg = `linear-gradient(${[opaque, transp]})`;
 
         //Let the Alpha slider fade from opaque to transparent:
-        this._domA.style.backgroundImage = bg + ', ' + BG_TRANSP;
+        this._domA.style.background = bg + ', ' + BG_TRANSP;
 
 
         /* Editable value */
@@ -698,13 +693,19 @@ const flipped = true;
             return config;
         }
 */
+}
+
+/* Inject the default CSS (if we're not building for strict CSP settings)  */
+if ('## PLACEHOLDER-CSS-SECTION ##') {
+    const style = document.createElement('style');
+    style.textContent = `## PLACEHOLDER-CSS ##`;
+    document.documentElement.firstElementChild //<head>, or <body> if there is no <head>
+        .appendChild(style);
 
     /**
      * The `<style>` element for picker CSS which is added to the document.
      */
-    static get StyleElement() {
-        return _style;
-    }
+    Picker.StyleElement = style;
 }
 
 

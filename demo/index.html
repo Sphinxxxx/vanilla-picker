@@ -6,104 +6,14 @@
     <title>vanilla-picker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="../dist/vanilla-picker.js?123456"></script>
-    <script _src="https://unpkg.com/vanilla-picker@2.5"></script>
-    
-    <script>
-        window.onerror = function(msg, url, line) { alert('Error: '+msg+'\nURL: '+url+'\nLine: '+line); };
-    </script>
+    <!--
+    <script src="../dist/vanilla-picker.csp.js"></script>
+    <link rel="stylesheet" href="../dist/vanilla-picker.csp.css">
+    -->
+    <script src="../dist/vanilla-picker.js"></script>
 
-    <style>
-        body {
-            display: flex;
-            flex-flow: column nowrap;
-            margin: 0;
-            min-height: 100vh;
-            align-items: center;
-
-            font-family: Georgia, sans-serif;
-            background-color: white;
-            __background-image: repeating-linear-gradient( 0deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px),
-                              repeating-linear-gradient(90deg, skyblue 0, skyblue 1px, transparent 0, transparent 20px);
-        }
-        h1 sub {
-            font-size: .5em;
-            color: darkslategray;
-            font-style: italic;
-        }
-        
-        ul {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        
-        #custom-toggler {
-            position: absolute;
-            padding: 1em;
-            font: inherit;
-        }
-        
-        #shared li {
-            display: inline-block;
-            width: 2em;
-            height: 2em;
-        }
-        #shared .picker_editor {
-            width: 100%;
-        }
-        
-        #main-color {
-            display: inline-block;
-            border: 4px dashed tomato;
-        }
-        #main-color .picker_sample, #main-color .picker_done {
-            display: none;
-        }
-        #main-color .picker_editor {
-            width: 100%;
-        }
-
-        .popup-parent {
-            position: absolute;
-            background: dodgerblue;
-            color: white;
-            padding: 10px 16px;
-            width: 100px;
-            font-family: sans-serif;
-            font-weight: 100;
-            font-size: 20px;
-            text-align: center;
-        }
-        .popup-parent:focus {
-            outline: 0.3em dashed rgba(255, 165, 0, 0.7);
-        }
-        
-        @media(max-width: 500px) {
-            .layout_default.picker_wrapper {
-                __font-size: 7px;
-            }
-            .layout_default .picker_editor {
-                width: 100%;
-            }
-        }
-        
-        
-        /* //DEBUG
-        .picker_hue {
-            background: none;
-        }
-        .picker_hue::before {
-            content:  '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);
-            outline: 1px solid silver;
-        }
-        */
-        
-    </style>
+    <script src="./main.js"></script>
+    <link rel="stylesheet" href="./main.css">
 </head>
 
 <body>
@@ -113,20 +23,20 @@
 
     <h2>Shared picker</h2>
     <ul id="shared">
-        <li id="shared-1" style="background-color:tomato;"></li>
-        <li id="shared-2" style="background-color:lime;"></li>
-        <li id="shared-3" style="background-color:dodgerblue;"></li>
-        <li id="shared-4" style="background-color:gold;"></li>
+        <li id="shared-1"></li>
+        <li id="shared-2"></li>
+        <li id="shared-3"></li>
+        <li id="shared-4"></li>
     </ul>
 
-    <a href="#" id="basic" class="popup-parent" style="top:45%;left:1em;">
+    <a href="#" id="basic" class="popup-parent">
         Click me!
     </a>
 
-    <button id="custom-toggler" style="bottom:20%;left:5%;">
+    <button id="custom-toggler">
         Open "Custom" popup
     </button>
-    <a href="#" id="custom" class="popup-parent" style="bottom:20%;left:40%;">
+    <a href="#" id="custom" class="popup-parent">
         Custom
         <select id="custom-placement" _onclick="event.stopPropagation();">
             <option selected>top</option>
@@ -139,130 +49,5 @@
     <h2>Shadow DOM</h2>
     <div id="shadow"></div>
 
-    <script>
-        "use strict";
-        /*global Picker*/
-        
-        function $(selector, context) {
-            return (context || document).querySelector(selector);
-        }
-        
-        $('h1').insertAdjacentElement('beforeend', document.createElement('sub')).textContent = $('script[src]').src.replace(/.*\//, ' ');
-
-
-        var parentMain      = $('#main-color'),
-            parentBasic     = $('#basic'),
-            parentCustom    = $('#custom'),
-            customPlacement = $('#custom-placement'),
-            customToggler   = $('#custom-toggler'),
-            parentShared    = $('#shared'),
-            containerShadow = $('#shadow');
-        var parentShadow;
-        
-        //Shadow DOM:
-        //https://github.com/Sphinxxxx/vanilla-picker/issues/15
-        if(containerShadow.attachShadow) {
-            var shadow = containerShadow.attachShadow({ mode: 'open' });
-            shadow.appendChild(Picker.StyleElement.cloneNode(true));
-
-            parentShadow = document.createElement('button');
-            parentShadow.textContent = 'Shadow DOM';
-            shadow.appendChild(parentShadow);
-        }
-
-        var popupBasic, popupCustom, popupShared, pickerFixed, popupShadow;
-
-
-        /* Basic example */
-        popupBasic = new Picker(parentBasic);
-        popupBasic.onDone = function(color) {
-            parentBasic.style.background = color.rgbaString;
-        };
-        //Open the popup manually:
-        popupBasic.openHandler();
-
-
-        /* Custom popup behavior */
-        popupCustom = new Picker({
-            parent: parentCustom,
-            popup: customPlacement.value,
-            editor: false,
-            cancelButton: true,
-            color: '#dbeb',
-            onDone: function(color) {
-                parentCustom.style.background = color.rgbaString;
-            },
-        });
-        customPlacement.onchange = function(e) {
-            popupCustom.setOptions({
-                popup: customPlacement.value,
-            });
-        };
-        //Disable the normal open behavior and implement our own:
-        const openDefault = popupCustom.openHandler.bind(popupCustom);
-        popupCustom.openHandler = function() { };
-        customToggler.onclick = function(e) {
-            openDefault();
-        };
-
-
-        /* Shared picker */
-        popupShared = new Picker({
-            editorFormat: 'hsl',
-            onChange: function(color) {
-                this.settings.parent.style.backgroundColor = color.rgbaString;
-            }
-        });
-        parentShared.addEventListener('click', function(e) {
-            if(e.target.nodeName !== 'LI') { return; }
-            var parent = e.target;
-
-            popupShared.movePopup({
-                parent: parent,
-                color: parent.style.backgroundColor,
-            }, true);
-        });
-
-
-        /* Non-popup picker */
-        pickerFixed = new Picker({
-            parent: parentMain,
-            popup: false,
-            alpha: false,
-            //editor: false,
-            editorFormat: 'rgb',
-            color: '#cef6',
-            onChange: function(color) {
-                document.body.style.backgroundColor = color.rgbaString;
-            },
-        });
-        pickerFixed.setColor('lime', true);
-
-
-        /* Shadow DOM */
-        if(parentShadow) {
-            popupShadow = new Picker({
-                parent: parentShadow,
-                editor: false,
-                cancelButton: true,
-                onChange: function(color) {
-                    parentShadow.style.color = color.rgbaString;
-                },
-                onDone: function(color) {
-                    parentShadow.style.backgroundColor = color.rgbaString;
-                },
-            });
-        }
-
-
-        //*
-        [popupBasic, popupCustom, popupShared, pickerFixed].forEach(p => {
-            p.onOpen  = function(color) { console.log('Opened', this.settings.parent.id, color.hex); };
-            p.onClose = function(color) { console.log('Closed', this.settings.parent.id, color.hex); };
-        });
-        //*/
-    </script>
-
 </body>
-
 </html>

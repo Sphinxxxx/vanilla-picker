@@ -104,7 +104,11 @@
 .picker_alpha, .picker_sample {
     position: relative;
     
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E") left top / contain white;
+    //Fails on strict CSP settings..
+    //  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Cpath d='M1,0H0V1H2V2H1' fill='lightgrey'/%3E%3C/svg%3E") left top / contain white;
+    $checker-dark: lightgrey;
+    background: linear-gradient(45deg, $checker-dark 25%, transparent 25%, transparent 75%, $checker-dark 75%) 0 0 / 2em 2em,
+                linear-gradient(45deg, $checker-dark 25%, white 25%, white 75%, $checker-dark 75%) 1em 1em / 2em 2em;
     @include border-deco();
     
     .picker_selector {

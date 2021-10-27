@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.11.2",
+  "version": "2.12.0",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "keywords": [
     "ux",
@@ -33,6 +33,10 @@
   "main": "dist/vanilla-picker.js",
   "unpkg": "dist/vanilla-picker.min.js",
   "module": "dist/vanilla-picker.mjs",
+  "exports": {
+    ".":     "./dist/vanilla-picker.js",
+    "./csp": "./dist/vanilla-picker.csp.js"
+  },
   "files": [
     "src/",
     "dist/"

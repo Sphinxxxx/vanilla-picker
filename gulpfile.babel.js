@@ -68,7 +68,6 @@ function stream2Promise(stream) {
 }
 
 gulp.task('build', function(cb) {
-    const ESPath = pkg.module;
     
     //Generate the JSDoc documentation:
     function generateDocs() {
@@ -113,7 +112,26 @@ gulp.task('build', function(cb) {
     }
 
     //Bundle everything into an ES6 module:
-    function buildBundle(assets) {
+    function buildBundle(assets, csp) {
+        //Keep these names the same as in package.json:
+        const outBase = csp ? 'dist/vanilla-picker.csp' : 'dist/vanilla-picker',
+              outModule = outBase + '.mjs',
+              outUMD = outBase + '.js',
+              outUMDMin = outBase + '.min.js';
+        
+        const css = assets.css.trim();
+
+        const searchReplace = {
+            '## PLACEHOLDER-HTML ##': assets.html,
+        };
+        //https://github.com/Sphinxxxx/vanilla-picker/issues/45
+        if(csp) {
+            searchReplace['## PLACEHOLDER-CSS-SECTION ##'] = '';
+        }
+        else {
+            searchReplace['## PLACEHOLDER-CSS ##'] = css;
+        }
+
         return rollup({
             input: entry,
             plugins: [
@@ -128,10 +146,7 @@ gulp.task('build', function(cb) {
                 replace({
                     include: '/**/*.js',
                     delimiters: ['', ''],
-                    values: {
-                        '## PLACEHOLDER-CSS ##':  assets.css.trim(),
-                        '## PLACEHOLDER-HTML ##': assets.html,
-                    }
+                    values: searchReplace,
                 }),
                 babel({
                     babelrc: false,
@@ -154,7 +169,9 @@ gulp.task('build', function(cb) {
                 //https://rollupjs.org/guide/en/#rolluprollup
                 const code = gen.output[0].code;
                 return stream2Promise(
-                    file(ESPath, code, { src: true }).pipe(gulp.dest('.'))
+                    file(outModule, code, { src: true })
+                        .pipe(header(myBanner, { pkg: pkg }))
+                        .pipe(gulp.dest('.'))
                 );
             })
             //..and a traditional UMD:
@@ -163,7 +180,7 @@ gulp.task('build', function(cb) {
                 name: globalName,
             }))
             .then(es5 => stream2Promise(
-                file(pkg.main, es5.output[0].code, { src: true })
+                file(outUMD, es5.output[0].code, { src: true })
 
                     //Write un-minified:
                     .pipe(strip())
@@ -174,17 +191,26 @@ gulp.task('build', function(cb) {
                     //https://codehangar.io/concatenate-and-minify-javascript-with-gulp/
                     //https://stackoverflow.com/questions/32656647/gulp-bundle-then-minify
                     //(https://stackoverflow.com/questions/40609393/gulp-rename-illegal-operation)
-                    .pipe(rename({ extname: '.min.js' }))
+                    .pipe(rename(outUMDMin))
                     .pipe(uglify())
                     .pipe(header(myBanner, { pkg: pkg }))
                     .pipe(gulp.dest('.'))
             ));
+        })
+        //Write separate CSS file for strict CSP settings:
+        .then(() => {
+            if(csp) {
+                file(outBase + '.css', css, { src: true }).pipe(gulp.dest('.'))
+            }
         });
     }
     
     return Promise.all([
         generateDocs(),
-        prepareAssets().then(buildBundle)//.then(transpile)
+        prepareAssets().then(assets =>
+            buildBundle(assets).then(() =>
+            buildBundle(assets, true))
+        )
     ]);
 
 });
