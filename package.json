@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.12.0",
+  "version": "2.12.1",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "keywords": [
     "ux",
@@ -34,8 +34,18 @@
   "unpkg": "dist/vanilla-picker.min.js",
   "module": "dist/vanilla-picker.mjs",
   "exports": {
-    ".":     "./dist/vanilla-picker.js",
-    "./csp": "./dist/vanilla-picker.csp.js"
+    ".": {
+      "require": "./dist/vanilla-picker.js",
+      "import": "./dist/vanilla-picker.mjs",
+      "default": "./dist/vanilla-picker.mjs"
+    },
+    "./csp": {
+      "require": "./dist/vanilla-picker.csp.js",
+      "import": "./dist/vanilla-picker.csp.mjs",
+      "default": "./dist/vanilla-picker.csp.mjs"
+    },
+    "./dist/": "./dist/",
+    "./dist/*": "./dist/*"
   },
   "files": [
     "src/",
@@ -61,7 +71,7 @@
     "gulp-strip-comments": "^2.5.2",
     "gulp-uglify": "^3.0.2",
     "postcss-cli": "^6.1.2",
-    "pug": "^2.0.4",
+    "pug": "^3.0.2",
     "rollup": "^2.58.0",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-cleanup": "^3.1.1",

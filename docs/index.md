@@ -33,6 +33,19 @@ A simple, easy to use vanilla JS (no dependencies) color picker with alpha selec
 <script src="https://unpkg.com/vanilla-picker@2"></script>
 ```
 
+> **_Note:_**
+> 
+> The script adds a `<style>` element to the page, with all the needed CSS. If your site's [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) doesn't allow that, use the CSP build with a separate CSS file instead:
+> ```
+> import Picker from 'vanilla-picker/csp';
+> import 'vanilla-picker/dist/vanilla-picker.csp.css';
+> ```
+> ..or
+> ```
+> <script src="vanilla-picker.csp.min.js"></script>
+> <link  href="vanilla-picker.csp.css" rel="stylesheet">
+> ```
+
 #### Usage
 
 ```html

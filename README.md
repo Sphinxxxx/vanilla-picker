@@ -32,6 +32,7 @@ https://codepen.io/Sphinxxxx/pen/zRmKBX
 > The script adds a `<style>` element to the page, with all the needed CSS. If your site's [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) doesn't allow that, use the CSP build with a separate CSS file instead:
 > ```
 > import Picker from 'vanilla-picker/csp';
+> import 'vanilla-picker/dist/vanilla-picker.csp.css';
 > ```
 > ..or
 > ```
