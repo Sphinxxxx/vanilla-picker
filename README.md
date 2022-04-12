@@ -77,6 +77,16 @@ https://vanilla-picker.js.org/gen/Picker.html
 The color picker is built to support basic keyboard navigation and use with screen readers.
 I would be very interested in feedback on improvements that could be done here!
 
+## Building
+Make sure you have [Node](https://nodejs.org) and [Gulp](https://gulpjs.com/) installed:
+```sh
+npm install --global gulp-cli
+```
+
+Then build with:
+```sh
+gulp build
+```
 
 ## Credits
 

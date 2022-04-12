@@ -9,24 +9,21 @@ const BG_TRANSP = `linear-gradient(45deg, lightgrey 25%, transparent 25%, transp
                    linear-gradient(45deg, lightgrey 25%,       white 25%,       white 75%, lightgrey 75%) 1em 1em / 2em 2em`;
 const HUES = 360;
 //We need to use keydown instead of keypress to handle Esc from the editor textbox:
-const EVENT_KEY = 'keydown', //'keypress'
-      EVENT_CLICK_OUTSIDE = 'mousedown',
-      EVENT_TAB_MOVE = 'focusin';
+const EVENT_KEY = 'keydown';
 
 
 function $(selector, context) {
     return (context || document).querySelector(selector);
 }
 
-function stopEvent(e) {
-    //Stop an event from bubbling up to the parent:
-    e.preventDefault();
-    e.stopPropagation();
-}
 function onKey(bucket, target, keys, handler, stop) {
     bucket.add(target, EVENT_KEY, function(e) {
         if(keys.indexOf(e.key) >= 0) {
-            if(stop) { stopEvent(e); }
+            if(stop) {
+                //Stop an event from bubbling up to the parent:
+                e.preventDefault();
+                e.stopPropagation();
+            }
             handler(e);
         }
     });
@@ -71,6 +68,12 @@ class Picker {
      * @param {Object} options - @see {@linkcode Picker#setOptions|setOptions()}
      */
     constructor(options) {
+        // Colour alias for backward compatibility
+        const that = this;
+        Object.defineProperty(this, 'colour', {
+            get() { return that.color; },
+            set(value) { that.color = value; }
+        });
 
         //Default settings
         this.settings = {
@@ -119,6 +122,7 @@ class Picker {
      * @param {HTMLElement}  options.parent           - Which element the picker should be attached to.
      * @param {('top'|'bottom'|'left'|'right'|false)}
      *                       [options.popup=right]    - If the picker is used as a popup, where to place it relative to the parent. `false` to add the picker as a normal child element of the parent.
+     * @param {boolean}      [options.manualPopup]    - Set to true to suppress automatic click-to-open event registration when you want to use picker as a popup, but want to control when it opens manually
      * @param {string}       [options.template]       - Custom HTML string from which to build the picker. See /src/picker.pug for required elements and class names.
      * @param {string}       [options.layout=default] - Suffix of a custom "layout_..." CSS class to handle the overall arrangement of the picker elements.
      * @param {boolean}      [options.alpha=true]     - Whether to enable adjusting the alpha channel.
@@ -189,7 +193,7 @@ class Picker {
         
         //Init popup behavior once we have all the parts we need:
         const parent = settings.parent;
-        if(parent && settings.popup && !this._popupInited) {
+        if(parent && settings.popup && !settings.manualPopup && !this._popupInited) {
 
             //Keep openHandler() pluggable, but call it in the right context:
             const openProxy = (e) => this.openHandler(e);
@@ -202,10 +206,6 @@ class Picker {
             //
             //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values#Whitespace_keys
             onKey(this._events, parent, [' ', 'Spacebar', 'Enter'], openProxy/*, true*/);
-            
-            //This must wait until we have created our DOM..
-            //  addEvent(window, 'mousedown', (e) => this.closeHandler(e));
-            //  addEvent(this._domOkay, 'click', (e) => this.closeHandler(e));
 
             this._popupInited = true;
         }
@@ -231,53 +231,28 @@ class Picker {
             const toFocus = (e && (e.type === EVENT_KEY)) ? this._domEdit : this.domElement;
             setTimeout(() => toFocus.focus(), 100);
 
-            if(this.onOpen) { this.onOpen(this.colour); }
+            if(this.onOpen) { this.onOpen(this.color); }
         }
     }
 
 
     /**
      * Default behavior for closing the popup
+     *
+     * @param {boolean} returnFocus - Whether to return the focus to the parent element
      */
-    closeHandler(e) {
-        const event = e && e.type;
-        let doHide = false;
-
-        //Close programmatically:
-        if(!e) {
-            doHide = true;
-        }
-        //Close by clicking/tabbing outside the popup:
-        else if((event === EVENT_CLICK_OUTSIDE) || (event === EVENT_TAB_MOVE)) {
-
-            //See comments in `_bindEvents()`.
-            //Undesirable behavior in Firefox though: When clicking (mousedown) the [Ok] button or the textbox,
-            //a `focusout` is raised on `picker_wrapper`, followed by a `focusin` on the parent (if it is focusable).
-            //To keep that new event from closing the popup, we add 100ms to our time control:
-            const knownTime = (this.__containedEvent || 0) + 100;
-            if(e.timeStamp > knownTime) {
-                doHide = true;
-            }
-        }
-        //Close by mouse/touch or key events:
-        else {
-            //Don't bubble [Ok] clicks or [Enter] keys up to the parent, because that's the trigger to re-open the popup.
-            stopEvent(e);
-
-            doHide = true;
-        }
-
-        if(doHide && this.hide()) {
+    closeHandler(returnFocus) {
+        if(this.hide()) {
             this.settings.parent.style.pointerEvents = '';
 
             //Recommended popup behavior from http://whatsock.com/tsg/Coding%20Arena/Popups/Popup%20(Internal%20Content)/demo.htm
             //However, we don't re-focus the parent if the user closes the popup by clicking somewhere else on the screen,
             //because they may have scrolled to a different part of the page by then, and focusing would then inadvertently scroll the parent back into view:
-            if(event !== EVENT_CLICK_OUTSIDE) {
+            if (returnFocus && this.settings.parent && !this.settings.manualPopup) {
                 this.settings.parent.focus();
             }
 
-            if(this.onClose) { this.onClose(this.colour); }
+            if(this.onClose) { this.onClose(this.color); }
         }
     }
 
@@ -290,7 +265,7 @@ class Picker {
      */
     movePopup(options, open) {
         //Cleanup if the popup is currently open (at least revert the current parent's .pointerEvents);
-        this.closeHandler();
+        this.closeHandler(false);
         
         this.setOptions(options);
         if(open) {
@@ -328,14 +303,14 @@ class Picker {
             hsla[3] = 1;
             c.hsla = hsla;
         }
-        this.colour = this.color = c;
+        this.color = c;
         this._setHSLA(null, null, null, null, flags);
     }
     /**
      * @see {@linkcode Picker#setColor|setColor()}
      */
-    setColour(colour, silent) {
-        this.setColor(colour, silent);
+    setColour(color, silent) {
+        this.setColor(color, silent);
     }
 
 
@@ -377,7 +352,7 @@ class Picker {
         this._setPosition();
 
 
-        if(this.colour) {
+        if(this.color) {
             this._updateUI();
         }
         else {
@@ -401,6 +376,7 @@ class Picker {
      * Release all resources used by this picker instance.
      */
     destroy() {
+        this.closeHandler(true);
         this._events.destroy();
         if(this.domElement) {
             this.settings.parent.removeChild(this.domElement);
@@ -418,8 +394,8 @@ class Picker {
               dom = this.domElement,
               events = this._events;
         
-        function addEvent(target, type, handler) {
-            events.add(target, type, handler);
+        function addEvent(target, type, handler, options) {
+            events.add(target, type, handler, options);
         }
         
         
@@ -464,39 +440,18 @@ class Picker {
 
         //onClose:
         this._ifPopup(() => {
-            //Keep closeHandler() pluggable, but call it in the right context:
-            const popupCloseProxy = (e) => this.closeHandler(e);
-
-            addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
-            addEvent(window, EVENT_TAB_MOVE,      popupCloseProxy);
-            onKey(events, dom, ['Esc', 'Escape'], popupCloseProxy);
-
-            //Above, we added events on `window` to close the popup if the user clicks outside or tabs away from the picker.
-            //Now, we must make sure that clicks and tabs within the picker don't cause the popup to close.
-            //Things we have tried:
-            //  * Check `e.target` in `closeHandler()` and see if it's a child element of the picker.
-            //      - That won't work if used in a shadow DOM, where the original `target` isn't available once the event reaches `window` (issue #15).
-            //  * Stop the events from propagating past the popup element (using `e.stopPropagation()`).
-            //      - ..but stopping mouse events interferes with text selection in the editor.
-            //
-            //So, next attempt: Note the `timeStamp` of the contained event, and check it in `closeHandler()`.
-            //That should be a unique identifier of the event, and the time seems to be preserved when retargeting shadow DOM events:
-            const timeKeeper = (e) => {
-                this.__containedEvent = e.timeStamp;
-            }
-            addEvent(dom, EVENT_CLICK_OUTSIDE, timeKeeper);
-            //Note: Now that we have added the 'focusin' event, this trick requires the picker wrapper to be focusable (via `tabindex` - see /src/picker.pug),
-            //or else the popup loses focus if you click anywhere on the picker's background.
-            addEvent(dom, EVENT_TAB_MOVE,      timeKeeper);
+            addEvent(dom, 'blur', (e) => { that._closeTimeoutId = setTimeout(() => that.closeHandler(false), 0); }, true);
+            addEvent(dom, 'focus', (e) => clearTimeout(that._closeTimeoutId), true);
+            onKey(events, dom, ['Esc', 'Escape'], () => that.closeHandler(true));
             
             //Cancel button:
-            addEvent(this._domCancel, 'click', popupCloseProxy);
+            addEvent(this._domCancel, 'click', () => that.closeHandler(true));
         });
 
         //onDone:
         const onDoneProxy = (e) => {
-            this._ifPopup(() => this.closeHandler(e));
-            if(this.onDone) { this.onDone(this.colour); }
+            that._ifPopup(() => that.closeHandler(true));
+            if (that.onDone) { that.onDone(that.color); }
         };
         addEvent(this._domOkay, 'click',   onDoneProxy);
         onKey(events, dom,      ['Enter'], onDoneProxy);
@@ -547,7 +502,7 @@ class Picker {
     _setHSLA(h, s, l, a,  flags) {
         flags = flags || {};
 
-        const col = this.colour,
+        const col = this.color,
               hsla = col.hsla;
 
         [h, s, l, a].forEach((x, i) => {
@@ -564,7 +519,7 @@ class Picker {
         if(!this.domElement) { return; }
         flags = flags || {};
 
-        const col = this.colour,
+        const col = this.color,
               hsl = col.hsla,
               cssHue  = `hsl(${hsl[0] * HUES}, 100%, 50%)`,
               cssHSL  = col.hslString,

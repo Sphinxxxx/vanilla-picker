@@ -14,6 +14,7 @@ declare module 'vanilla-picker' {
   interface Options {
     parent?: HTMLElement;
     popup?: 'top' | 'bottom' | 'left' | 'right' | false;
+    manualPopup?: boolean;
     template?: string;
     layout?: string;
     alpha?: boolean;

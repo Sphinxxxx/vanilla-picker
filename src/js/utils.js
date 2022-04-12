@@ -3,8 +3,8 @@ class EventBucket {
         this._events = [];
     }
 
-    add(target, type, handler) {
-        target.addEventListener(type, handler, false);
+    add(target, type, handler, options) {
+        target.addEventListener(type, handler, options || false);
         this._events.push({
             target,
             type,
