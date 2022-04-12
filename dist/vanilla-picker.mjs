@@ -2,7 +2,7 @@
  * vanilla-picker v2.12.1
  * https://vanilla-picker.js.org
  *
- * Copyright 2017-2021 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
+ * Copyright 2017-2022 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
  * Released under the ISC license.
  */
 var classCallCheck = function (instance, Constructor) {
@@ -361,8 +361,8 @@ var EventBucket = function () {
 
     createClass(EventBucket, [{
         key: 'add',
-        value: function add(target, type, handler) {
-            target.addEventListener(type, handler, false);
+        value: function add(target, type, handler, options) {
+            target.addEventListener(type, handler, options || false);
             this._events.push({
                 target: target,
                 type: type,
@@ -482,24 +482,19 @@ function dragTrack(eventBucket, area, callback) {
 var BG_TRANSP = 'linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%) 0 0 / 2em 2em,\n                   linear-gradient(45deg, lightgrey 25%,       white 25%,       white 75%, lightgrey 75%) 1em 1em / 2em 2em';
 var HUES = 360;
 
-var EVENT_KEY = 'keydown',
-    EVENT_CLICK_OUTSIDE = 'mousedown',
-    EVENT_TAB_MOVE = 'focusin';
+var EVENT_KEY = 'keydown';
 
 function $(selector, context) {
     return (context || document).querySelector(selector);
 }
 
-function stopEvent(e) {
-
-    e.preventDefault();
-    e.stopPropagation();
-}
 function onKey(bucket, target, keys, handler, stop) {
     bucket.add(target, EVENT_KEY, function (e) {
         if (keys.indexOf(e.key) >= 0) {
             if (stop) {
-                stopEvent(e);
+
+                e.preventDefault();
+                e.stopPropagation();
             }
             handler(e);
         }
@@ -510,6 +505,16 @@ var Picker = function () {
     function Picker(options) {
         classCallCheck(this, Picker);
 
+
+        var that = this;
+        Object.defineProperty(this, 'colour', {
+            get: function get() {
+                return that.color;
+            },
+            set: function set(value) {
+                that.color = value;
+            }
+        });
 
         this.settings = {
 
@@ -586,7 +591,7 @@ var Picker = function () {
             }
 
             var parent = settings.parent;
-            if (parent && settings.popup && !this._popupInited) {
+            if (parent && settings.popup && !settings.manualPopup && !this._popupInited) {
 
                 var openProxy = function openProxy(e) {
                     return _this.openHandler(e);
@@ -616,40 +621,22 @@ var Picker = function () {
                 }, 100);
 
                 if (this.onOpen) {
-                    this.onOpen(this.colour);
+                    this.onOpen(this.color);
                 }
             }
         }
     }, {
         key: 'closeHandler',
-        value: function closeHandler(e) {
-            var event = e && e.type;
-            var doHide = false;
-
-            if (!e) {
-                doHide = true;
-            } else if (event === EVENT_CLICK_OUTSIDE || event === EVENT_TAB_MOVE) {
-
-                var knownTime = (this.__containedEvent || 0) + 100;
-                if (e.timeStamp > knownTime) {
-                    doHide = true;
-                }
-            } else {
-
-                stopEvent(e);
-
-                doHide = true;
-            }
-
-            if (doHide && this.hide()) {
+        value: function closeHandler(returnFocus) {
+            if (this.hide()) {
                 this.settings.parent.style.pointerEvents = '';
 
-                if (event !== EVENT_CLICK_OUTSIDE) {
+                if (returnFocus && this.settings.parent && !this.settings.manualPopup) {
                     this.settings.parent.focus();
                 }
 
                 if (this.onClose) {
-                    this.onClose(this.colour);
+                    this.onClose(this.color);
                 }
             }
         }
@@ -657,7 +644,7 @@ var Picker = function () {
         key: 'movePopup',
         value: function movePopup(options, open) {
 
-            this.closeHandler();
+            this.closeHandler(false);
 
             this.setOptions(options);
             if (open) {
@@ -696,13 +683,13 @@ var Picker = function () {
                 hsla[3] = 1;
                 c.hsla = hsla;
             }
-            this.colour = this.color = c;
+            this.color = c;
             this._setHSLA(null, null, null, null, flags);
         }
     }, {
         key: 'setColour',
-        value: function setColour(colour, silent) {
-            this.setColor(colour, silent);
+        value: function setColour(color, silent) {
+            this.setColor(color, silent);
         }
     }, {
         key: 'show',
@@ -748,7 +735,7 @@ var Picker = function () {
 
             this._setPosition();
 
-            if (this.colour) {
+            if (this.color) {
                 this._updateUI();
             } else {
                 this._setColor(this.settings.defaultColor);
@@ -765,6 +752,7 @@ var Picker = function () {
     }, {
         key: 'destroy',
         value: function destroy() {
+            this.closeHandler(true);
             this._events.destroy();
             if (this.domElement) {
                 this.settings.parent.removeChild(this.domElement);
@@ -779,8 +767,8 @@ var Picker = function () {
                 dom = this.domElement,
                 events = this._events;
 
-            function addEvent(target, type, handler) {
-                events.add(target, type, handler);
+            function addEvent(target, type, handler, options) {
+                events.add(target, type, handler, options);
             }
 
             addEvent(dom, 'click', function (e) {
@@ -817,31 +805,29 @@ var Picker = function () {
             }
 
             this._ifPopup(function () {
+                addEvent(dom, 'blur', function (e) {
+                    that._closeTimeoutId = setTimeout(function () {
+                        return that.closeHandler(false);
+                    }, 0);
+                }, true);
+                addEvent(dom, 'focus', function (e) {
+                    return clearTimeout(that._closeTimeoutId);
+                }, true);
+                onKey(events, dom, ['Esc', 'Escape'], function () {
+                    return that.closeHandler(true);
+                });
 
-                var popupCloseProxy = function popupCloseProxy(e) {
-                    return _this2.closeHandler(e);
-                };
-
-                addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
-                addEvent(window, EVENT_TAB_MOVE, popupCloseProxy);
-                onKey(events, dom, ['Esc', 'Escape'], popupCloseProxy);
-
-                var timeKeeper = function timeKeeper(e) {
-                    _this2.__containedEvent = e.timeStamp;
-                };
-                addEvent(dom, EVENT_CLICK_OUTSIDE, timeKeeper);
-
-                addEvent(dom, EVENT_TAB_MOVE, timeKeeper);
-
-                addEvent(_this2._domCancel, 'click', popupCloseProxy);
+                addEvent(_this2._domCancel, 'click', function () {
+                    return that.closeHandler(true);
+                });
             });
 
             var onDoneProxy = function onDoneProxy(e) {
-                _this2._ifPopup(function () {
-                    return _this2.closeHandler(e);
+                that._ifPopup(function () {
+                    return that.closeHandler(true);
                 });
-                if (_this2.onDone) {
-                    _this2.onDone(_this2.colour);
+                if (that.onDone) {
+                    that.onDone(that.color);
                 }
             };
             addEvent(this._domOkay, 'click', onDoneProxy);
@@ -882,7 +868,7 @@ var Picker = function () {
         value: function _setHSLA(h, s, l, a, flags) {
             flags = flags || {};
 
-            var col = this.colour,
+            var col = this.color,
                 hsla = col.hsla;
 
             [h, s, l, a].forEach(function (x, i) {
@@ -906,7 +892,7 @@ var Picker = function () {
             }
             flags = flags || {};
 
-            var col = this.colour,
+            var col = this.color,
                 hsl = col.hsla,
                 cssHue = 'hsl(' + hsl[0] * HUES + ', 100%, 50%)',
                 cssHSL = col.hslString,
@@ -992,7 +978,7 @@ var Picker = function () {
 
 {
     var style = document.createElement('style');
-    style.textContent = '.picker_wrapper.no_alpha .picker_alpha{display:none}.picker_wrapper.no_editor .picker_editor{position:absolute;z-index:-1;opacity:0}.picker_wrapper.no_cancel .picker_cancel{display:none}.layout_default.picker_wrapper{display:flex;flex-flow:row wrap;justify-content:space-between;align-items:stretch;font-size:10px;width:25em;padding:.5em}.layout_default.picker_wrapper input,.layout_default.picker_wrapper button{font-size:1rem}.layout_default.picker_wrapper>*{margin:.5em}.layout_default.picker_wrapper::before{content:"";display:block;width:100%;height:0;order:1}.layout_default .picker_slider,.layout_default .picker_selector{padding:1em}.layout_default .picker_hue{width:100%}.layout_default .picker_sl{flex:1 1 auto}.layout_default .picker_sl::before{content:"";display:block;padding-bottom:100%}.layout_default .picker_editor{order:1;width:6.5rem}.layout_default .picker_editor input{width:100%;height:100%}.layout_default .picker_sample{order:1;flex:1 1 auto}.layout_default .picker_done,.layout_default .picker_cancel{order:1}.picker_wrapper{box-sizing:border-box;background:#f2f2f2;box-shadow:0 0 0 1px silver;cursor:default;font-family:sans-serif;color:#444;pointer-events:auto}.picker_wrapper:focus{outline:none}.picker_wrapper button,.picker_wrapper input{box-sizing:border-box;border:none;box-shadow:0 0 0 1px silver;outline:none}.picker_wrapper button:focus,.picker_wrapper button:active,.picker_wrapper input:focus,.picker_wrapper input:active{box-shadow:0 0 2px 1px #1e90ff}.picker_wrapper button{padding:.4em .6em;cursor:pointer;background-color:#f5f5f5;background-image:linear-gradient(0deg, gainsboro, transparent)}.picker_wrapper button:active{background-image:linear-gradient(0deg, transparent, gainsboro)}.picker_wrapper button:hover{background-color:#fff}.picker_selector{position:absolute;z-index:1;display:block;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);border:2px solid #fff;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);box-shadow:0 0 0 1px silver}.picker_sl{position:relative;box-shadow:0 0 0 1px silver;background-image:linear-gradient(180deg, white, rgba(255, 255, 255, 0) 50%),linear-gradient(0deg, black, rgba(0, 0, 0, 0) 50%),linear-gradient(90deg, #808080, rgba(128, 128, 128, 0))}.picker_alpha,.picker_sample{position:relative;background:linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%) 0 0/2em 2em,linear-gradient(45deg, lightgrey 25%, white 25%, white 75%, lightgrey 75%) 1em 1em/2em 2em;box-shadow:0 0 0 1px silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_editor input{font-family:monospace;padding:.2em .4em}.picker_sample::before{content:"";position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_arrow{position:absolute;z-index:-1}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;-webkit-transform:skew(45deg);transform:skew(45deg);-webkit-transform-origin:0 100%;transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;-webkit-transform:rotate(-90deg);transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;-webkit-transform:rotate(90deg) scale(1, -1);transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;-webkit-transform:scale(-1, 1);transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
+    style.textContent = '.picker_wrapper.no_alpha .picker_alpha{display:none}.picker_wrapper.no_editor .picker_editor{position:absolute;z-index:-1;opacity:0}.picker_wrapper.no_cancel .picker_cancel{display:none}.layout_default.picker_wrapper{display:-webkit-box;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;flex-flow:row wrap;-webkit-box-pack:justify;justify-content:space-between;-webkit-box-align:stretch;align-items:stretch;font-size:10px;width:25em;padding:.5em}.layout_default.picker_wrapper input,.layout_default.picker_wrapper button{font-size:1rem}.layout_default.picker_wrapper>*{margin:.5em}.layout_default.picker_wrapper::before{content:"";display:block;width:100%;height:0;-webkit-box-ordinal-group:2;order:1}.layout_default .picker_slider,.layout_default .picker_selector{padding:1em}.layout_default .picker_hue{width:100%}.layout_default .picker_sl{-webkit-box-flex:1;flex:1 1 auto}.layout_default .picker_sl::before{content:"";display:block;padding-bottom:100%}.layout_default .picker_editor{-webkit-box-ordinal-group:2;order:1;width:6.5rem}.layout_default .picker_editor input{width:100%;height:100%}.layout_default .picker_sample{-webkit-box-ordinal-group:2;order:1;-webkit-box-flex:1;flex:1 1 auto}.layout_default .picker_done,.layout_default .picker_cancel{-webkit-box-ordinal-group:2;order:1}.picker_wrapper{box-sizing:border-box;background:#f2f2f2;box-shadow:0 0 0 1px silver;cursor:default;font-family:sans-serif;color:#444;pointer-events:auto}.picker_wrapper:focus{outline:none}.picker_wrapper button,.picker_wrapper input{box-sizing:border-box;border:none;box-shadow:0 0 0 1px silver;outline:none}.picker_wrapper button:focus,.picker_wrapper button:active,.picker_wrapper input:focus,.picker_wrapper input:active{box-shadow:0 0 2px 1px #1e90ff}.picker_wrapper button{padding:.4em .6em;cursor:pointer;background-color:#f5f5f5;background-image:-webkit-gradient(linear, left bottom, left top, from(gainsboro), to(transparent));background-image:linear-gradient(0deg, gainsboro, transparent)}.picker_wrapper button:active{background-image:-webkit-gradient(linear, left bottom, left top, from(transparent), to(gainsboro));background-image:linear-gradient(0deg, transparent, gainsboro)}.picker_wrapper button:hover{background-color:#fff}.picker_selector{position:absolute;z-index:1;display:block;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);border:2px solid #fff;border-radius:100%;box-shadow:0 0 3px 1px #67b9ff;background:currentColor;cursor:pointer}.picker_slider .picker_selector{border-radius:2px}.picker_hue{position:relative;background-image:-webkit-gradient(linear, left top, right top, from(red), color-stop(yellow), color-stop(lime), color-stop(cyan), color-stop(blue), color-stop(magenta), to(red));background-image:linear-gradient(90deg, red, yellow, lime, cyan, blue, magenta, red);box-shadow:0 0 0 1px silver}.picker_sl{position:relative;box-shadow:0 0 0 1px silver;background-image:-webkit-gradient(linear, left top, left bottom, from(white), color-stop(50%, rgba(255, 255, 255, 0))),-webkit-gradient(linear, left bottom, left top, from(black), color-stop(50%, rgba(0, 0, 0, 0))),-webkit-gradient(linear, left top, right top, from(#808080), to(rgba(128, 128, 128, 0)));background-image:linear-gradient(180deg, white, rgba(255, 255, 255, 0) 50%),linear-gradient(0deg, black, rgba(0, 0, 0, 0) 50%),linear-gradient(90deg, #808080, rgba(128, 128, 128, 0))}.picker_alpha,.picker_sample{position:relative;background:linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%) 0 0/2em 2em,linear-gradient(45deg, lightgrey 25%, white 25%, white 75%, lightgrey 75%) 1em 1em/2em 2em;box-shadow:0 0 0 1px silver}.picker_alpha .picker_selector,.picker_sample .picker_selector{background:none}.picker_editor input{font-family:monospace;padding:.2em .4em}.picker_sample::before{content:"";position:absolute;display:block;width:100%;height:100%;background:currentColor}.picker_arrow{position:absolute;z-index:-1}.picker_wrapper.popup{position:absolute;z-index:2;margin:1.5em}.picker_wrapper.popup,.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{background:#f2f2f2;box-shadow:0 0 10px 1px rgba(0,0,0,.4)}.picker_wrapper.popup .picker_arrow{width:3em;height:3em;margin:0}.picker_wrapper.popup .picker_arrow::before,.picker_wrapper.popup .picker_arrow::after{content:"";display:block;position:absolute;top:0;left:0;z-index:-99}.picker_wrapper.popup .picker_arrow::before{width:100%;height:100%;-webkit-transform:skew(45deg);transform:skew(45deg);-webkit-transform-origin:0 100%;transform-origin:0 100%}.picker_wrapper.popup .picker_arrow::after{width:150%;height:150%;box-shadow:none}.popup.popup_top{bottom:100%;left:0}.popup.popup_top .picker_arrow{bottom:0;left:0;-webkit-transform:rotate(-90deg);transform:rotate(-90deg)}.popup.popup_bottom{top:100%;left:0}.popup.popup_bottom .picker_arrow{top:0;left:0;-webkit-transform:rotate(90deg) scale(1, -1);transform:rotate(90deg) scale(1, -1)}.popup.popup_left{top:0;right:100%}.popup.popup_left .picker_arrow{top:0;right:0;-webkit-transform:scale(-1, 1);transform:scale(-1, 1)}.popup.popup_right{top:0;left:100%}.popup.popup_right .picker_arrow{top:0;left:0}';
     document.documentElement.firstElementChild.appendChild(style);
 
     Picker.StyleElement = style;

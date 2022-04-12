@@ -2,7 +2,7 @@
  * vanilla-picker v2.12.1
  * https://vanilla-picker.js.org
  *
- * Copyright 2017-2021 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
+ * Copyright 2017-2022 Andreas Borgen (https://github.com/Sphinxxxx), Adam Brooks (https://github.com/dissimulate)
  * Released under the ISC license.
  */
 var classCallCheck = function (instance, Constructor) {
@@ -361,8 +361,8 @@ var EventBucket = function () {
 
     createClass(EventBucket, [{
         key: 'add',
-        value: function add(target, type, handler) {
-            target.addEventListener(type, handler, false);
+        value: function add(target, type, handler, options) {
+            target.addEventListener(type, handler, options || false);
             this._events.push({
                 target: target,
                 type: type,
@@ -482,24 +482,19 @@ function dragTrack(eventBucket, area, callback) {
 var BG_TRANSP = 'linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%) 0 0 / 2em 2em,\n                   linear-gradient(45deg, lightgrey 25%,       white 25%,       white 75%, lightgrey 75%) 1em 1em / 2em 2em';
 var HUES = 360;
 
-var EVENT_KEY = 'keydown',
-    EVENT_CLICK_OUTSIDE = 'mousedown',
-    EVENT_TAB_MOVE = 'focusin';
+var EVENT_KEY = 'keydown';
 
 function $(selector, context) {
     return (context || document).querySelector(selector);
 }
 
-function stopEvent(e) {
-
-    e.preventDefault();
-    e.stopPropagation();
-}
 function onKey(bucket, target, keys, handler, stop) {
     bucket.add(target, EVENT_KEY, function (e) {
         if (keys.indexOf(e.key) >= 0) {
             if (stop) {
-                stopEvent(e);
+
+                e.preventDefault();
+                e.stopPropagation();
             }
             handler(e);
         }
@@ -510,6 +505,16 @@ var Picker = function () {
     function Picker(options) {
         classCallCheck(this, Picker);
 
+
+        var that = this;
+        Object.defineProperty(this, 'colour', {
+            get: function get() {
+                return that.color;
+            },
+            set: function set(value) {
+                that.color = value;
+            }
+        });
 
         this.settings = {
 
@@ -586,7 +591,7 @@ var Picker = function () {
             }
 
             var parent = settings.parent;
-            if (parent && settings.popup && !this._popupInited) {
+            if (parent && settings.popup && !settings.manualPopup && !this._popupInited) {
 
                 var openProxy = function openProxy(e) {
                     return _this.openHandler(e);
@@ -616,40 +621,22 @@ var Picker = function () {
                 }, 100);
 
                 if (this.onOpen) {
-                    this.onOpen(this.colour);
+                    this.onOpen(this.color);
                 }
             }
         }
     }, {
         key: 'closeHandler',
-        value: function closeHandler(e) {
-            var event = e && e.type;
-            var doHide = false;
-
-            if (!e) {
-                doHide = true;
-            } else if (event === EVENT_CLICK_OUTSIDE || event === EVENT_TAB_MOVE) {
-
-                var knownTime = (this.__containedEvent || 0) + 100;
-                if (e.timeStamp > knownTime) {
-                    doHide = true;
-                }
-            } else {
-
-                stopEvent(e);
-
-                doHide = true;
-            }
-
-            if (doHide && this.hide()) {
+        value: function closeHandler(returnFocus) {
+            if (this.hide()) {
                 this.settings.parent.style.pointerEvents = '';
 
-                if (event !== EVENT_CLICK_OUTSIDE) {
+                if (returnFocus && this.settings.parent && !this.settings.manualPopup) {
                     this.settings.parent.focus();
                 }
 
                 if (this.onClose) {
-                    this.onClose(this.colour);
+                    this.onClose(this.color);
                 }
             }
         }
@@ -657,7 +644,7 @@ var Picker = function () {
         key: 'movePopup',
         value: function movePopup(options, open) {
 
-            this.closeHandler();
+            this.closeHandler(false);
 
             this.setOptions(options);
             if (open) {
@@ -696,13 +683,13 @@ var Picker = function () {
                 hsla[3] = 1;
                 c.hsla = hsla;
             }
-            this.colour = this.color = c;
+            this.color = c;
             this._setHSLA(null, null, null, null, flags);
         }
     }, {
         key: 'setColour',
-        value: function setColour(colour, silent) {
-            this.setColor(colour, silent);
+        value: function setColour(color, silent) {
+            this.setColor(color, silent);
         }
     }, {
         key: 'show',
@@ -748,7 +735,7 @@ var Picker = function () {
 
             this._setPosition();
 
-            if (this.colour) {
+            if (this.color) {
                 this._updateUI();
             } else {
                 this._setColor(this.settings.defaultColor);
@@ -765,6 +752,7 @@ var Picker = function () {
     }, {
         key: 'destroy',
         value: function destroy() {
+            this.closeHandler(true);
             this._events.destroy();
             if (this.domElement) {
                 this.settings.parent.removeChild(this.domElement);
@@ -779,8 +767,8 @@ var Picker = function () {
                 dom = this.domElement,
                 events = this._events;
 
-            function addEvent(target, type, handler) {
-                events.add(target, type, handler);
+            function addEvent(target, type, handler, options) {
+                events.add(target, type, handler, options);
             }
 
             addEvent(dom, 'click', function (e) {
@@ -817,31 +805,29 @@ var Picker = function () {
             }
 
             this._ifPopup(function () {
+                addEvent(dom, 'blur', function (e) {
+                    that._closeTimeoutId = setTimeout(function () {
+                        return that.closeHandler(false);
+                    }, 0);
+                }, true);
+                addEvent(dom, 'focus', function (e) {
+                    return clearTimeout(that._closeTimeoutId);
+                }, true);
+                onKey(events, dom, ['Esc', 'Escape'], function () {
+                    return that.closeHandler(true);
+                });
 
-                var popupCloseProxy = function popupCloseProxy(e) {
-                    return _this2.closeHandler(e);
-                };
-
-                addEvent(window, EVENT_CLICK_OUTSIDE, popupCloseProxy);
-                addEvent(window, EVENT_TAB_MOVE, popupCloseProxy);
-                onKey(events, dom, ['Esc', 'Escape'], popupCloseProxy);
-
-                var timeKeeper = function timeKeeper(e) {
-                    _this2.__containedEvent = e.timeStamp;
-                };
-                addEvent(dom, EVENT_CLICK_OUTSIDE, timeKeeper);
-
-                addEvent(dom, EVENT_TAB_MOVE, timeKeeper);
-
-                addEvent(_this2._domCancel, 'click', popupCloseProxy);
+                addEvent(_this2._domCancel, 'click', function () {
+                    return that.closeHandler(true);
+                });
             });
 
             var onDoneProxy = function onDoneProxy(e) {
-                _this2._ifPopup(function () {
-                    return _this2.closeHandler(e);
+                that._ifPopup(function () {
+                    return that.closeHandler(true);
                 });
-                if (_this2.onDone) {
-                    _this2.onDone(_this2.colour);
+                if (that.onDone) {
+                    that.onDone(that.color);
                 }
             };
             addEvent(this._domOkay, 'click', onDoneProxy);
@@ -882,7 +868,7 @@ var Picker = function () {
         value: function _setHSLA(h, s, l, a, flags) {
             flags = flags || {};
 
-            var col = this.colour,
+            var col = this.color,
                 hsla = col.hsla;
 
             [h, s, l, a].forEach(function (x, i) {
@@ -906,7 +892,7 @@ var Picker = function () {
             }
             flags = flags || {};
 
-            var col = this.colour,
+            var col = this.color,
                 hsl = col.hsla,
                 cssHue = 'hsl(' + hsl[0] * HUES + ', 100%, 50%)',
                 cssHSL = col.hslString,
