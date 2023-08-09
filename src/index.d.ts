@@ -1,5 +1,5 @@
 declare module 'vanilla-picker' {
-  interface Color {
+  export interface Color {
     rgba: number[];
     hsla: number[];
     rgbString: string;
@@ -9,9 +9,9 @@ declare module 'vanilla-picker' {
     hex: string;
   }
 
-  type ColorCallback = (color: Color) => void;
+  export type ColorCallback = (color: Color) => void;
 
-  interface Options {
+  export interface Options {
     parent?: HTMLElement;
     popup?: 'top' | 'bottom' | 'left' | 'right' | false;
     template?: string;
@@ -26,8 +26,8 @@ declare module 'vanilla-picker' {
     onOpen?: ColorCallback;
     onClose?: ColorCallback;
   }
-  
-  type Configuration = Options | HTMLElement;
+
+  export type Configuration = Options | HTMLElement;
 
   class Picker {
     constructor(options: Configuration);
