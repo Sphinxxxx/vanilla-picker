@@ -1,6 +1,6 @@
 {
   "name": "vanilla-picker",
-  "version": "2.12.2",
+  "version": "2.12.3",
   "description": "A simple, easy to use vanilla JS color picker with alpha selection.",
   "keywords": [
     "ux",
@@ -25,7 +25,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sphinxxxx/vanilla-picker.git"
+    "url": "git+https://github.com/Sphinxxxx/vanilla-picker.git"
   },
   "bugs": {
     "url": "https://github.com/Sphinxxxx/vanilla-picker/issues"
@@ -35,11 +35,13 @@
   "module": "dist/vanilla-picker.mjs",
   "exports": {
     ".": {
+      "types": "./src/index.d.ts",
       "require": "./dist/vanilla-picker.js",
       "import": "./dist/vanilla-picker.mjs",
       "default": "./dist/vanilla-picker.mjs"
     },
     "./csp": {
+      "types": "./src/index.d.ts",
       "require": "./dist/vanilla-picker.csp.js",
       "import": "./dist/vanilla-picker.csp.mjs",
       "default": "./dist/vanilla-picker.csp.mjs"

@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 -->
 
 
+## [2.12.3] - 2024-03-23
+### Fixed
+- `"types"` in `package.json`.
+
+
 ## [2.12.2] - 2023-08-20
 ### Fixed
 - `export` TypeScript types.
@@ -191,7 +196,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Inline styles replaced with CSS for easier customization
 
 
-[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.12.2...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/vanilla-picker/compare/v2.12.3...HEAD
+[2.12.3]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.12.2...v2.12.3
 [2.12.2]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.12.1...v2.12.2
 [2.12.1]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.12.0...v2.12.1
 [2.12.0]:     https://github.com/Sphinxxxx/vanilla-picker/compare/v2.11.2...v2.12.0
