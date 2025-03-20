@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/npm/l/vanilla-picker.svg)](https://github.com/Sphinxxxx/vanilla-picker/blob/master/LICENSE.md)
 [![Version](https://img.shields.io/npm/v/vanilla-picker.svg)](https://npmjs.com/vanilla-picker)
-[![Size](https://badgen.net/badgesize/gzip/sphinxxxx/vanilla-picker/master/dist/vanilla-picker.min.js?label=min%2Bgzip)](https://unpkg.com/vanilla-picker)
+[![Size](https://img.shields.io/bundlejs/size/vanilla-picker)](https://unpkg.com/vanilla-picker)
 [![Downloads](https://img.shields.io/npm/dm/vanilla-picker.svg)](https://npmjs.com/vanilla-picker)
 
 A simple, easy to use vanilla JS (no dependencies) color picker with alpha selection.
